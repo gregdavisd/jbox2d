@@ -47,7 +47,7 @@ import org.jbox2d.pooling.IWorldPool;
  * large amounts of garbage collection. A better solution is to use stack allocation via escape analysis. This means
  * removing static builder methods and instead using 'new' directly while making objects as short lived as possible.
  *
- * The pool is tightly coupled to the collision system and needs redesigning. Now the pool's only active job now is to a
+ * The pool is tightly coupled to the collision system and needs redesigning. Now the pool's only active job is as a
  * class factory of contact types.
  */
 /**
