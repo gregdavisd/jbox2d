@@ -48,27 +48,7 @@ public class OneSidedTest extends TestbedTest {
   State m_state;
   Fixture m_platform;
   Fixture m_character;
-
-  @Override
-  public Long getTag(Fixture fixture) {
-    if (fixture == m_platform)
-      return PLATFORM_TAG;
-    if (fixture == m_character)
-      return CHARACTER_TAG;
-    return super.getTag(fixture);
-  }
-
-  @Override
-  public void processFixture(Fixture fixture, Long tag) {
-    if (tag == PLATFORM_TAG) {
-      m_platform = fixture;
-    } else if (tag == CHARACTER_TAG) {
-      m_character = fixture;
-    } else {
-      super.processFixture(fixture, tag);
-    }
-  }
-  
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

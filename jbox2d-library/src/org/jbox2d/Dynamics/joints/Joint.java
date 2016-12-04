@@ -77,8 +77,6 @@ public abstract class Joint {
   }
 
   private final JointType m_type;
-  public Joint m_prev;
-  public Joint m_next;
   public JointEdge m_edgeA;
   public JointEdge m_edgeB;
   protected Body m_bodyA;
@@ -170,14 +168,7 @@ public abstract class Joint {
    * @return
    */
   public abstract float getReactionTorque(float inv_dt);
-
-  /**
-   * get the next joint the world joint list.
-   */
-  public Joint getNext() {
-    return m_next;
-  }
-
+ 
   /**
    * get the user data pointer.
    */

@@ -61,10 +61,6 @@ public abstract class Contact {
 	private boolean is_filter;
 	public boolean is_toi;
 
-	// World pool and list pointers.
-	public Contact m_prev;
-	public Contact m_next;
-
 	// Nodes for connecting bodies.
 	public ContactEdge m_nodeA;
 	public ContactEdge m_nodeB;
@@ -156,14 +152,6 @@ public abstract class Contact {
 		return is_enabled;
 	}
 
-	/**
-	 * Get the next contact in the world's contact list.
-	 *
-	 * @return
-	 */
-	public Contact getNext() {
-		return m_next;
-	}
 
 	/**
 	 * Get the first fixture in this contact.

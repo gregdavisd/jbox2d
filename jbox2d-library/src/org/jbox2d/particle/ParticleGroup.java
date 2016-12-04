@@ -11,8 +11,6 @@ public class ParticleGroup {
   int m_lastIndex;
   int m_groupFlags;
   float m_strength;
-  ParticleGroup m_prev;
-  ParticleGroup m_next;
 
   int m_timestamp;
   float m_mass;
@@ -43,10 +41,6 @@ public class ParticleGroup {
     m_destroyAutomatically = true;
     m_toBeDestroyed = false;
     m_toBeSplit = false;
-  }
-
-  public ParticleGroup getNext() {
-    return m_next;
   }
 
   public int getParticleCount() {

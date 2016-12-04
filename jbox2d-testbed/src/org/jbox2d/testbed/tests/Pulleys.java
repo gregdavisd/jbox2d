@@ -46,23 +46,7 @@ public class Pulleys extends TestbedTest {
   private static final long JOINT_TAG = 2;
 
   PulleyJoint m_joint1;  
-
-  @Override
-  public Long getTag(Joint joint) {
-    if (joint == m_joint1)
-      return JOINT_TAG;
-    return super.getTag(joint);
-  }
-
-  @Override
-  public void processJoint(Joint joint, Long tag) {
-    if (tag == JOINT_TAG) {
-      m_joint1 = (PulleyJoint) joint;
-    } else {
-      super.processJoint(joint, tag);
-    }
-  }
-
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

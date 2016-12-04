@@ -38,24 +38,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class ConveyorBelt extends TestbedTest {
   private static long platformTag = 98752L;
   private Fixture m_platform;
-  
-  @Override
-  public Long getTag(Fixture argFixture) {
-    if (argFixture == m_platform) {
-      return platformTag;
-    }
-    return super.getTag(argFixture);
-  }
-  
-  @Override
-  public void processFixture(Fixture argFixture, Long argTag) {
-    if(argTag == platformTag) {
-      m_platform = argFixture;
-      return;
-    }
-    super.processFixture(argFixture, argTag);
-  }
-
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

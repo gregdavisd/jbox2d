@@ -214,23 +214,7 @@ public class ApplyForce extends TestbedTest {
   public boolean isSaveLoadEnabled() {
     return true;
   }
-
-  @Override
-  public Long getTag(Body body) {
-    if (body == m_body) {
-      return BODY_TAG;
-    }
-    return super.getTag(body);
-  }
-
-  @Override
-  public void processBody(Body body, Long tag) {
-    if (tag == BODY_TAG) {
-      m_body = body;
-    }
-    super.processBody(body, tag);
-  }
-
+ 
   @Override
   public String getTestName() {
     return "Apply Force";

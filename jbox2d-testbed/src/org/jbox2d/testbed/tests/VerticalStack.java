@@ -47,24 +47,7 @@ public class VerticalStack extends TestbedTest {
   public static final int e_rowCount = 15;
 
   Body m_bullet;
-
-  @Override
-  public Long getTag(Body argBody) {
-    if (argBody == m_bullet) {
-      return BULLET_TAG;
-    }
-    return super.getTag(argBody);
-  }
-
-  @Override
-  public void processBody(Body argBody, Long argTag) {
-    if (argTag == BULLET_TAG) {
-      m_bullet = argBody;
-      return;
-    }
-    super.processBody(argBody, argTag);
-  }
-
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

@@ -55,56 +55,7 @@ public class Car extends TestbedTest {
   private float m_speed;
   private WheelJoint m_spring1;
   private WheelJoint m_spring2;
-
-  @Override
-  public Long getTag(Body body) {
-    if (body == m_car) {
-      return CAR_TAG;
-    }
-    if (body == m_wheel1) {
-      return WHEEL1_TAG;
-    }
-    if (body == m_wheel2) {
-      return WHEEL2_TAG;
-    }
-    return super.getTag(body);
-  }
-
-  @Override
-  public Long getTag(Joint joint) {
-    if (joint == m_spring1) {
-      return SPRING1_TAG;
-    }
-    if (joint == m_spring2) {
-      return SPRING2_TAG;
-    }
-    return super.getTag(joint);
-  }
-
-  @Override
-  public void processBody(Body body, Long tag) {
-    if (tag == CAR_TAG) {
-      m_car = body;
-    } else if (tag == WHEEL1_TAG) {
-      m_wheel1 = body;
-    } else if (tag == WHEEL2_TAG) {
-      m_wheel2 = body;
-    } else {
-      super.processBody(body, tag);
-    }
-  }
-
-  @Override
-  public void processJoint(Joint joint, Long tag) {
-    if (tag == SPRING1_TAG) {
-      m_spring1 = (WheelJoint) joint;
-    } else if (tag == SPRING2_TAG) {
-      m_spring2 = (WheelJoint) joint;
-    } else {
-      super.processJoint(joint, tag);
-    }
-  }
-
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

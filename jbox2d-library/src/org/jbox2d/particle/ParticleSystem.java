@@ -1,7 +1,11 @@
 package org.jbox2d.particle;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import org.jbox2d.Dynamics.CircularWorld;
 
 import org.jbox2d.callbacks.ParticleDestructionListener;
 import org.jbox2d.callbacks.ParticleQueryCallback;
@@ -12,7 +16,6 @@ import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.BufferUtils;
-import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
@@ -24,7 +27,7 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.particle.VoronoiDiagram.VoronoiDiagramCallback;
 
-public class ParticleSystem {
+public class ParticleSystem extends CircularWorld{
 
 	/**
 	 * All particle types that require creating pairs
@@ -108,8 +111,7 @@ public class ParticleSystem {
 	int m_triadCapacity;
 	Triad[] m_triadBuffer;
 
-	int m_groupCount;
-	ParticleGroup m_groupList;
+	private List<ParticleGroup> m_groupList;
 
 	float m_pressureStrength;
 	float m_dampingStrength;
@@ -122,10 +124,9 @@ public class ParticleSystem {
 	float m_ejectionStrength;
 	float m_colorMixingStrength;
 
-	World m_world;
 
 	public ParticleSystem(World world) {
-		m_world = world;
+		super(world);
 		m_timestamp = 0;
 		m_allParticleFlags = 0;
 		m_allGroupFlags = 0;
@@ -155,8 +156,6 @@ public class ParticleSystem {
 		m_triadCount = 0;
 		m_triadCapacity = 0;
 
-		m_groupCount = 0;
-
 		m_pressureStrength = 0.05f;
 		m_dampingStrength = 1.0f;
 		m_elasticStrength = 0.25f;
@@ -168,11 +167,12 @@ public class ParticleSystem {
 		m_ejectionStrength = 0.5f;
 		m_colorMixingStrength = 0.5f;
 
+		m_groupList = new ArrayList<>();
 		m_flagsBuffer = new ParticleBufferInt();
-		m_positionBuffer = new ParticleBuffer<Vec2>(Vec2.class);
-		m_velocityBuffer = new ParticleBuffer<Vec2>(Vec2.class);
-		m_colorBuffer = new ParticleBuffer<ParticleColor>(ParticleColor.class);
-		m_userDataBuffer = new ParticleBuffer<Object>(Object.class);
+		m_positionBuffer = new ParticleBuffer<>(Vec2.class);
+		m_velocityBuffer = new ParticleBuffer<>(Vec2.class);
+		m_colorBuffer = new ParticleBuffer<>(ParticleColor.class);
+		m_userDataBuffer = new ParticleBuffer<>(Object.class);
 	}
 
 //  public void assertNotSamePosition() {
@@ -265,7 +265,7 @@ public class ParticleSystem {
 		dpcallback.init(this, shape, xf, callDestructionListener);
 		AABB temp = new AABB();
 		shape.computeAABB(temp, xf, 0);
-		m_world.queryAABB(dpcallback, temp);
+		getWorld().queryAABB(dpcallback, temp);
 		return dpcallback.destroyed;
 	}
 
@@ -280,9 +280,9 @@ public class ParticleSystem {
 
 	public ParticleGroup createParticleGroup(ParticleGroupDef groupDef) {
 		float stride = getParticleStride();
-		final Transform identity =  new Transform();
+		final Transform identity = new Transform();
 		identity.setIdentity();
-		Transform transform =  new Transform();
+		Transform transform = new Transform();
 		transform.setIdentity();
 		int firstIndex = m_count;
 		if (groupDef.shape != null) {
@@ -335,13 +335,7 @@ public class ParticleSystem {
 		group.m_userData = groupDef.userData;
 		group.m_transform.set(transform);
 		group.m_destroyAutomatically = groupDef.destroyAutomatically;
-		group.m_prev = null;
-		group.m_next = m_groupList;
-		if (m_groupList != null) {
-			m_groupList.m_prev = group;
-		}
-		m_groupList = group;
-		++m_groupCount;
+		m_groupList.add(group);
 		for (int i = firstIndex; i < lastIndex; i++) {
 			m_groupBuffer[i] = group;
 		}
@@ -459,37 +453,38 @@ public class ParticleSystem {
 		groupA.m_groupFlags = groupFlags;
 		groupA.m_lastIndex = groupB.m_lastIndex;
 		groupB.m_firstIndex = groupB.m_lastIndex;
-		destroyParticleGroup(groupB);
+		destroyAndRemoveParticleGroup(groupB);
 
 		if ((groupFlags & ParticleGroupType.b2_solidParticleGroup) != 0) {
 			computeDepthForGroup(groupA);
 		}
 	}
 
-	// Only called from solveZombie() or joinParticleGroups().
+	/*
+	 * It's too inconvenient have items removed from a list that is being iterated over this way there's an option.
+	 */
+	void destroyAndRemoveParticleGroup(ParticleGroup group) {
+		destroyParticleGroup(group);
+		if (!m_groupList.remove(group)) {
+			/*
+			 * the particle group is not in this ParticleSystem
+			 *
+			 */
+			throw new AssertionError();
+		}
+	}
+
 	void destroyParticleGroup(ParticleGroup group) {
-		assert (m_groupCount > 0);
 		assert (group != null);
 
-		if (m_world.getParticleDestructionListener() != null) {
-			m_world.getParticleDestructionListener().sayGoodbye(group);
+		if (getWorld().getParticleDestructionListener() != null) {
+			getWorld().getParticleDestructionListener().sayGoodbye(group);
 		}
 
 		for (int i = group.m_firstIndex; i < group.m_lastIndex; i++) {
 			m_groupBuffer[i] = null;
 		}
 
-		if (group.m_prev != null) {
-			group.m_prev.m_next = group.m_next;
-		}
-		if (group.m_next != null) {
-			group.m_next.m_prev = group.m_prev;
-		}
-		if (group == m_groupList) {
-			m_groupList = group.m_next;
-		}
-
-		--m_groupCount;
 	}
 
 	public void computeDepthForGroup(ParticleGroup group) {
@@ -652,7 +647,7 @@ public class ParticleSystem {
 		m_bodyContactCount = 0;
 
 		ubccallback.system = this;
-		m_world.queryAABB(ubccallback, aabb);
+		getWorld().queryAABB(ubccallback, aabb);
 	}
 
 	private SolveCollisionCallback sccallback = new SolveCollisionCallback();
@@ -683,7 +678,7 @@ public class ParticleSystem {
 		}
 		sccallback.step = step;
 		sccallback.system = this;
-		m_world.queryAABB(sccallback, aabb);
+		getWorld().queryAABB(sccallback, aabb);
 	}
 
 	public void solve(TimeStep step) {
@@ -702,11 +697,12 @@ public class ParticleSystem {
 			return;
 		}
 		m_allGroupFlags = 0;
-		for (ParticleGroup group = m_groupList; group != null; group = group.getNext()) {
+		for (int i_group = 0; i_group < m_groupList.size(); ++i_group) {
+			ParticleGroup group = m_groupList.get(i_group);
 			m_allGroupFlags |= group.m_groupFlags;
 		}
-		final float gravityx = step.dt * m_gravityScale * m_world.getGravity().x;
-		final float gravityy = step.dt * m_gravityScale * m_world.getGravity().y;
+		final float gravityx = step.dt * m_gravityScale * getWorld().getGravity().x;
+		final float gravityy = step.dt * m_gravityScale * getWorld().getGravity().y;
 		float criticalVelocytySquared = getCriticalVelocitySquared(step);
 		for (int i = 0; i < m_count; i++) {
 			Vec2 v = m_velocityBuffer.data[i];
@@ -900,7 +896,8 @@ public class ParticleSystem {
 	}
 
 	void solveRigid(final TimeStep step) {
-		for (ParticleGroup group = m_groupList; group != null; group = group.getNext()) {
+		for (int i_group = 0; i_group < m_groupList.size(); ++i_group) {
+			ParticleGroup group = m_groupList.get(i_group);
 			if ((group.m_groupFlags & ParticleGroupType.b2_rigidParticleGroup) != 0) {
 				group.updateStatistics();
 				Vec2 temp = new Vec2();
@@ -909,7 +906,7 @@ public class ParticleSystem {
 				rotation.set(step.dt * group.m_angularVelocity);
 				Rot.mulToOutUnsafe(rotation, group.m_center, cross);
 				temp.set(group.m_linearVelocity).scale(step.dt).add(group.m_center).sub(cross);
-				Transform tempXf=new Transform();
+				Transform tempXf = new Transform();
 				tempXf.p.set(temp);
 				tempXf.q.set(rotation);
 				Transform.mulToOut(tempXf, group.m_transform, group.m_transform);
@@ -1200,7 +1197,7 @@ public class ParticleSystem {
 		for (int i = 0; i < m_count; i++) {
 			int flags = m_flagsBuffer.data[i];
 			if ((flags & ParticleType.b2_zombieParticle) != 0) {
-				ParticleDestructionListener destructionListener = m_world.getParticleDestructionListener();
+				ParticleDestructionListener destructionListener = getWorld().getParticleDestructionListener();
 				if ((flags & ParticleType.b2_destructionListener) != 0 && destructionListener != null) {
 					destructionListener.sayGoodbye(i);
 				}
@@ -1334,7 +1331,8 @@ public class ParticleSystem {
 		m_triadCount = j;
 
 		// update groups
-		for (ParticleGroup group = m_groupList; group != null; group = group.getNext()) {
+		for (int i_group = 0; i_group < m_groupList.size(); ++i_group) {
+			ParticleGroup group = m_groupList.get(i_group);
 			int firstIndex = newCount;
 			int lastIndex = 0;
 			boolean modified = false;
@@ -1369,14 +1367,14 @@ public class ParticleSystem {
 		// m_world.m_stackAllocator.Free(newIndices);
 
 		// destroy bodies with no particles
-		for (ParticleGroup group = m_groupList; group != null;) {
-			ParticleGroup next = group.getNext();
+		for (Iterator i_group = m_groupList.iterator(); i_group.hasNext();) {
+			ParticleGroup group = (ParticleGroup) i_group.next();
 			if (group.m_toBeDestroyed) {
 				destroyParticleGroup(group);
+				i_group.remove();
 			} else if (group.m_toBeSplit) {
 				// TODO: split the group
 			}
-			group = next;
 		}
 	}
 
@@ -1397,13 +1395,13 @@ public class ParticleSystem {
 		}
 	}
 
-	private final NewIndices newIndices = new NewIndices();
-
 	void RotateBuffer(int start, int mid, int end) {
 		// move the particles assigned to the given group toward the end of array
 		if (start == mid || mid == end) {
 			return;
 		}
+		NewIndices newIndices = new NewIndices();
+
 		newIndices.start = start;
 		newIndices.mid = mid;
 		newIndices.end = end;
@@ -1457,7 +1455,8 @@ public class ParticleSystem {
 		}
 
 		// update groups
-		for (ParticleGroup group = m_groupList; group != null; group = group.getNext()) {
+		for (int i_group = 0; i_group < m_groupList.size(); ++i_group) {
+			ParticleGroup group = m_groupList.get(i_group);
 			group.m_firstIndex = newIndices.getIndex(group.m_firstIndex);
 			group.m_lastIndex = newIndices.getIndex(group.m_lastIndex - 1) + 1;
 		}
@@ -1594,7 +1593,7 @@ public class ParticleSystem {
 	}
 
 	public int getParticleGroupCount() {
-		return m_groupCount;
+		return m_groupList.size();
 	}
 
 	public ParticleGroup[] getParticleGroupList() {
@@ -2106,7 +2105,6 @@ public class ParticleSystem {
 
 		private final RayCastInput input = new RayCastInput();
 		private final RayCastOutput output = new RayCastOutput();
-
 
 		@Override
 		public boolean reportFixture(Fixture fixture) {

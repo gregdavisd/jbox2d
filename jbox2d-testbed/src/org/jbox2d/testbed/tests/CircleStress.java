@@ -48,22 +48,7 @@ public class CircleStress extends TestbedTest {
   private static final long JOINT_TAG = 1;
 
   private RevoluteJoint joint;
-
-  @Override
-  public Long getTag(Joint argJoint) {
-    if (argJoint == joint) {
-      return JOINT_TAG;
-    }
-    return null;
-  }
-
-  @Override
-  public void processJoint(Joint argJoint, Long argTag) {
-    if (argTag == JOINT_TAG) {
-      joint = (RevoluteJoint) argJoint;
-    }
-  }
-
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

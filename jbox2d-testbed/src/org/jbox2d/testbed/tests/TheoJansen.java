@@ -56,42 +56,7 @@ public class TheoJansen extends TestbedTest {
   RevoluteJoint m_motorJoint;
   boolean m_motorOn;
   float m_motorSpeed;
-
-  @Override
-  public Long getTag(Body argBody) {
-    if (argBody == m_chassis) {
-      return CHASSIS_TAG;
-    } else if (argBody == m_wheel) {
-      return WHEEL_TAG;
-    }
-    return null;
-  }
-
-  @Override
-  public Long getTag(Joint argJoint) {
-    if (argJoint == m_motorJoint) {
-      return MOTOR_TAG;
-    }
-    return null;
-  }
-
-  @Override
-  public void processBody(Body argBody, Long argTag) {
-    if (argTag == CHASSIS_TAG) {
-      m_chassis = argBody;
-    } else if (argTag == WHEEL_TAG) {
-      m_wheel = argBody;
-    }
-  }
-
-  @Override
-  public void processJoint(Joint argJoint, Long argTag) {
-    if (argTag == MOTOR_TAG) {
-      m_motorJoint = (RevoluteJoint) argJoint;
-      m_motorOn = m_motorJoint.isMotorEnabled();
-    }
-  }
-
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

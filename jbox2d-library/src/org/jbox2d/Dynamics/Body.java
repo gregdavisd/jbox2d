@@ -23,6 +23,8 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
@@ -35,12 +37,14 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
 
+import org.jbox2d.Dynamics.CircularWorld;
+
 /**
  * A rigid body. These are created via World.createBody.
  *
  * @author Daniel Murphy
  */
-public class Body {
+public class Body extends CircularWorld {
 
 //	public static final int E_ISLAND_FLAG = 0x0001;
 //	public static final int E_AWAKE_FLAG = 0x0002;
@@ -82,15 +86,9 @@ public class Body {
 	public final Vec2 m_force = new Vec2();
 	public float m_torque = 0;
 
-	public World m_world;
-	public Body m_prev;
-	public Body m_next;
-
-	public Fixture m_fixtureList;
-	public int m_fixtureCount;
-
-	public JointEdge m_jointList;
-	public ContactEdge m_contactList;
+	private final List<Fixture> m_fixtureList;
+	private final List<JointEdge> m_jointList;
+	private final List< ContactEdge> m_contactList;
 
 	public float m_mass, m_invMass;
 
@@ -106,8 +104,10 @@ public class Body {
 	public Object m_userData;
 
 	public Body(final BodyDef bd, World world) {
+		super(world);
 		//assert (bd.position.isValid());
 		//assert (bd.linearVelocity.isValid());
+		m_fixtureList = new ArrayList<>();
 		assert (bd.gravityScale >= 0.0f);
 		assert (bd.angularDamping >= 0.0f);
 		assert (bd.linearDamping >= 0.0f);
@@ -128,8 +128,6 @@ public class Body {
 			is_active = true;
 		}
 
-		m_world = world;
-
 		m_xf.p.set(bd.position);
 		m_xf.q.set(bd.angle);
 
@@ -140,10 +138,8 @@ public class Body {
 		m_sweep.a = bd.angle;
 		m_sweep.alpha0 = 0.0f;
 
-		m_jointList = null;
-		m_contactList = null;
-		m_prev = null;
-		m_next = null;
+		m_jointList = new ArrayList<>();
+		m_contactList = new ArrayList<>();
 
 		m_linearVelocity.set(bd.linearVelocity);
 		m_angularVelocity = bd.angularVelocity;
@@ -172,9 +168,8 @@ public class Body {
 
 		m_userData = bd.userData;
 
-		m_fixtureList = null;
-		m_fixtureCount = 0;
 	}
+
 
 	/**
 	 * Creates a fixture and attach it to this body. Use this function if you need to set some fixture parameters, like
@@ -185,9 +180,9 @@ public class Body {
 	 * @warning This function is locked during callbacks.
 	 */
 	public final Fixture createFixture(FixtureDef def) {
-		assert (m_world.isLocked() == false);
+		assert (getWorld().isLocked() == false);
 
-		if (m_world.isLocked() == true) {
+		if (getWorld().isLocked() == true) {
 			return null;
 		}
 
@@ -195,13 +190,11 @@ public class Body {
 		fixture.create(this, def);
 
 		if (is_active) {
-			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
+			BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
 			fixture.createProxies(broadPhase, m_xf);
 		}
 
-		fixture.m_next = m_fixtureList;
-		m_fixtureList = fixture;
-		++m_fixtureCount;
+		m_fixtureList.add(fixture);
 
 		fixture.m_body = this;
 
@@ -212,7 +205,7 @@ public class Body {
 
 		// Let the world know we have a new fixture. This will cause new contacts
 		// to be created at the beginning of the next time step.
-		m_world.m_flags |= World.NEW_FIXTURE;
+		getWorld().m_flags |= World.NEW_FIXTURE;
 
 		return fixture;
 	}
@@ -244,65 +237,45 @@ public class Body {
 	 * @warning This function is locked during callbacks.
 	 */
 	public final void destroyFixture(Fixture fixture) {
-		assert (m_world.isLocked() == false);
-		if (m_world.isLocked() == true) {
+		assert (getWorld().isLocked() == false);
+		if (getWorld().isLocked() == true) {
 			return;
 		}
 
 		assert (fixture.m_body == this);
 
-		// Remove the fixture from this body's singly linked list.
-		assert (m_fixtureCount > 0);
-		Fixture node = m_fixtureList;
-		Fixture last = null; // java change
-		boolean found = false;
-		while (node != null) {
-			if (node == fixture) {
-				node = fixture.m_next;
-				found = true;
-				break;
-			}
-			last = node;
-			node = node.m_next;
-		}
-
-		// You tried to remove a shape that is not attached to this body.
-		assert (found);
-
-		// java change, remove it from the list
-		if (last == null) {
-			m_fixtureList = fixture.m_next;
-		} else {
-			last.m_next = fixture.m_next;
-		}
-
 		// Destroy any contacts associated with the fixture.
-		ContactEdge edge = m_contactList;
-		while (edge != null) {
+		/*
+		 * have to loop monkey because ContactManager is deleting items from the contact list being iterated over.
+		 */
+		int i_contact_edge = 0;
+		while (i_contact_edge < m_contactList.size()) {
+			ContactEdge edge = m_contactList.get(i_contact_edge);
 			Contact c = edge.contact;
-			edge = edge.next;
-
 			Fixture fixtureA = c.getFixtureA();
 			Fixture fixtureB = c.getFixtureB();
 
 			if (fixture == fixtureA || fixture == fixtureB) {
 				// This destroys the contact and removes it from
 				// this body's contact list.
-				m_world.m_contactManager.destroy(c);
+				getWorld().m_contactManager.destroyContact(c);
+			} else {
+				++i_contact_edge;
 			}
 		}
 
 		if (is_active) {
-			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
+			BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
 			fixture.destroyProxies(broadPhase);
 		}
 
-		fixture.destroy();
-		fixture.m_body = null;
-		fixture.m_next = null;
-		fixture = null;
-
-		--m_fixtureCount;
+		if (!m_fixtureList.remove(fixture)) {
+			/*
+			 * tried to remove a fixture not connected to this body
+			 *
+			 */
+			throw new AssertionError();
+		}
 
 		// Reset the mass data.
 		resetMassData();
@@ -317,8 +290,8 @@ public class Body {
 	 * @param angle the world rotation in radians.
 	 */
 	public final void setTransform(Vec2 position, float angle) {
-		assert (m_world.isLocked() == false);
-		if (m_world.isLocked() == true) {
+		assert (getWorld().isLocked() == false);
+		if (getWorld().isLocked() == true) {
 			return;
 		}
 
@@ -332,10 +305,8 @@ public class Body {
 		m_sweep.c0.set(m_sweep.c);
 		m_sweep.a0 = m_sweep.a;
 
-		BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-		for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
-			f.synchronize(broadPhase, m_xf, m_xf);
-		}
+		BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
+		m_fixtureList.forEach(f -> f.synchronize(broadPhase, m_xf, m_xf));
 	}
 
 	/**
@@ -606,8 +577,8 @@ public class Body {
 	 */
 	public final void setMassData(MassData massData) {
 		// TODO_ERIN adjust linear velocity and torque to account for movement of center.
-		assert (m_world.isLocked() == false);
-		if (m_world.isLocked() == true) {
+		assert (getWorld().isLocked() == false);
+		if (getWorld().isLocked() == true) {
 			return;
 		}
 
@@ -679,7 +650,9 @@ public class Body {
 		localCenter.setZero();
 		final Vec2 temp = new Vec2();
 		final MassData massData = pmd;
-		for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
+		for (int i = 0; i < m_fixtureList.size(); ++i) {
+			Fixture f = m_fixtureList.get(i);
+
 			if (f.m_density == 0.0f) {
 				continue;
 			}
@@ -874,8 +847,8 @@ public class Body {
 	 * @param type
 	 */
 	public final void setType(BodyType type) {
-		assert (m_world.isLocked() == false);
-		if (m_world.isLocked() == true) {
+		assert (getWorld().isLocked() == false);
+		if (getWorld().isLocked() == true) {
 			return;
 		}
 
@@ -900,18 +873,12 @@ public class Body {
 		m_force.setZero();
 		m_torque = 0.0f;
 
-		// Delete the attached contacts.
-		ContactEdge ce = m_contactList;
-		while (ce != null) {
-			ContactEdge ce0 = ce;
-			ce = ce.next;
-			m_world.m_contactManager.destroy(ce0.contact);
-		}
-		m_contactList = null;
+		delete_attached_contacts();
 
 		// Touch the proxies so that new contacts will be created (when appropriate)
-		BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-		for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
+		BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
+		for (int i_fixture = 0; i_fixture < m_fixtureList.size(); ++i_fixture) {
+			Fixture f = m_fixtureList.get(i_fixture);
 			int proxyCount = f.m_proxyCount;
 			for (int i = 0; i < proxyCount; ++i) {
 				broadPhase.touchProxy(f.m_proxies[i].proxyId);
@@ -930,7 +897,7 @@ public class Body {
 	 * Should this body be treated like a bullet for continuous collision detection?
 	 */
 	public final void setBullet(boolean flag) {
-		is_bullet=flag;
+		is_bullet = flag;
 	}
 
 	/**
@@ -939,7 +906,7 @@ public class Body {
 	 * @param flag
 	 */
 	public final void setSleepingAllowed(boolean flag) {
-		is_auto_sleep=flag;
+		is_auto_sleep = flag;
 	}
 
 	/**
@@ -960,11 +927,11 @@ public class Body {
 	public final void setAwake(boolean flag) {
 		if (flag) {
 			if (!is_awake) {
-				is_awake=true;
+				is_awake = true;
 				m_sleepTime = 0.0f;
 			}
 		} else {
-			is_awake=false;
+			is_awake = false;
 			m_sleepTime = 0.0f;
 			m_linearVelocity.setZero();
 			m_angularVelocity = 0.0f;
@@ -993,39 +960,29 @@ public class Body {
 	 * @param flag
 	 */
 	public final void setActive(boolean flag) {
-		assert (m_world.isLocked() == false);
+		assert (getWorld().isLocked() == false);
 
 		if (flag == isActive()) {
 			return;
 		}
 
 		if (flag) {
-			is_active=true;
+			is_active = true;
 
 			// Create all proxies.
-			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-			for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
-				f.createProxies(broadPhase, m_xf);
-			}
+			BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
+			m_fixtureList.forEach(f -> f.createProxies(broadPhase, m_xf));
 
 			// Contacts are created the next time step.
 		} else {
-			is_active=false;
+			is_active = false;
 
 			// Destroy all proxies.
-			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-			for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
-				f.destroyProxies(broadPhase);
-			}
+			BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
+			m_fixtureList.forEach(f -> f.destroyProxies(broadPhase));
 
 			// Destroy the attached contacts.
-			ContactEdge ce = m_contactList;
-			while (ce != null) {
-				ContactEdge ce0 = ce;
-				ce = ce.next;
-				m_world.m_contactManager.destroy(ce0.contact);
-			}
-			m_contactList = null;
+			delete_attached_contacts();
 		}
 	}
 
@@ -1044,7 +1001,7 @@ public class Body {
 	 * @param flag
 	 */
 	public final void setFixedRotation(boolean flag) {
-		is_fixed_rotation=flag;
+		is_fixed_rotation = flag;
 		resetMassData();
 	}
 
@@ -1059,32 +1016,30 @@ public class Body {
 
 	/**
 	 * Get the list of all fixtures attached to this body.
+	 *
+	 * @return
 	 */
-	public final Fixture getFixtureList() {
+	public final List<Fixture> getFixtureList() {
 		return m_fixtureList;
 	}
 
 	/**
 	 * Get the list of all joints attached to this body.
+	 *
+	 * @return
 	 */
-	public final JointEdge getJointList() {
+	public final List<JointEdge> getJointList() {
 		return m_jointList;
 	}
 
 	/**
 	 * Get the list of all contacts attached to this body.
 	 *
+	 * @return
 	 * @warning this list changes during the time step and you may miss some collisions if you don't use ContactListener.
 	 */
-	public final ContactEdge getContactList() {
+	public final List<ContactEdge> getContactList() {
 		return m_contactList;
-	}
-
-	/**
-	 * Get the next body in the world's body list.
-	 */
-	public final Body getNext() {
-		return m_next;
 	}
 
 	/**
@@ -1099,13 +1054,6 @@ public class Body {
 	 */
 	public final void setUserData(Object data) {
 		m_userData = data;
-	}
-
-	/**
-	 * Get the parent world of this body.
-	 */
-	public final World getWorld() {
-		return m_world;
 	}
 
 	// djm pooling
@@ -1125,9 +1073,8 @@ public class Body {
 		xf1.p.y = m_sweep.c0.y - xf1.q.s * m_sweep.localCenter.x - xf1.q.c * m_sweep.localCenter.y;
 		// end inline
 
-		for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
-			f.synchronize(m_world.m_contactManager.m_broadPhase, xf1, m_xf);
-		}
+		m_fixtureList.forEach(f -> f.synchronize(getWorld().m_contactManager.m_broadPhase, xf1, m_xf));
+
 	}
 
 	public final void synchronizeTransform() {
@@ -1153,14 +1100,15 @@ public class Body {
 	 */
 	public final boolean shouldCollide(Body other) {
 		// At least one body should be dynamic.
-		if (m_type != BodyType.DYNAMIC && other.m_type != BodyType.DYNAMIC) {
+		if ((m_type != BodyType.DYNAMIC) && (other.m_type != BodyType.DYNAMIC)) {
 			return false;
 		}
 
 		// Does a joint prevent collision?
-		for (JointEdge jn = m_jointList; jn != null; jn = jn.next) {
+		for (int i_joint_edge = 0; i_joint_edge < m_jointList.size(); ++i_joint_edge) {
+			JointEdge jn = m_jointList.get(i_joint_edge);
 			if (jn.other == other) {
-				if (jn.joint.getCollideConnected() == false) {
+				if (!jn.joint.getCollideConnected()) {
 					return false;
 				}
 			}
@@ -1178,5 +1126,17 @@ public class Body {
 		// m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
 		Rot.mulToOutUnsafe(m_xf.q, m_sweep.localCenter, m_xf.p);
 		m_xf.p.scale(-1).add(m_sweep.c);
+	}
+
+	void delete_attached_contacts() {
+		// Delete the attached contacts.
+		/*
+		 * ContactManager.destroy() is removing the items from m_contactList hench the strange while loop
+		 *
+		 */
+		while (!m_contactList.isEmpty()) {
+			ContactEdge ce = m_contactList.get(0);
+			getWorld().m_contactManager.destroyContact(ce.contact);
+		}
 	}
 }

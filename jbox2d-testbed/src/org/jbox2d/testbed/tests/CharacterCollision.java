@@ -46,24 +46,7 @@ public class CharacterCollision extends TestbedTest {
   private static final long CHARACTER_TAG = 1231l;
 
   private Body m_character;
-
-  @Override
-  public Long getTag(Body argBody) {
-    if (argBody == m_character) {
-      return CHARACTER_TAG;
-    }
-    return super.getTag(argBody);
-  }
-
-  @Override
-  public void processBody(Body argBody, Long argTag) {
-    if (argTag == CHARACTER_TAG) {
-      m_character = argBody;
-      return;
-    }
-    super.processBody(argBody, argTag);
-  }
-
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

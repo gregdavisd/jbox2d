@@ -48,24 +48,7 @@ public class RevoluteTest extends TestbedTest {
   private static final long JOINT_TAG = 1;
   private RevoluteJoint m_joint;
   private boolean isLeft = false;
-
-  @Override
-  public Long getTag(Joint joint) {
-    if (joint == m_joint)
-      return JOINT_TAG;
-    return super.getTag(joint);
-  }
-
-  @Override
-  public void processJoint(Joint joint, Long tag) {
-    if (tag == JOINT_TAG) {
-      m_joint = (RevoluteJoint) joint;
-      isLeft = m_joint.getMotorSpeed() > 0;
-    } else {
-      super.processJoint(joint, tag);
-    }
-  }
-
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

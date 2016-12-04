@@ -49,27 +49,7 @@ public class BodyTypes extends TestbedTest {
   Body m_attachment;
   Body m_platform;
   float m_speed;
-
-  @Override
-  public Long getTag(Body body) {
-    if (body == m_attachment)
-      return ATTACHMENT_TAG;
-    if (body == m_platform)
-      return PLATFORM_TAG;
-    return super.getTag(body);
-  }
-
-  @Override
-  public void processBody(Body body, Long tag) {
-    if (tag == ATTACHMENT_TAG) {
-      m_attachment = body;
-    } else if (tag == PLATFORM_TAG) {
-      m_platform = body;
-    } else {
-      super.processBody(body, tag);
-    }
-  }
-  
+ 
   @Override
   public boolean isSaveLoadEnabled() {
     return true;

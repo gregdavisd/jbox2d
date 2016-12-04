@@ -1,7 +1,7 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright notice,
@@ -9,7 +9,7 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -20,7 +20,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ ***************************************************************************** */
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.shapes.CircleShape;
@@ -37,12 +37,12 @@ public class ConfinedTest extends TestbedTest {
 
 	int e_columnCount = 0;
 	int e_rowCount = 0;
-	
+
 	@Override
 	public boolean isSaveLoadEnabled() {
-	  return true;
+		return true;
 	}
-	
+
 	@Override
 	public String getTestName() {
 		return "Confined";
@@ -50,9 +50,9 @@ public class ConfinedTest extends TestbedTest {
 
 	@Override
 	public void initTest(boolean argDeserialized) {
-	  if(argDeserialized){
-	    return;
-	  }
+		if (argDeserialized) {
+			return;
+		}
 		{
 			BodyDef bd = new BodyDef();
 			Body ground = getWorld().createBody(bd);
@@ -86,10 +86,8 @@ public class ConfinedTest extends TestbedTest {
 		fd.density = 1.0f;
 		fd.friction = 0.1f;
 
-		for (int j = 0; j < e_columnCount; ++j)
-		{
-			for (int i = 0; i < e_rowCount; ++i)
-			{
+		for (int j = 0; j < e_columnCount; ++j) {
+			for (int i = 0; i < e_rowCount; ++i) {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(-10.0f + (2.1f * j + 1.0f + 0.01f * i) * radius, (2.0f * i + 1.0f) * radius);
@@ -101,9 +99,8 @@ public class ConfinedTest extends TestbedTest {
 
 		getWorld().setGravity(new Vec2(0.0f, 0.0f));
 	}
-	
-	public void createCircle()
-	{
+
+	public void createCircle() {
 		float radius = 2.0f;
 		CircleShape shape = new CircleShape();
 		shape.m_p.setZero();
@@ -114,7 +111,7 @@ public class ConfinedTest extends TestbedTest {
 		fd.density = 1.0f;
 		fd.friction = 0.0f;
 
-		Vec2 p = new Vec2((float)Math.random(), 3.0f + (float)Math.random());
+		Vec2 p = new Vec2((float) Math.random(), 3.0f + (float) Math.random());
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DYNAMIC;
 		bd.position = p;
@@ -123,22 +120,19 @@ public class ConfinedTest extends TestbedTest {
 
 		body.createFixture(fd);
 	}
-	
+
 	@Override
 	public void step(TestbedSettings settings) {
 
 		super.step(settings);
 
-		for (Body b = getWorld().getBodyList(); b != null; b = b.getNext())
-		{
-			if (b.getType() != BodyType.DYNAMIC)
-			{
+		for (Body b : getWorld().getBodyList()) {
+			if (b.getType() != BodyType.DYNAMIC) {
 				continue;
 			}
 
 			Vec2 p = b.getPosition();
-			if (p.x <= -10.0f || 10.0f <= p.x || p.y <= 0.0f || 20.0f <= p.y)
-			{
+			if (p.x <= -10.0f || 10.0f <= p.x || p.y <= 0.0f || 20.0f <= p.y) {
 				p.x += 0.0;
 			}
 		}
@@ -148,10 +142,10 @@ public class ConfinedTest extends TestbedTest {
 
 	@Override
 	public void keyPressed(char argKeyChar, int argKeyCode) {
-		switch(argKeyChar){
-		case 'c':
-			createCircle();
-			break;
+		switch (argKeyChar) {
+			case 'c':
+				createCircle();
+				break;
 		}
 	}
 }

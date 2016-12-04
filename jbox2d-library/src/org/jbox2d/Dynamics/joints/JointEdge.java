@@ -44,14 +44,5 @@ public class JointEdge {
 	 * the joint
 	 */
 	public Joint joint;
-	
-	/**
-	 * the previous joint edge in the body's joint list
-	 */
-	public JointEdge prev;
-	
-	/**
-	 * the next joint edge in the body's joint list
-	 */
-	public JointEdge next;
+
 }

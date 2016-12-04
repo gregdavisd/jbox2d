@@ -44,13 +44,5 @@ public class ContactEdge {
    */
   public Contact contact ;
 
-  /**
-   * the previous contact edge in the body's contact list
-   */
-  public ContactEdge prev ;
 
-  /**
-   * the next contact edge in the body's contact list
-   */
-  public ContactEdge next ;
 }
