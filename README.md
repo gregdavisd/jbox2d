@@ -1,5 +1,5 @@
 # jbox2d
-Optimisations an enhancements for mobile
+Optimisations and enhancements for mobile
 
 - Removed pooling except for singleton objects.  
 - Changed Vec2 to be based on vecmath Vector2f
