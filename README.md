@@ -1,5 +1,6 @@
 # jbox2d
 Optimisations and enhancements for mobile
+This fork of JBox2d is mostly to improve memory handling. This version can run the Piston and Circle stress tests with a 16mb heap (Java -Xmx16m) whereas the original version would immediately crash at 16m and at 64m would eventually crash.
 
 - Removed pooling except for singleton objects.  
 - Changed Vec2 to be based on vecmath Vector2f
@@ -9,4 +10,5 @@ Optimisations and enhancements for mobile
 - Removed unused classes.
 - Removed some static utility methods, still more needed to be removed.
 - Removed GWT compatibility.
+- Replaced Ad hod linked lists with ArrayList.
 
