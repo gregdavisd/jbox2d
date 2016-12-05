@@ -1,6 +1,6 @@
 # jbox2d
 Optimisations and enhancements for mobile.
-This fork of JBox2d is mostly to improve memory handling. This version can run the Piston and Circle stress tests with a 16mb heap (Java -Xmx16m) for an indefinite time, whereas the original version would immediately crash at 16m and at 64m would eventually crash.
+This fork of JBox2d is mostly to improve memory handling. This version can run the Piston and Circle stress tests with a 16mb heap (Java -Xmx16m) for an indefinite time, whereas the original version would immediately crash at 16m and at 64m would eventually crash. A large proportion of memory use is by the TestBed and Java 2d graphics and windowing objects, without that overhead it needs even less memory.
 
 - Removed pooling except for singleton objects.  
 - Changed Vec2 to be based on vecmath Vector2f
