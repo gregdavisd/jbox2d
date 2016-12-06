@@ -1,7 +1,7 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright notice,
@@ -9,7 +9,7 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -20,7 +20,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ ***************************************************************************** */
 /**
  * Created at 1:41:40 PM Jan 23, 2011
  */
@@ -33,6 +33,7 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.PrimeColor3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -51,249 +52,250 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class PolyShapes extends TestbedTest {
-  int k_maxBodies = 256;
-  int m_bodyIndex;
-  Body m_bodies[] = new Body[k_maxBodies];
-  PolygonShape m_polygons[] = new PolygonShape[4];
-  CircleShape m_circle;
 
-  @Override
-  public void initTest(boolean argDeserialized) {
-    // Ground body
-    {
-      BodyDef bd = new BodyDef();
-      Body ground = getWorld().createBody(bd);
+	int k_maxBodies = 256;
+	int m_bodyIndex;
+	Body m_bodies[] = new Body[k_maxBodies];
+	PolygonShape m_polygons[] = new PolygonShape[4];
+	CircleShape m_circle;
 
-      EdgeShape shape = new EdgeShape();
-      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-      ground.createFixture(shape, 0.0f);
-    }
+	@Override
+	public void initTest(boolean argDeserialized) {
+		// Ground body
+		{
+			BodyDef bd = new BodyDef();
+			Body ground = getWorld().createBody(bd);
 
-    {
-      Vec2 vertices[] = new Vec2[3];
-      vertices[0] = new Vec2(-0.5f, 0.0f);
-      vertices[1] = new Vec2(0.5f, 0.0f);
-      vertices[2] = new Vec2(0.0f, 1.5f);
-      m_polygons[0] = new PolygonShape();
-      m_polygons[0].set(vertices, 3);
-    }
+			EdgeShape shape = new EdgeShape();
+			shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+			ground.createFixture(shape, 0.0f);
+		}
 
-    {
-      Vec2 vertices[] = new Vec2[3];
-      vertices[0] = new Vec2(-0.1f, 0.0f);
-      vertices[1] = new Vec2(0.1f, 0.0f);
-      vertices[2] = new Vec2(0.0f, 1.5f);
-      m_polygons[1] = new PolygonShape();
-      m_polygons[1].set(vertices, 3);
-    }
+		{
+			Vec2 vertices[] = new Vec2[3];
+			vertices[0] = new Vec2(-0.5f, 0.0f);
+			vertices[1] = new Vec2(0.5f, 0.0f);
+			vertices[2] = new Vec2(0.0f, 1.5f);
+			m_polygons[0] = new PolygonShape();
+			m_polygons[0].set(vertices, 3);
+		}
 
-    {
-      float w = 1.0f;
-      float b = w / (2.0f + (float)Math.sqrt(2.0f));
-      float s = (float)Math.sqrt(2.0f) * b;
+		{
+			Vec2 vertices[] = new Vec2[3];
+			vertices[0] = new Vec2(-0.1f, 0.0f);
+			vertices[1] = new Vec2(0.1f, 0.0f);
+			vertices[2] = new Vec2(0.0f, 1.5f);
+			m_polygons[1] = new PolygonShape();
+			m_polygons[1].set(vertices, 3);
+		}
 
-      Vec2 vertices[] = new Vec2[8];
-      vertices[0] = new Vec2(0.5f * s, 0.0f);
-      vertices[1] = new Vec2(0.5f * w, b);
-      vertices[2] = new Vec2(0.5f * w, b + s);
-      vertices[3] = new Vec2(0.5f * s, w);
-      vertices[4] = new Vec2(-0.5f * s, w);
-      vertices[5] = new Vec2(-0.5f * w, b + s);
-      vertices[6] = new Vec2(-0.5f * w, b);
-      vertices[7] = new Vec2(-0.5f * s, 0.0f);
+		{
+			float w = 1.0f;
+			float b = w / (2.0f + (float) Math.sqrt(2.0f));
+			float s = (float) Math.sqrt(2.0f) * b;
 
-      m_polygons[2] = new PolygonShape();
-      m_polygons[2].set(vertices, 8);
-    }
+			Vec2 vertices[] = new Vec2[8];
+			vertices[0] = new Vec2(0.5f * s, 0.0f);
+			vertices[1] = new Vec2(0.5f * w, b);
+			vertices[2] = new Vec2(0.5f * w, b + s);
+			vertices[3] = new Vec2(0.5f * s, w);
+			vertices[4] = new Vec2(-0.5f * s, w);
+			vertices[5] = new Vec2(-0.5f * w, b + s);
+			vertices[6] = new Vec2(-0.5f * w, b);
+			vertices[7] = new Vec2(-0.5f * s, 0.0f);
 
-    {
-      m_polygons[3] = new PolygonShape();
-      m_polygons[3].setAsBox(0.5f, 0.5f);
-    }
+			m_polygons[2] = new PolygonShape();
+			m_polygons[2].set(vertices, 8);
+		}
 
-    {
-      m_circle = new CircleShape();
-      m_circle.m_radius = 0.5f;
-    }
+		{
+			m_polygons[3] = new PolygonShape();
+			m_polygons[3].setAsBox(0.5f, 0.5f);
+		}
 
-    m_bodyIndex = 0;
-  }
+		{
+			m_circle = new CircleShape();
+			m_circle.m_radius = 0.5f;
+		}
 
-  void Create(int index) {
-    BodyDef bd = new BodyDef();
-    bd.type = BodyType.DYNAMIC;
+		m_bodyIndex = 0;
+	}
 
-    float x = MathUtils.randomFloat(-2.0f, 2.0f);
-    bd.position.set(x, 10.0f);
-    bd.angle = MathUtils.randomFloat(-(float)Math.PI, (float)Math.PI);
+	void Create(int index) {
+		BodyDef bd = new BodyDef();
+		bd.type = BodyType.DYNAMIC;
 
-    if (index == 4) {
-      bd.angularDamping = 0.02f;
-    }
+		float x = MathUtils.randomFloat(-2.0f, 2.0f);
+		bd.position.set(x, 10.0f);
+		bd.angle = MathUtils.randomFloat(-(float) Math.PI, (float) Math.PI);
 
-    m_bodies[m_bodyIndex] = getWorld().createBody(bd);
+		if (index == 4) {
+			bd.angularDamping = 0.02f;
+		}
 
-    if (index < 4) {
-      FixtureDef fd = new FixtureDef();
-      fd.shape = m_polygons[index];
-      fd.density = 1.0f;
-      fd.friction = 0.3f;
-      m_bodies[m_bodyIndex].createFixture(fd);
-    } else {
-      FixtureDef fd = new FixtureDef();
-      fd.shape = m_circle;
-      fd.density = 1.0f;
-      fd.friction = 0.3f;
+		m_bodies[m_bodyIndex] = getWorld().createBody(bd);
 
-      m_bodies[m_bodyIndex].createFixture(fd);
-    }
+		if (index < 4) {
+			FixtureDef fd = new FixtureDef();
+			fd.shape = m_polygons[index];
+			fd.density = 1.0f;
+			fd.friction = 0.3f;
+			m_bodies[m_bodyIndex].createFixture(fd);
+		} else {
+			FixtureDef fd = new FixtureDef();
+			fd.shape = m_circle;
+			fd.density = 1.0f;
+			fd.friction = 0.3f;
 
-    m_bodyIndex = (m_bodyIndex + 1) % k_maxBodies;
-  }
+			m_bodies[m_bodyIndex].createFixture(fd);
+		}
 
-  void DestroyBody() {
-    for (int i = 0; i < k_maxBodies; ++i) {
-      if (m_bodies[i] != null) {
-        getWorld().destroyBody(m_bodies[i]);
-        m_bodies[i] = null;
-        return;
-      }
-    }
-  }
+		m_bodyIndex = (m_bodyIndex + 1) % k_maxBodies;
+	}
 
-  @Override
-  public void keyPressed(char key, int argKeyCode) {
-    switch (key) {
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-        Create(key - '1');
-        break;
+	void DestroyBody() {
+		for (int i = 0; i < k_maxBodies; ++i) {
+			if (m_bodies[i] != null) {
+				getWorld().destroyBody(m_bodies[i]);
+				m_bodies[i] = null;
+				return;
+			}
+		}
+	}
 
-      case 'a':
-        for (int i = 0; i < k_maxBodies; i += 2) {
-          if (m_bodies[i] != null) {
-            boolean active = m_bodies[i].isActive();
-            m_bodies[i].setActive(!active);
-          }
-        }
-        break;
+	@Override
+	public void keyPressed(char key, int argKeyCode) {
+		switch (key) {
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+				Create(key - '1');
+				break;
 
-      case 'd':
-        DestroyBody();
-        break;
-    }
-  }
+			case 'a':
+				for (int i = 0; i < k_maxBodies; i += 2) {
+					if (m_bodies[i] != null) {
+						boolean active = m_bodies[i].isActive();
+						m_bodies[i].setActive(!active);
+					}
+				}
+				break;
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
-  @Override
-  public void step(TestbedSettings settings) {
-    super.step(settings);
+			case 'd':
+				DestroyBody();
+				break;
+		}
+	}
 
-    PolyShapesCallback callback = new PolyShapesCallback(getWorld().getPool());
-    callback.m_circle.m_radius = 2.0f;
-    callback.m_circle.m_p.set(0.0f, 2.1f);
-    callback.m_transform.setIdentity();
-    callback.debugDraw = getDebugDraw();
+	/**
+	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
+	 */
+	@Override
+	public void step(TestbedSettings settings) {
+		super.step(settings);
 
-    AABB aabb = new AABB();
-    callback.m_circle.computeAABB(aabb, callback.m_transform, 0);
+		PolyShapesCallback callback = new PolyShapesCallback(getWorld().getPool());
+		callback.m_circle.m_radius = 2.0f;
+		callback.m_circle.m_p.set(0.0f, 2.1f);
+		callback.m_transform.setIdentity();
+		callback.debugDraw = getDebugDraw();
 
-    getWorld().queryAABB(callback, aabb);
+		AABB aabb = new AABB();
+		callback.m_circle.computeAABB(aabb, callback.m_transform, 0);
 
-    PrimeColor3f color = new PrimeColor3f(0.4f, 0.7f, 0.8f);
-    getDebugDraw().drawCircle(callback.m_circle.m_p, callback.m_circle.m_radius, color);
+		getWorld().queryAABB(callback, aabb);
 
-    addTextLine("Press 1-5 to drop stuff");
-    addTextLine("Press 'a' to (de)activate some bodies");
-    addTextLine("Press 'd' to destroy a body");
-    addTextLine("Up to 30 bodies in the target circle are highlighted");
-  }
+		PrimeColor3f color = new PrimeColor3f(0.4f, 0.7f, 0.8f);
+		getDebugDraw().drawCircle(callback.m_circle.m_p, callback.m_circle.m_radius, color);
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
-  @Override
-  public String getTestName() {
-    return "PolyShapes";
-  }
+		addTextLine("Press 1-5 to drop stuff");
+		addTextLine("Press 'a' to (de)activate some bodies");
+		addTextLine("Press 'd' to destroy a body");
+		addTextLine("Up to 30 bodies in the target circle are highlighted");
+	}
+
+	/**
+	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
+	 */
+	@Override
+	public String getTestName() {
+		return "PolyShapes";
+	}
 
 }
 
 /**
- * This callback is called by b2World::QueryAABB. We find all the fixtures that overlap an AABB. Of
- * those, we use b2TestOverlap to determine which fixtures overlap a circle. Up to 30 overlapped
- * fixtures will be highlighted with a yellow border.
- * 
+ * This callback is called by b2World::QueryAABB. We find all the fixtures that overlap an AABB. Of those, we use
+ * b2TestOverlap to determine which fixtures overlap a circle. Up to 30 overlapped fixtures will be highlighted with a
+ * yellow border.
+ *
  * @author Daniel Murphy
  */
-
 class PolyShapesCallback implements QueryCallback {
-  int e_maxCount = 30;
-  CircleShape m_circle = new CircleShape();
-  Transform m_transform = new Transform();
-  DebugDraw debugDraw;
-  int m_count;
-  IWorldPool p;
 
-  public PolyShapesCallback(IWorldPool argWorld) {
-    m_count = 0;
-    p = argWorld;
-  }
+	int e_maxCount = 30;
+	CircleShape m_circle = new CircleShape();
+	Transform m_transform = new Transform();
+	DebugDraw debugDraw;
+	int m_count;
+	IWorldPool p;
 
-  void DrawFixture(Fixture fixture) {
-    PrimeColor3f color = new PrimeColor3f(0.95f, 0.95f, 0.6f);
-    final Transform xf = fixture.getBody().getTransform();
+	public PolyShapesCallback(IWorldPool argWorld) {
+		m_count = 0;
+		p = argWorld;
+	}
 
-    switch (fixture.getType()) {
-      case CIRCLE: {
-        CircleShape circle = (CircleShape) fixture.getShape();
+	void DrawFixture(Fixture fixture) {
+		PrimeColor3f color = new PrimeColor3f(0.95f, 0.95f, 0.6f);
+		final Transform xf = fixture.getBody().getTransform();
 
-        Vec2 center = Transform.mul(xf, circle.m_p);
-        float radius = circle.m_radius;
+		switch (fixture.getType()) {
+			case ShapeType.CIRCLE: {
+				CircleShape circle = (CircleShape) fixture.getShape();
 
-        debugDraw.drawCircle(center, radius, color);
-      }
-        break;
+				Vec2 center = Transform.mul(xf, circle.m_p);
+				float radius = circle.m_radius;
 
-      case POLYGON: {
-        PolygonShape poly = (PolygonShape) fixture.getShape();
-        int vertexCount = poly.m_count;
-        assert (vertexCount <= Settings.maxPolygonVertices);
-        Vec2 vertices[] = new Vec2[Settings.maxPolygonVertices];
+				debugDraw.drawCircle(center, radius, color);
+			}
+			break;
 
-        for (int i = 0; i < vertexCount; ++i) {
-          vertices[i] = Transform.mul(xf, poly.m_vertices[i]);
-        }
+			case ShapeType.POLYGON: {
+				PolygonShape poly = (PolygonShape) fixture.getShape();
+				int vertexCount = poly.m_count;
+				assert (vertexCount <= Settings.maxPolygonVertices);
+				Vec2 vertices[] = new Vec2[Settings.maxPolygonVertices];
 
-        debugDraw.drawPolygon(vertices, vertexCount, color);
-      }
-        break;
-      default:
-        break;
-    }
-  }
+				for (int i = 0; i < vertexCount; ++i) {
+					vertices[i] = Transform.mul(xf, poly.m_vertices[i]);
+				}
 
-  public boolean reportFixture(Fixture fixture) {
-    if (m_count == e_maxCount) {
-      return false;
-    }
+				debugDraw.drawPolygon(vertices, vertexCount, color);
+			}
+			break;
+			default:
+				break;
+		}
+	}
 
-    Body body = fixture.getBody();
-    Shape shape = fixture.getShape();
+	public boolean reportFixture(Fixture fixture) {
+		if (m_count == e_maxCount) {
+			return false;
+		}
 
-    boolean overlap = p.getCollision().testOverlap(shape, 0, m_circle, 0, body.getTransform(),
-        m_transform);
+		Body body = fixture.getBody();
+		Shape shape = fixture.getShape();
 
-    if (overlap) {
-      DrawFixture(fixture);
-      ++m_count;
-    }
+		boolean overlap = p.getCollision().testOverlap(shape, 0, m_circle, 0, body.getTransform(),
+			m_transform);
 
-    return true;
-  }
+		if (overlap) {
+			DrawFixture(fixture);
+			++m_count;
+		}
+
+		return true;
+	}
 }

@@ -45,7 +45,7 @@ public class ContactManager extends CircularWorld implements PairCallback {
 	private final List<Contact> m_contactList;
 	public ContactFilter m_contactFilter;
 	public ContactListener m_contactListener;
- 
+
 	public ContactManager(World argPool, BroadPhase broadPhase) {
 		super(argPool);
 		m_contactFilter = new ContactFilter();
@@ -231,7 +231,7 @@ public class ContactManager extends CircularWorld implements PairCallback {
 				}
 
 				// Check user filtering.
-				if (m_contactFilter != null && !m_contactFilter.shouldCollide(fixtureA, fixtureB) ) {
+				if (m_contactFilter != null && !m_contactFilter.shouldCollide(fixtureA, fixtureB)) {
 					i_contacts.remove();
 					destroy(c);
 					continue;

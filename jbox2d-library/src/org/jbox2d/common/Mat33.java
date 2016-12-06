@@ -26,8 +26,6 @@ package org.jbox2d.common;
 import java.io.Serializable;
 import javax.vecmath.Matrix3f;
 
-
-
 /**
  * A 3-by-3 matrix. Stored in column-major order.
  *
@@ -84,11 +82,11 @@ public class Mat33 extends Matrix3f implements Serializable {
 	 */
 	public final void solve33ToOut(Vec3 b, Vec3 out) {
 		assert (b != out);
-		Vec3 ex= new Vec3();
+		Vec3 ex = new Vec3();
 		getColumn(0, ex);
-		Vec3 ey= new Vec3();
+		Vec3 ey = new Vec3();
 		getColumn(1, ey);
-		Vec3 ez= new Vec3();
+		Vec3 ez = new Vec3();
 		getColumn(2, ez);
 
 		out.cross(ey, ez);
@@ -151,6 +149,5 @@ public class Mat33 extends Matrix3f implements Serializable {
 		M.m12 = M.m21;
 		M.m22 = det * (a11 * a22 - a12 * a12);
 	}
-
 
 }

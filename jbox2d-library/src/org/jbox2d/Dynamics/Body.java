@@ -54,7 +54,7 @@ public class Body extends CircularWorld {
 //	public static final int E_ACTIVE_FLAG = 0x0020;
 //	public static final int E_TOI_FLAG = 0x0040;
 //
-	public BodyType m_type;
+	public byte m_type;
 
 	public boolean is_island;
 	private boolean is_awake;
@@ -169,7 +169,6 @@ public class Body extends CircularWorld {
 		m_userData = bd.userData;
 
 	}
-
 
 	/**
 	 * Creates a fixture and attach it to this body. Use this function if you need to set some fixture parameters, like
@@ -837,7 +836,7 @@ public class Body extends CircularWorld {
 		m_angularDamping = angularDamping;
 	}
 
-	public final BodyType getType() {
+	public final int getType() {
 		return m_type;
 	}
 
@@ -846,7 +845,7 @@ public class Body extends CircularWorld {
 	 *
 	 * @param type
 	 */
-	public final void setType(BodyType type) {
+	public final void setType(byte type) {
 		assert (getWorld().isLocked() == false);
 		if (getWorld().isLocked() == true) {
 			return;

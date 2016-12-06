@@ -1008,7 +1008,7 @@ class PositionSolverManifold {
 		final Rot xfBq = xfB.q;
 		final Vec2 pcLocalPointsI = pc.localPoints[index];
 		switch (pc.type) {
-			case CIRCLES: {
+			case Manifold.ManifoldType.CIRCLES: {
 				// Transform.mulToOutUnsafe(xfA, pc.localPoint, pointA);
 				// Transform.mulToOutUnsafe(xfB, pc.localPoints[0], pointB);
 				// normal.set(pointB).sub(pointA);
@@ -1035,7 +1035,7 @@ class PositionSolverManifold {
 				break;
 			}
 
-			case FACE_A: {
+			case Manifold.ManifoldType.FACE_A: {
 				// Rot.mulToOutUnsafe(xfAq, pc.localNormal, normal);
 				// Transform.mulToOutUnsafe(xfA, pc.localPoint, planePoint);
 				//
@@ -1060,7 +1060,7 @@ class PositionSolverManifold {
 				break;
 			}
 
-			case FACE_B: {
+			case Manifold.ManifoldType.FACE_B: {
 				// Rot.mulToOutUnsafe(xfBq, pc.localNormal, normal);
 				// Transform.mulToOutUnsafe(xfB, pc.localPoint, planePoint);
 				//

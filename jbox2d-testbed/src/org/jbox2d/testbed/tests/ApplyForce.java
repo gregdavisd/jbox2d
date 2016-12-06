@@ -1,7 +1,7 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright notice,
@@ -9,7 +9,7 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -20,7 +20,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ ***************************************************************************** */
 /**
  * Created at 7:50:04 AM Jan 20, 2011
  */
@@ -44,179 +44,180 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class ApplyForce extends TestbedTest {
-  private static final long BODY_TAG = 12;
 
-  Body m_body;
+	private static final long BODY_TAG = 12;
 
-  @Override
-  public void initTest(boolean deserialized) {
-    if (deserialized) {
-      return;
-    }
+	Body m_body;
 
-    getWorld().setGravity(new Vec2(0.0f, 0.0f));
+	@Override
+	public void initTest(boolean deserialized) {
+		if (deserialized) {
+			return;
+		}
 
-    final float k_restitution = 0.4f;
+		getWorld().setGravity(new Vec2(0.0f, 0.0f));
 
-    Body ground;
-    {
-      BodyDef bd = new BodyDef();
-      bd.position.set(0.0f, 20.0f);
-      ground = getWorld().createBody(bd);
+		final float k_restitution = 0.4f;
 
-      EdgeShape shape = new EdgeShape();
+		Body ground;
+		{
+			BodyDef bd = new BodyDef();
+			bd.position.set(0.0f, 20.0f);
+			ground = getWorld().createBody(bd);
 
-      FixtureDef sd = new FixtureDef();
-      sd.shape = shape;
-      sd.density = 0.0f;
-      sd.restitution = k_restitution;
+			EdgeShape shape = new EdgeShape();
 
-      // Left vertical
-      shape.set(new Vec2(-20.0f, -20.0f), new Vec2(-20.0f, 20.0f));
-      ground.createFixture(sd);
+			FixtureDef sd = new FixtureDef();
+			sd.shape = shape;
+			sd.density = 0.0f;
+			sd.restitution = k_restitution;
 
-      // Right vertical
-      shape.set(new Vec2(20.0f, -20.0f), new Vec2(20.0f, 20.0f));
-      ground.createFixture(sd);
+			// Left vertical
+			shape.set(new Vec2(-20.0f, -20.0f), new Vec2(-20.0f, 20.0f));
+			ground.createFixture(sd);
 
-      // Top horizontal
-      shape.set(new Vec2(-20.0f, 20.0f), new Vec2(20.0f, 20.0f));
-      ground.createFixture(sd);
+			// Right vertical
+			shape.set(new Vec2(20.0f, -20.0f), new Vec2(20.0f, 20.0f));
+			ground.createFixture(sd);
 
-      // Bottom horizontal
-      shape.set(new Vec2(-20.0f, -20.0f), new Vec2(20.0f, -20.0f));
-      ground.createFixture(sd);
-    }
+			// Top horizontal
+			shape.set(new Vec2(-20.0f, 20.0f), new Vec2(20.0f, 20.0f));
+			ground.createFixture(sd);
 
-    {
-      Transform xf1 = new Transform();
-      xf1.q.set(0.3524f * (float)Math.PI);
-      Rot.mulToOutUnsafe(xf1.q, new Vec2(1.0f, 0.0f), xf1.p);
+			// Bottom horizontal
+			shape.set(new Vec2(-20.0f, -20.0f), new Vec2(20.0f, -20.0f));
+			ground.createFixture(sd);
+		}
 
-      Vec2 vertices[] = new Vec2[3];
-      vertices[0] = Transform.mul(xf1, new Vec2(-1.0f, 0.0f));
-      vertices[1] = Transform.mul(xf1, new Vec2(1.0f, 0.0f));
-      vertices[2] = Transform.mul(xf1, new Vec2(0.0f, 0.5f));
+		{
+			Transform xf1 = new Transform();
+			xf1.q.set(0.3524f * (float) Math.PI);
+			Rot.mulToOutUnsafe(xf1.q, new Vec2(1.0f, 0.0f), xf1.p);
 
-      PolygonShape poly1 = new PolygonShape();
-      poly1.set(vertices, 3);
+			Vec2 vertices[] = new Vec2[3];
+			vertices[0] = Transform.mul(xf1, new Vec2(-1.0f, 0.0f));
+			vertices[1] = Transform.mul(xf1, new Vec2(1.0f, 0.0f));
+			vertices[2] = Transform.mul(xf1, new Vec2(0.0f, 0.5f));
 
-      FixtureDef sd1 = new FixtureDef();
-      sd1.shape = poly1;
-      sd1.density = 4.0f;
+			PolygonShape poly1 = new PolygonShape();
+			poly1.set(vertices, 3);
 
-      Transform xf2 = new Transform();
-      xf2.q.set(-0.3524f * (float)Math.PI);
-      Rot.mulToOut(xf2.q, new Vec2(-1.0f, 0.0f), xf2.p);
+			FixtureDef sd1 = new FixtureDef();
+			sd1.shape = poly1;
+			sd1.density = 4.0f;
 
-      vertices[0] = Transform.mul(xf2, new Vec2(-1.0f, 0.0f));
-      vertices[1] = Transform.mul(xf2, new Vec2(1.0f, 0.0f));
-      vertices[2] = Transform.mul(xf2, new Vec2(0.0f, 0.5f));
+			Transform xf2 = new Transform();
+			xf2.q.set(-0.3524f * (float) Math.PI);
+			Rot.mulToOut(xf2.q, new Vec2(-1.0f, 0.0f), xf2.p);
 
-      PolygonShape poly2 = new PolygonShape();
-      poly2.set(vertices, 3);
+			vertices[0] = Transform.mul(xf2, new Vec2(-1.0f, 0.0f));
+			vertices[1] = Transform.mul(xf2, new Vec2(1.0f, 0.0f));
+			vertices[2] = Transform.mul(xf2, new Vec2(0.0f, 0.5f));
 
-      FixtureDef sd2 = new FixtureDef();
-      sd2.shape = poly2;
-      sd2.density = 2.0f;
+			PolygonShape poly2 = new PolygonShape();
+			poly2.set(vertices, 3);
 
-      BodyDef bd = new BodyDef();
-      bd.type = BodyType.DYNAMIC;
-      bd.angularDamping = 2.0f;
-      bd.linearDamping = 0.5f;
+			FixtureDef sd2 = new FixtureDef();
+			sd2.shape = poly2;
+			sd2.density = 2.0f;
 
-      bd.position.set(0.0f, 2.0f);
-      bd.angle = (float)Math.PI;
-      bd.allowSleep = false;
-      m_body = getWorld().createBody(bd);
-      m_body.createFixture(sd1);
-      m_body.createFixture(sd2);
-    }
+			BodyDef bd = new BodyDef();
+			bd.type = BodyType.DYNAMIC;
+			bd.angularDamping = 2.0f;
+			bd.linearDamping = 0.5f;
 
-    {
-      PolygonShape shape = new PolygonShape();
-      shape.setAsBox(0.5f, 0.5f);
+			bd.position.set(0.0f, 2.0f);
+			bd.angle = (float) Math.PI;
+			bd.allowSleep = false;
+			m_body = getWorld().createBody(bd);
+			m_body.createFixture(sd1);
+			m_body.createFixture(sd2);
+		}
 
-      FixtureDef fd = new FixtureDef();
-      fd.shape = shape;
-      fd.density = 1.0f;
-      fd.friction = 0.3f;
+		{
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(0.5f, 0.5f);
 
-      for (int i = 0; i < 10; ++i) {
-        BodyDef bd = new BodyDef();
-        bd.type = BodyType.DYNAMIC;
+			FixtureDef fd = new FixtureDef();
+			fd.shape = shape;
+			fd.density = 1.0f;
+			fd.friction = 0.3f;
 
-        bd.position.set(0.0f, 5.0f + 1.54f * i);
-        Body body = getWorld().createBody(bd);
+			for (int i = 0; i < 10; ++i) {
+				BodyDef bd = new BodyDef();
+				bd.type = BodyType.DYNAMIC;
 
-        body.createFixture(fd);
+				bd.position.set(0.0f, 5.0f + 1.54f * i);
+				Body body = getWorld().createBody(bd);
 
-        float gravity = 10.0f;
-        float I = body.getInertia();
-        float mass = body.getMass();
+				body.createFixture(fd);
 
-        // For a circle: I = 0.5 * m * r * r ==> r = sqrt(2 * I / m)
-        float radius = (float)Math.sqrt(2.0f * I / mass);
+				float gravity = 10.0f;
+				float I = body.getInertia();
+				float mass = body.getMass();
 
-        FrictionJointDef jd = new FrictionJointDef();
-        jd.localAnchorA.setZero();
-        jd.localAnchorB.setZero();
-        jd.bodyA = ground;
-        jd.bodyB = body;
-        jd.collideConnected = true;
-        jd.maxForce = mass * gravity;
-        jd.maxTorque = mass * radius * gravity;
+				// For a circle: I = 0.5 * m * r * r ==> r = sqrt(2 * I / m)
+				float radius = (float) Math.sqrt(2.0f * I / mass);
 
-        getWorld().createJoint(jd);
-      }
-    }
-  }
+				FrictionJointDef jd = new FrictionJointDef();
+				jd.localAnchorA.setZero();
+				jd.localAnchorB.setZero();
+				jd.bodyA = ground;
+				jd.bodyB = body;
+				jd.collideConnected = true;
+				jd.maxForce = mass * gravity;
+				jd.maxTorque = mass * radius * gravity;
 
-  @Override
-  public void keyPressed(char keyCar, int keyCode) {
-    // TODO Auto-generated method stub
-    super.keyPressed(keyCar, keyCode);
-  }
-  
-  @Override
-  public void step(TestbedSettings settings) {
-    super.step(settings);
+				getWorld().createJoint(jd);
+			}
+		}
+	}
 
-    addTextLine("Use 'wasd' to move, 'e' and 's' drift.");
-    if (getModel().getKeys()['w']) {
-      Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
-      Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(0.0f, 2.0f)));
-      m_body.applyForce(f, p);
-    } else if (getModel().getKeys()['q']) {
-      Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
-      Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(-.2f, 0f)));
-      m_body.applyForce(f, p);
-    } else if (getModel().getKeys()['e']) {
-      Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
-      Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(.2f, 0f)));
-      m_body.applyForce(f, p);
-    } else if (getModel().getKeys()['s']) {
-      Vec2 f = m_body.getWorldVector(new Vec2(0.0f, 30.0f));
-      Vec2 p = m_body.getWorldCenter();
-      m_body.applyForce(f, p);
-    }
+	@Override
+	public void keyPressed(char keyCar, int keyCode) {
+		// TODO Auto-generated method stub
+		super.keyPressed(keyCar, keyCode);
+	}
 
-    if (getModel().getKeys()['a']) {
-      m_body.applyTorque(20.0f);
-    }
+	@Override
+	public void step(TestbedSettings settings) {
+		super.step(settings);
 
-    if (getModel().getKeys()['d']) {
-      m_body.applyTorque(-20.0f);
-    }
-  }
+		addTextLine("Use 'wasd' to move, 'e' and 's' drift.");
+		if (getModel().getKeys()['w']) {
+			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
+			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(0.0f, 2.0f)));
+			m_body.applyForce(f, p);
+		} else if (getModel().getKeys()['q']) {
+			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
+			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(-.2f, 0f)));
+			m_body.applyForce(f, p);
+		} else if (getModel().getKeys()['e']) {
+			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
+			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(.2f, 0f)));
+			m_body.applyForce(f, p);
+		} else if (getModel().getKeys()['s']) {
+			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, 30.0f));
+			Vec2 p = m_body.getWorldCenter();
+			m_body.applyForce(f, p);
+		}
 
-  @Override
-  public boolean isSaveLoadEnabled() {
-    return true;
-  }
- 
-  @Override
-  public String getTestName() {
-    return "Apply Force";
-  }
+		if (getModel().getKeys()['a']) {
+			m_body.applyTorque(20.0f);
+		}
+
+		if (getModel().getKeys()['d']) {
+			m_body.applyTorque(-20.0f);
+		}
+	}
+
+	@Override
+	public boolean isSaveLoadEnabled() {
+		return true;
+	}
+
+	@Override
+	public String getTestName() {
+		return "Apply Force";
+	}
 }

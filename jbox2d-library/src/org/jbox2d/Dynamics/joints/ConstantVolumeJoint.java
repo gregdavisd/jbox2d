@@ -113,7 +113,7 @@ public class ConstantVolumeJoint extends Joint {
 			final int next = (i == bodies.length - 1) ? 0 : i + 1;
 			area +=
 				bodies[i].getWorldCenter().x * bodies[next].getWorldCenter().y -
-				 bodies[next].getWorldCenter().x * bodies[i].getWorldCenter().y;
+				bodies[next].getWorldCenter().x * bodies[i].getWorldCenter().y;
 		}
 		area *= .5f;
 		return area;
@@ -125,7 +125,7 @@ public class ConstantVolumeJoint extends Joint {
 			final int next = (i == bodies.length - 1) ? 0 : i + 1;
 			area +=
 				positions[bodies[i].m_islandIndex].c.x * positions[bodies[next].m_islandIndex].c.y -
-				 positions[bodies[next].m_islandIndex].c.x * positions[bodies[i].m_islandIndex].c.y;
+				positions[bodies[next].m_islandIndex].c.x * positions[bodies[i].m_islandIndex].c.y;
 		}
 		area *= .5f;
 		return area;
@@ -155,7 +155,7 @@ public class ConstantVolumeJoint extends Joint {
 		for (int i = 0; i < bodies.length; ++i) {
 			final int next = (i == bodies.length - 1) ? 0 : i + 1;
 			delta.set(toExtrude * (normals[i].x + normals[next].x), toExtrude *
-				 (normals[i].y + normals[next].y));
+				(normals[i].y + normals[next].y));
 			// sumdeltax += dx;
 			float normSqrd = delta.lengthSquared();
 			if (normSqrd > Settings.maxLinearCorrection * Settings.maxLinearCorrection) {
@@ -220,7 +220,7 @@ public class ConstantVolumeJoint extends Joint {
 		for (int i = 0; i < bodies.length; ++i) {
 			final int prev = (i == 0) ? bodies.length - 1 : i - 1;
 			final int next = (i == bodies.length - 1) ? 0 : i + 1;
-			d[i]= new Vec2(positions[bodies[next].m_islandIndex].c);
+			d[i] = new Vec2(positions[bodies[next].m_islandIndex].c);
 			d[i].sub(positions[bodies[prev].m_islandIndex].c);
 			dotMassSum += (d[i].lengthSquared()) / bodies[i].getMass();
 			crossMassSum += velocities[bodies[i].m_islandIndex].v.cross(d[i]);

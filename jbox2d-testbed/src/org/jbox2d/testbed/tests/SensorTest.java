@@ -1,7 +1,7 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright notice,
@@ -9,7 +9,7 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -20,7 +20,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ ***************************************************************************** */
 /**
  * Created at 1:25:51 PM Jan 23, 2011
  */
@@ -44,135 +44,136 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class SensorTest extends TestbedTest {
 
-  class BoolWrapper {
-    boolean tf;
-  }
+	class BoolWrapper {
 
-  int e_count = 7;
-  Fixture m_sensor;
-  Body m_bodies[] = new Body[e_count];
-  BoolWrapper m_touching[] = new BoolWrapper[e_count];
+		boolean tf;
+	}
 
-  @Override
-  public void initTest(boolean deserialized) {
+	int e_count = 7;
+	Fixture m_sensor;
+	Body m_bodies[] = new Body[e_count];
+	BoolWrapper m_touching[] = new BoolWrapper[e_count];
 
-    for (int i = 0; i < m_touching.length; i++) {
-      m_touching[i] = new BoolWrapper();
-    }
+	@Override
+	public void initTest(boolean deserialized) {
 
-    {
-      BodyDef bd = new BodyDef();
-      Body ground = getWorld().createBody(bd);
+		for (int i = 0; i < m_touching.length; i++) {
+			m_touching[i] = new BoolWrapper();
+		}
 
-      {
-        EdgeShape shape = new EdgeShape();
-        shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-        ground.createFixture(shape, 0.0f);
-      }
+		{
+			BodyDef bd = new BodyDef();
+			Body ground = getWorld().createBody(bd);
 
-      {
-        CircleShape shape = new CircleShape();
-        shape.m_radius = 5.0f;
-        shape.m_p.set(0.0f, 10.0f);
+			{
+				EdgeShape shape = new EdgeShape();
+				shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+				ground.createFixture(shape, 0.0f);
+			}
 
-        FixtureDef fd = new FixtureDef();
-        fd.shape = shape;
-        fd.isSensor = true;
-        m_sensor = ground.createFixture(fd);
-      }
-    }
+			{
+				CircleShape shape = new CircleShape();
+				shape.m_radius = 5.0f;
+				shape.m_p.set(0.0f, 10.0f);
 
-    {
-      CircleShape shape = new CircleShape();
-      shape.m_radius = 1.0f;
+				FixtureDef fd = new FixtureDef();
+				fd.shape = shape;
+				fd.isSensor = true;
+				m_sensor = ground.createFixture(fd);
+			}
+		}
 
-      for (int i = 0; i < e_count; ++i) {
-        BodyDef bd = new BodyDef();
-        bd.type = BodyType.DYNAMIC;
-        bd.position.set(-10.0f + 3.0f * i, 20.0f);
-        bd.userData = m_touching[i];
+		{
+			CircleShape shape = new CircleShape();
+			shape.m_radius = 1.0f;
 
-        m_touching[i].tf = false;
-        m_bodies[i] = getWorld().createBody(bd);
+			for (int i = 0; i < e_count; ++i) {
+				BodyDef bd = new BodyDef();
+				bd.type = BodyType.DYNAMIC;
+				bd.position.set(-10.0f + 3.0f * i, 20.0f);
+				bd.userData = m_touching[i];
 
-        m_bodies[i].createFixture(shape, 1.0f);
-      }
-    }
-  }
+				m_touching[i].tf = false;
+				m_bodies[i] = getWorld().createBody(bd);
 
-  // Implement contact listener.
-  public void beginContact(Contact contact) {
-    Fixture fixtureA = contact.getFixtureA();
-    Fixture fixtureB = contact.getFixtureB();
+				m_bodies[i].createFixture(shape, 1.0f);
+			}
+		}
+	}
 
-    if (fixtureA == m_sensor) {
-      Object userData = fixtureB.getBody().getUserData();
-      if (userData != null) {
-        ((BoolWrapper) userData).tf = true;
-      }
-    }
+	// Implement contact listener.
+	public void beginContact(Contact contact) {
+		Fixture fixtureA = contact.getFixtureA();
+		Fixture fixtureB = contact.getFixtureB();
 
-    if (fixtureB == m_sensor) {
-      Object userData = fixtureA.getBody().getUserData();
-      if (userData != null) {
-        ((BoolWrapper) userData).tf = true;
-      }
-    }
-  }
+		if (fixtureA == m_sensor) {
+			Object userData = fixtureB.getBody().getUserData();
+			if (userData != null) {
+				((BoolWrapper) userData).tf = true;
+			}
+		}
 
-  // Implement contact listener.
-  public void endContact(Contact contact) {
-    Fixture fixtureA = contact.getFixtureA();
-    Fixture fixtureB = contact.getFixtureB();
+		if (fixtureB == m_sensor) {
+			Object userData = fixtureA.getBody().getUserData();
+			if (userData != null) {
+				((BoolWrapper) userData).tf = true;
+			}
+		}
+	}
 
-    if (fixtureA == m_sensor) {
-      Object userData = fixtureB.getBody().getUserData();
-      if (userData != null) {
-        ((BoolWrapper) userData).tf = false;
-      }
-    }
+	// Implement contact listener.
+	public void endContact(Contact contact) {
+		Fixture fixtureA = contact.getFixtureA();
+		Fixture fixtureB = contact.getFixtureB();
 
-    if (fixtureB == m_sensor) {
-      Object userData = fixtureA.getBody().getUserData();
-      if (userData != null) {
-        ((BoolWrapper) userData).tf = false;
-      }
-    }
-  }
+		if (fixtureA == m_sensor) {
+			Object userData = fixtureB.getBody().getUserData();
+			if (userData != null) {
+				((BoolWrapper) userData).tf = false;
+			}
+		}
 
-  @Override
-  public void step(TestbedSettings settings) {
-    // TODO Auto-generated method stub
-    super.step(settings);
+		if (fixtureB == m_sensor) {
+			Object userData = fixtureA.getBody().getUserData();
+			if (userData != null) {
+				((BoolWrapper) userData).tf = false;
+			}
+		}
+	}
 
-    // Traverse the contact results. Apply a force on shapes
-    // that overlap the sensor.
-    for (int i = 0; i < e_count; ++i) {
-      if (m_touching[i].tf == false) {
-        continue;
-      }
+	@Override
+	public void step(TestbedSettings settings) {
+		// TODO Auto-generated method stub
+		super.step(settings);
 
-      Body body = m_bodies[i];
-      Body ground = m_sensor.getBody();
+		// Traverse the contact results. Apply a force on shapes
+		// that overlap the sensor.
+		for (int i = 0; i < e_count; ++i) {
+			if (m_touching[i].tf == false) {
+				continue;
+			}
 
-      CircleShape circle = (CircleShape) m_sensor.getShape();
-      Vec2 center = (Vec2) ground.getWorldPoint(circle.m_p);
+			Body body = m_bodies[i];
+			Body ground = m_sensor.getBody();
 
-      Vec2 position = body.getPosition();
+			CircleShape circle = (CircleShape) m_sensor.getShape();
+			Vec2 center = (Vec2) ground.getWorldPoint(circle.m_p);
 
-      Vec2 d = (Vec2) new Vec2(center).sub(position);
-      if (d.lengthSquared() < Settings.EPSILON * Settings.EPSILON) {
-        continue;
-      }
+			Vec2 position = body.getPosition();
 
-      d.normalize();
-      Vec2 F = (Vec2) d.scale(100f);
-      body.applyForce(F, position);
-    }
-  }
+			Vec2 d = (Vec2) new Vec2(center).sub(position);
+			if (d.lengthSquared() < Settings.EPSILON * Settings.EPSILON) {
+				continue;
+			}
 
-  @Override
-  public String getTestName() {
-    return "Sensor Test";
-  }
+			d.normalize();
+			Vec2 F = (Vec2) d.scale(100f);
+			body.applyForce(F, position);
+		}
+	}
+
+	@Override
+	public String getTestName() {
+		return "Sensor Test";
+	}
 }

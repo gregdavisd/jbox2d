@@ -25,7 +25,6 @@ package org.jbox2d.common;
 
 import java.io.Serializable;
 
-
 /**
  * This describes the motion of a body/shape for TOI computation. Shapes are defined with respect to the body origin,
  * which may not coincide with the center of mass. However, to support dynamics we must interpolate the center of mass
@@ -68,7 +67,7 @@ public class Sweep implements Serializable {
 	}
 
 	public final void normalize() {
-		float d =  TWOPI * (float) Math.floor(a0 / TWOPI);
+		float d = TWOPI * (float) Math.floor(a0 / TWOPI);
 		a0 -= d;
 		a -= d;
 	}

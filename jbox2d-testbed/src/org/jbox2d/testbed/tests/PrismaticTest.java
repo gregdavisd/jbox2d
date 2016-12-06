@@ -1,7 +1,7 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright notice,
@@ -9,7 +9,7 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -20,7 +20,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ ***************************************************************************** */
 /**
  * Created at 6:00:03 AM Jan 12, 2011
  */
@@ -43,91 +43,91 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class PrismaticTest extends TestbedTest {
-  private static final long JOINT_TAG = 1;
-  PrismaticJoint m_joint;
- 
-  @Override
-  public boolean isSaveLoadEnabled() {
-    return true;
-  }
 
-  @Override
-  public void initTest(boolean deserialized) {
-    if (deserialized) {
-      return;
-    }
-    Body ground = null;
-    {
-      BodyDef bd = new BodyDef();
-      ground = getWorld().createBody(bd);
+	private static final long JOINT_TAG = 1;
+	PrismaticJoint m_joint;
 
-      EdgeShape shape = new EdgeShape();
-      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-      ground.createFixture(shape, 0.0f);
-    }
+	@Override
+	public boolean isSaveLoadEnabled() {
+		return true;
+	}
 
-    {
-      PolygonShape shape = new PolygonShape();
-      shape.setAsBox(2.0f, 0.5f);
+	@Override
+	public void initTest(boolean deserialized) {
+		if (deserialized) {
+			return;
+		}
+		Body ground = null;
+		{
+			BodyDef bd = new BodyDef();
+			ground = getWorld().createBody(bd);
 
-      BodyDef bd = new BodyDef();
-      bd.type = BodyType.DYNAMIC;
-      bd.position.set(-10.0f, 10.0f);
-      bd.angle = 0.5f * (float)Math.PI;
-      bd.allowSleep = false;
-      Body body = getWorld().createBody(bd);
-      body.createFixture(shape, 5.0f);
+			EdgeShape shape = new EdgeShape();
+			shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+			ground.createFixture(shape, 0.0f);
+		}
 
-      PrismaticJointDef pjd = new PrismaticJointDef();
+		{
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(2.0f, 0.5f);
 
-      // Bouncy limit
-      Vec2 axis = new Vec2(2.0f, 1.0f);
-      axis.normalize();
-      pjd.initialize(ground, body, new Vec2(0.0f, 0.0f), axis);
+			BodyDef bd = new BodyDef();
+			bd.type = BodyType.DYNAMIC;
+			bd.position.set(-10.0f, 10.0f);
+			bd.angle = 0.5f * (float) Math.PI;
+			bd.allowSleep = false;
+			Body body = getWorld().createBody(bd);
+			body.createFixture(shape, 5.0f);
 
-      // Non-bouncy limit
-      // pjd.Initialize(ground, body, Vec2(-10.0f, 10.0f), Vec2(1.0f, 0.0f));
+			PrismaticJointDef pjd = new PrismaticJointDef();
 
-      pjd.motorSpeed = 10.0f;
-      pjd.maxMotorForce = 10000.0f;
-      pjd.enableMotor = true;
-      pjd.lowerTranslation = 0.0f;
-      pjd.upperTranslation = 20.0f;
-      pjd.enableLimit = true;
+			// Bouncy limit
+			Vec2 axis = new Vec2(2.0f, 1.0f);
+			axis.normalize();
+			pjd.initialize(ground, body, new Vec2(0.0f, 0.0f), axis);
 
-      m_joint = (PrismaticJoint) getWorld().createJoint(pjd);
-    }
-  }
+			// Non-bouncy limit
+			// pjd.Initialize(ground, body, Vec2(-10.0f, 10.0f), Vec2(1.0f, 0.0f));
+			pjd.motorSpeed = 10.0f;
+			pjd.maxMotorForce = 10000.0f;
+			pjd.enableMotor = true;
+			pjd.lowerTranslation = 0.0f;
+			pjd.upperTranslation = 20.0f;
+			pjd.enableLimit = true;
 
-  @Override
-  public void step(TestbedSettings settings) {
-    super.step(settings);
-    addTextLine("Keys: (l) limits, (m) motors, (s) speed");
-    float force = m_joint.getMotorForce(1);
-    addTextLine("Motor Force = " + force);
-  }
+			m_joint = (PrismaticJoint) getWorld().createJoint(pjd);
+		}
+	}
 
-  @Override
-  public void keyPressed(char argKeyChar, int argKeyCode) {
+	@Override
+	public void step(TestbedSettings settings) {
+		super.step(settings);
+		addTextLine("Keys: (l) limits, (m) motors, (s) speed");
+		float force = m_joint.getMotorForce(1);
+		addTextLine("Motor Force = " + force);
+	}
 
-    switch (argKeyChar) {
-      case 'l':
-        m_joint.enableLimit(!m_joint.isLimitEnabled());
-        getModel().getKeys()['l'] = false;
-        break;
-      case 'm':
-        m_joint.enableMotor(!m_joint.isMotorEnabled());
-        getModel().getKeys()['m'] = false;
-        break;
-      case 's':
-        m_joint.setMotorSpeed(-m_joint.getMotorSpeed());
-        getModel().getKeys()['s'] = false;
-        break;
-    }
-  }
+	@Override
+	public void keyPressed(char argKeyChar, int argKeyCode) {
 
-  @Override
-  public String getTestName() {
-    return "Prismatic";
-  }
+		switch (argKeyChar) {
+			case 'l':
+				m_joint.enableLimit(!m_joint.isLimitEnabled());
+				getModel().getKeys()['l'] = false;
+				break;
+			case 'm':
+				m_joint.enableMotor(!m_joint.isMotorEnabled());
+				getModel().getKeys()['m'] = false;
+				break;
+			case 's':
+				m_joint.setMotorSpeed(-m_joint.getMotorSpeed());
+				getModel().getKeys()['s'] = false;
+				break;
+		}
+	}
+
+	@Override
+	public String getTestName() {
+		return "Prismatic";
+	}
 }

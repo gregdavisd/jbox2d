@@ -68,8 +68,8 @@ public class GearJoint extends Joint {
 	private final Joint m_joint1;
 	private final Joint m_joint2;
 
-	private final JointType m_typeA;
-	private final JointType m_typeB;
+	private final int m_typeA;
+	private final int m_typeB;
 
 	// Body A is connected to body C
 	// Body B is connected to body D

@@ -38,7 +38,7 @@ public class RopeJoint extends Joint {
 	private float m_invIA;
 	private float m_invIB;
 	private float m_mass;
-	private LimitState m_state;
+	private byte m_state;
 
 	protected RopeJoint(IWorldPool worldPool, RopeJointDef def) {
 		super(worldPool, def);
@@ -128,7 +128,6 @@ public class RopeJoint extends Joint {
 		} else {
 			m_impulse = 0.0f;
 		}
-
 
 		// data.velocities[m_indexA].v = vA;
 		data.velocities[m_indexA].w = wA;
@@ -220,7 +219,6 @@ public class RopeJoint extends Joint {
 		cB.y += m_invMassB * Py;
 		aB += m_invIB * (rB.x * Py - rB.y * Px);
 
-
 		// data.positions[m_indexA].c = cA;
 		data.positions[m_indexA].a = aA;
 		// data.positions[m_indexB].c = cB;
@@ -265,7 +263,7 @@ public class RopeJoint extends Joint {
 		this.m_maxLength = maxLength;
 	}
 
-	public LimitState getLimitState() {
+	public int getLimitState() {
 		return m_state;
 	}
 

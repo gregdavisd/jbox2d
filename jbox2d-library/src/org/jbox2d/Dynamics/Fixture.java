@@ -29,7 +29,6 @@ import org.jbox2d.collision.RayCastOutput;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
@@ -74,7 +73,7 @@ public class Fixture {
 	 *
 	 * @return the shape type.
 	 */
-	public ShapeType getType() {
+	public byte getType() {
 		return m_shape.getType();
 	}
 
@@ -172,7 +171,7 @@ public class Fixture {
 	public Body getBody() {
 		return m_body;
 	}
- 
+
 	public void setDensity(float density) {
 		assert (density >= 0f);
 		m_density = density;
@@ -291,7 +290,7 @@ public class Fixture {
 
 	// We need separation create/destroy functions from the constructor/destructor because
 	// the destructor cannot access the allocator (no destructor arguments allowed by C++).
-	public void create(Body body, FixtureDef def) {
+	void create(Body body, FixtureDef def) {
 		m_userData = def.userData;
 		m_friction = def.friction;
 		m_restitution = def.restitution;

@@ -1,7 +1,7 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright notice,
@@ -9,7 +9,7 @@
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -20,7 +20,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ ***************************************************************************** */
 package org.jbox2d.testbed.framework;
 
 import java.util.List;
@@ -33,191 +33,195 @@ import org.jbox2d.common.IViewportTransform;
 
 /**
  * Model for the testbed
- * 
+ *
  * @author Daniel
  */
 public class TestbedModel {
-  private final DefaultComboBoxModel tests = new DefaultComboBoxModel();
-  private final TestbedSettings settings = new TestbedSettings();
-  private DebugDraw draw;
-  private TestbedTest test;
-  private final Vector<TestChangedListener> listeners = new Vector<TestChangedListener>();
-  private final boolean[] keys = new boolean[512];
-  private final boolean[] codedKeys = new boolean[512];
-  private float calculatedFps;
-  private int currTestIndex = -1;
-  private TestbedTest runningTest;
-  private List<String> implSpecificHelp;
-  private TestbedPanel panel;
-  private WorldCreator worldCreator = new DefaultWorldCreator();
 
-  public TestbedModel() {}
+	private final DefaultComboBoxModel tests = new DefaultComboBoxModel();
+	private final TestbedSettings settings = new TestbedSettings();
+	private DebugDraw draw;
+	private TestbedTest test;
+	private final Vector<TestChangedListener> listeners = new Vector<TestChangedListener>();
+	private final boolean[] keys = new boolean[512];
+	private final boolean[] codedKeys = new boolean[512];
+	private float calculatedFps;
+	private int currTestIndex = -1;
+	private TestbedTest runningTest;
+	private List<String> implSpecificHelp;
+	private TestbedPanel panel;
+	private WorldCreator worldCreator = new DefaultWorldCreator();
 
-  public WorldCreator getWorldCreator() {
-    return worldCreator;
-  }
+	public TestbedModel() {
+	}
 
-  public void setWorldCreator(WorldCreator worldCreator) {
-    this.worldCreator = worldCreator;
-  }
+	public WorldCreator getWorldCreator() {
+		return worldCreator;
+	}
 
-  public void setPanel(TestbedPanel panel) {
-    this.panel = panel;
-  }
+	public void setWorldCreator(WorldCreator worldCreator) {
+		this.worldCreator = worldCreator;
+	}
 
-  public TestbedPanel getPanel() {
-    return panel;
-  }
+	public void setPanel(TestbedPanel panel) {
+		this.panel = panel;
+	}
 
-  public void setImplSpecificHelp(List<String> implSpecificHelp) {
-    this.implSpecificHelp = implSpecificHelp;
-  }
+	public TestbedPanel getPanel() {
+		return panel;
+	}
 
-  public List<String> getImplSpecificHelp() {
-    return implSpecificHelp;
-  }
+	public void setImplSpecificHelp(List<String> implSpecificHelp) {
+		this.implSpecificHelp = implSpecificHelp;
+	}
 
-  public void setCalculatedFps(float calculatedFps) {
-    this.calculatedFps = calculatedFps;
-  }
+	public List<String> getImplSpecificHelp() {
+		return implSpecificHelp;
+	}
 
-  public float getCalculatedFps() {
-    return calculatedFps;
-  }
+	public void setCalculatedFps(float calculatedFps) {
+		this.calculatedFps = calculatedFps;
+	}
 
-  public void setViewportTransform(IViewportTransform transform) {
-    draw.setViewportTransform(transform);
-  }
+	public float getCalculatedFps() {
+		return calculatedFps;
+	}
 
-  public void setDebugDraw(DebugDraw argDraw) {
-    draw = argDraw;
-  }
+	public void setViewportTransform(IViewportTransform transform) {
+		draw.setViewportTransform(transform);
+	}
 
-  public DebugDraw getDebugDraw() {
-    return draw;
-  }
+	public void setDebugDraw(DebugDraw argDraw) {
+		draw = argDraw;
+	}
 
-  public TestbedTest getCurrTest() {
-    return test;
-  }
+	public DebugDraw getDebugDraw() {
+		return draw;
+	}
 
-  /**
-   * Gets the array of keys, index corresponding to the char value.
-   * 
-   * @return
-   */
-  public boolean[] getKeys() {
-    return keys;
-  }
+	public TestbedTest getCurrTest() {
+		return test;
+	}
 
-  /**
-   * Gets the array of coded keys, index corresponding to the coded key value.
-   * 
-   * @return
-   */
-  public boolean[] getCodedKeys() {
-    return codedKeys;
-  }
+	/**
+	 * Gets the array of keys, index corresponding to the char value.
+	 *
+	 * @return
+	 */
+	public boolean[] getKeys() {
+		return keys;
+	}
 
-  public void setCurrTestIndex(int argCurrTestIndex) {
-    if (argCurrTestIndex < 0 || argCurrTestIndex >= tests.getSize()) {
-      throw new IllegalArgumentException("Invalid test index");
-    }
-    if (currTestIndex == argCurrTestIndex) {
-      return;
-    }
+	/**
+	 * Gets the array of coded keys, index corresponding to the coded key value.
+	 *
+	 * @return
+	 */
+	public boolean[] getCodedKeys() {
+		return codedKeys;
+	}
 
-    if (!isTestAt(argCurrTestIndex)) {
-      throw new IllegalArgumentException("No test at " + argCurrTestIndex);
-    }
-    currTestIndex = argCurrTestIndex;
-    ListItem item = (ListItem) tests.getElementAt(argCurrTestIndex);
-    test = item.test;
-    for (TestChangedListener listener : listeners) {
-      listener.testChanged(test, currTestIndex);
-    }
-  }
+	public void setCurrTestIndex(int argCurrTestIndex) {
+		if (argCurrTestIndex < 0 || argCurrTestIndex >= tests.getSize()) {
+			throw new IllegalArgumentException("Invalid test index");
+		}
+		if (currTestIndex == argCurrTestIndex) {
+			return;
+		}
 
-  public int getCurrTestIndex() {
-    return currTestIndex;
-  }
+		if (!isTestAt(argCurrTestIndex)) {
+			throw new IllegalArgumentException("No test at " + argCurrTestIndex);
+		}
+		currTestIndex = argCurrTestIndex;
+		ListItem item = (ListItem) tests.getElementAt(argCurrTestIndex);
+		test = item.test;
+		for (TestChangedListener listener : listeners) {
+			listener.testChanged(test, currTestIndex);
+		}
+	}
 
-  public void setRunningTest(TestbedTest runningTest) {
-    this.runningTest = runningTest;
-  }
+	public int getCurrTestIndex() {
+		return currTestIndex;
+	}
 
-  public TestbedTest getRunningTest() {
-    return runningTest;
-  }
+	public void setRunningTest(TestbedTest runningTest) {
+		this.runningTest = runningTest;
+	}
 
-  public void addTestChangeListener(TestChangedListener argListener) {
-    listeners.add(argListener);
-  }
+	public TestbedTest getRunningTest() {
+		return runningTest;
+	}
 
-  public void removeTestChangeListener(TestChangedListener argListener) {
-    listeners.remove(argListener);
-  }
+	public void addTestChangeListener(TestChangedListener argListener) {
+		listeners.add(argListener);
+	}
 
-  public void addTest(TestbedTest argTest) {
-    tests.addElement(new ListItem(argTest));
-  }
+	public void removeTestChangeListener(TestChangedListener argListener) {
+		listeners.remove(argListener);
+	}
 
-  public void addCategory(String argName) {
-    tests.addElement(new ListItem(argName));
-  }
+	public void addTest(TestbedTest argTest) {
+		tests.addElement(new ListItem(argTest));
+	}
 
-  public TestbedTest getTestAt(int argIndex) {
-    ListItem item = (ListItem) tests.getElementAt(argIndex);
-    if (item.isCategory()) {
-      return null;
-    }
-    return item.test;
-  }
+	public void addCategory(String argName) {
+		tests.addElement(new ListItem(argName));
+	}
 
-  public boolean isTestAt(int argIndex) {
-    ListItem item = (ListItem) tests.getElementAt(argIndex);
-    return !item.isCategory();
-  }
+	public TestbedTest getTestAt(int argIndex) {
+		ListItem item = (ListItem) tests.getElementAt(argIndex);
+		if (item.isCategory()) {
+			return null;
+		}
+		return item.test;
+	}
 
-  public void clearTestList() {
-    tests.removeAllElements();
-  }
+	public boolean isTestAt(int argIndex) {
+		ListItem item = (ListItem) tests.getElementAt(argIndex);
+		return !item.isCategory();
+	}
 
-  public int getTestsSize() {
-    return tests.getSize();
-  }
+	public void clearTestList() {
+		tests.removeAllElements();
+	}
 
-  public DefaultComboBoxModel getComboModel() {
-    return tests;
-  }
+	public int getTestsSize() {
+		return tests.getSize();
+	}
 
-  public TestbedSettings getSettings() {
-    return settings;
-  }
+	public DefaultComboBoxModel getComboModel() {
+		return tests;
+	}
 
-  public class ListItem {
-    public String category;
-    public TestbedTest test;
+	public TestbedSettings getSettings() {
+		return settings;
+	}
 
-    public ListItem(String argCategory) {
-      category = argCategory;
-    }
+	public class ListItem {
 
-    public ListItem(TestbedTest argTest) {
-      test = argTest;
-    }
+		public String category;
+		public TestbedTest test;
 
-    public boolean isCategory() {
-      return category != null;
-    }
+		public ListItem(String argCategory) {
+			category = argCategory;
+		}
 
-    @Override
-    public String toString() {
-      return isCategory() ? category : test.getTestName();
-    }
-  }
+		public ListItem(TestbedTest argTest) {
+			test = argTest;
+		}
 
-  public static interface TestChangedListener {
-    public void testChanged(TestbedTest test, int index);
-  }
+		public boolean isCategory() {
+			return category != null;
+		}
+
+		@Override
+		public String toString() {
+			return isCategory() ? category : test.getTestName();
+		}
+	}
+
+	public static interface TestChangedListener {
+
+		public void testChanged(TestbedTest test, int index);
+	}
 }

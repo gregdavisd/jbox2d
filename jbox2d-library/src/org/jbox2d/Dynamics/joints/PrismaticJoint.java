@@ -120,7 +120,7 @@ public class PrismaticJoint extends Joint {
 	private float m_motorSpeed;
 	private boolean m_enableLimit;
 	private boolean m_enableMotor;
-	private LimitState m_limitState;
+	private byte m_limitState;
 
 	// Solver temp
 	private int m_indexA;
@@ -451,9 +451,9 @@ public class PrismaticJoint extends Joint {
 			float k23 = iA * m_a1 + iB * m_a2;
 			float k33 = mA + mB + iA * m_a1 * m_a1 + iB * m_a2 * m_a2;
 
-			m_K.setColumn(0,k11, k12, k13);
-			m_K.setColumn(1,k12, k22, k23);
-			m_K.setColumn(2,k13, k23, k33);
+			m_K.setColumn(0, k11, k12, k13);
+			m_K.setColumn(1, k12, k22, k23);
+			m_K.setColumn(2, k13, k23, k33);
 		}
 
 		// Compute motor and limit terms.
@@ -730,9 +730,9 @@ public class PrismaticJoint extends Joint {
 			float k33 = mA + mB + iA * a1 * a1 + iB * a2 * a2;
 
 			final Mat33 K = new Mat33();
-			K.setColumn(0,k11, k12, k13);
-			K.setColumn(1,k12, k22, k23);
-			K.setColumn(2,k13, k23, k33);
+			K.setColumn(0, k11, k12, k13);
+			K.setColumn(1, k12, k22, k23);
+			K.setColumn(2, k13, k23, k33);
 
 			final Vec3 C = new Vec3();
 			C.x = C1.x;
@@ -749,11 +749,11 @@ public class PrismaticJoint extends Joint {
 			}
 
 			final Mat22 K = new Mat22();
-			K.setColumn(0,k11, k12);
-			K.setColumn(1,k12, k22);
+			K.setColumn(0, k11, k12);
+			K.setColumn(1, k12, k22);
 
 			// temp is impulse1
-			K.solveToOut((Vec2)C1.negate(), temp);
+			K.solveToOut((Vec2) C1.negate(), temp);
 			C1.negate();
 
 			impulse.x = temp.x;
@@ -778,7 +778,6 @@ public class PrismaticJoint extends Joint {
 		data.positions[m_indexA].a = aA;
 		// data.positions[m_indexB].c.set(cB);
 		data.positions[m_indexB].a = aB;
-
 
 		return linearError <= Settings.linearSlop && angularError <= Settings.angularSlop;
 	}

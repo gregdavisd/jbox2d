@@ -23,7 +23,6 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
-
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.IWorldPool;
@@ -97,7 +96,8 @@ public class AABB {
 		if (dy < 0) {
 			return false;
 		}
-		return !(Float.isNaN(upperBound.x) || Float.isNaN(upperBound.y) || Float.isNaN(lowerBound.x) || Float.isNaN(lowerBound.y));
+		return !(Float.isNaN(upperBound.x) || Float.isNaN(upperBound.y) || Float.isNaN(lowerBound.x) || Float.isNaN(
+			lowerBound.y));
 	}
 
 	/**
@@ -191,7 +191,7 @@ public class AABB {
 		// djm: faster putting all of them together, as if one is false we leave the logic
 		// early
 		return lowerBound.x <= aabb.lowerBound.x && lowerBound.y <= aabb.lowerBound.y &&
-			 aabb.upperBound.x <= upperBound.x && aabb.upperBound.y <= upperBound.y;
+			aabb.upperBound.x <= upperBound.x && aabb.upperBound.y <= upperBound.y;
 	}
 
 	/**
@@ -204,10 +204,10 @@ public class AABB {
 		float tmin = -Float.MAX_VALUE;
 		float tmax = Float.MAX_VALUE;
 
-		final Vec2 p =  new Vec2();
-		final Vec2 d =  new Vec2();
-		final Vec2 absD =  new Vec2();
-		final Vec2 normal =  new Vec2();
+		final Vec2 p = new Vec2();
+		final Vec2 d = new Vec2();
+		final Vec2 absD = new Vec2();
+		final Vec2 normal = new Vec2();
 
 		p.set(input.p1);
 		d.set(input.p2).sub(input.p1);

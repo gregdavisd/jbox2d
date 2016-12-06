@@ -152,7 +152,6 @@ public abstract class Contact {
 		return is_enabled;
 	}
 
-
 	/**
 	 * Get the first fixture in this contact.
 	 *
@@ -219,9 +218,9 @@ public abstract class Contact {
 	public final void flagForFiltering() {
 		is_filter = true;
 	}
-	public final void unflagForFiltering()
-	{
-		is_filter=false;
+
+	public final void unflagForFiltering() {
+		is_filter = false;
 	}
 
 	public final boolean isFlaggedForFiltering() {

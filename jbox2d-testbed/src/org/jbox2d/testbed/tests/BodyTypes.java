@@ -1,7 +1,7 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright notice,
@@ -9,7 +9,7 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -20,7 +20,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ ***************************************************************************** */
 /**
  * .created at 1:14:57 AM Jan 14, 2011
  */
@@ -43,145 +43,146 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class BodyTypes extends TestbedTest {
-  private final static long ATTACHMENT_TAG = 19;
-  private final static long PLATFORM_TAG = 20;
 
-  Body m_attachment;
-  Body m_platform;
-  float m_speed;
- 
-  @Override
-  public boolean isSaveLoadEnabled() {
-    return true;
-  }
+	private final static long ATTACHMENT_TAG = 19;
+	private final static long PLATFORM_TAG = 20;
 
-  @Override
-  public void initTest(boolean deserialized) {
-    m_speed = 3.0f;
+	Body m_attachment;
+	Body m_platform;
+	float m_speed;
 
-    if (deserialized) {
-      return;
-    }
+	@Override
+	public boolean isSaveLoadEnabled() {
+		return true;
+	}
 
-    Body ground = null;
-    {
-      BodyDef bd = new BodyDef();
-      ground = getWorld().createBody(bd);
+	@Override
+	public void initTest(boolean deserialized) {
+		m_speed = 3.0f;
 
-      EdgeShape shape = new EdgeShape();
-      shape.set(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
+		if (deserialized) {
+			return;
+		}
 
-      FixtureDef fd = new FixtureDef();
-      fd.shape = shape;
+		Body ground = null;
+		{
+			BodyDef bd = new BodyDef();
+			ground = getWorld().createBody(bd);
 
-      ground.createFixture(fd);
-    }
+			EdgeShape shape = new EdgeShape();
+			shape.set(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
 
-    // Define attachment
-    {
-      BodyDef bd = new BodyDef();
-      bd.type = BodyType.DYNAMIC;
-      bd.position.set(0.0f, 3.0f);
-      m_attachment = getWorld().createBody(bd);
+			FixtureDef fd = new FixtureDef();
+			fd.shape = shape;
 
-      PolygonShape shape = new PolygonShape();
-      shape.setAsBox(0.5f, 2.0f);
-      m_attachment.createFixture(shape, 2.0f);
-    }
+			ground.createFixture(fd);
+		}
 
-    // Define platform
-    {
-      BodyDef bd = new BodyDef();
-      bd.type = BodyType.DYNAMIC;
-      bd.position.set(-4.0f, 5.0f);
-      m_platform = getWorld().createBody(bd);
+		// Define attachment
+		{
+			BodyDef bd = new BodyDef();
+			bd.type = BodyType.DYNAMIC;
+			bd.position.set(0.0f, 3.0f);
+			m_attachment = getWorld().createBody(bd);
 
-      PolygonShape shape = new PolygonShape();
-      shape.setAsBox(0.5f, 4.0f, new Vec2(4.0f, 0.0f), 0.5f * (float)Math.PI);
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(0.5f, 2.0f);
+			m_attachment.createFixture(shape, 2.0f);
+		}
 
-      FixtureDef fd = new FixtureDef();
-      fd.shape = shape;
-      fd.friction = 0.6f;
-      fd.density = 2.0f;
-      m_platform.createFixture(fd);
+		// Define platform
+		{
+			BodyDef bd = new BodyDef();
+			bd.type = BodyType.DYNAMIC;
+			bd.position.set(-4.0f, 5.0f);
+			m_platform = getWorld().createBody(bd);
 
-      RevoluteJointDef rjd = new RevoluteJointDef();
-      rjd.initialize(m_attachment, m_platform, new Vec2(0.0f, 5.0f));
-      rjd.maxMotorTorque = 50.0f;
-      rjd.enableMotor = true;
-      getWorld().createJoint(rjd);
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(0.5f, 4.0f, new Vec2(4.0f, 0.0f), 0.5f * (float) Math.PI);
 
-      PrismaticJointDef pjd = new PrismaticJointDef();
-      pjd.initialize(ground, m_platform, new Vec2(0.0f, 5.0f), new Vec2(1.0f, 0.0f));
+			FixtureDef fd = new FixtureDef();
+			fd.shape = shape;
+			fd.friction = 0.6f;
+			fd.density = 2.0f;
+			m_platform.createFixture(fd);
 
-      pjd.maxMotorForce = 1000.0f;
-      pjd.enableMotor = true;
-      pjd.lowerTranslation = -10.0f;
-      pjd.upperTranslation = 10.0f;
-      pjd.enableLimit = true;
+			RevoluteJointDef rjd = new RevoluteJointDef();
+			rjd.initialize(m_attachment, m_platform, new Vec2(0.0f, 5.0f));
+			rjd.maxMotorTorque = 50.0f;
+			rjd.enableMotor = true;
+			getWorld().createJoint(rjd);
 
-      getWorld().createJoint(pjd);
+			PrismaticJointDef pjd = new PrismaticJointDef();
+			pjd.initialize(ground, m_platform, new Vec2(0.0f, 5.0f), new Vec2(1.0f, 0.0f));
 
-    }
+			pjd.maxMotorForce = 1000.0f;
+			pjd.enableMotor = true;
+			pjd.lowerTranslation = -10.0f;
+			pjd.upperTranslation = 10.0f;
+			pjd.enableLimit = true;
 
-    // .create a payload
-    {
-      BodyDef bd = new BodyDef();
-      bd.type = BodyType.DYNAMIC;
-      bd.position.set(0.0f, 8.0f);
-      Body body = getWorld().createBody(bd);
+			getWorld().createJoint(pjd);
 
-      PolygonShape shape = new PolygonShape();
-      shape.setAsBox(0.75f, 0.75f);
+		}
 
-      FixtureDef fd = new FixtureDef();
-      fd.shape = shape;
-      fd.friction = 0.6f;
-      fd.density = 2.0f;
+		// .create a payload
+		{
+			BodyDef bd = new BodyDef();
+			bd.type = BodyType.DYNAMIC;
+			bd.position.set(0.0f, 8.0f);
+			Body body = getWorld().createBody(bd);
 
-      body.createFixture(fd);
-    }
-  }
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(0.75f, 0.75f);
 
-  @Override
-  public void step(TestbedSettings settings) {
-    super.step(settings);
+			FixtureDef fd = new FixtureDef();
+			fd.shape = shape;
+			fd.friction = 0.6f;
+			fd.density = 2.0f;
 
-    addTextLine("Keys: (d) dynamic, (s) static, (k) kinematic");
-    // Drive the kinematic body.
-    if (m_platform.getType() == BodyType.KINEMATIC) {
-      Vec2 p = m_platform.getTransform().p;
-      Vec2 v = m_platform.getLinearVelocity();
+			body.createFixture(fd);
+		}
+	}
 
-      if ((p.x < -10.0f && v.x < 0.0f) || (p.x > 10.0f && v.x > 0.0f)) {
-        v.x = -v.x;
-        m_platform.setLinearVelocity(v);
-      }
-    }
-  }
+	@Override
+	public void step(TestbedSettings settings) {
+		super.step(settings);
 
-  @Override
-  public void keyPressed(char argKeyChar, int argKeyCode) {
-    switch (argKeyChar) {
-      case 'd':
-        m_platform.setType(BodyType.DYNAMIC);
-        break;
+		addTextLine("Keys: (d) dynamic, (s) static, (k) kinematic");
+		// Drive the kinematic body.
+		if (m_platform.getType() == BodyType.KINEMATIC) {
+			Vec2 p = m_platform.getTransform().p;
+			Vec2 v = m_platform.getLinearVelocity();
 
-      case 's':
-        m_platform.setType(BodyType.STATIC);
-        break;
+			if ((p.x < -10.0f && v.x < 0.0f) || (p.x > 10.0f && v.x > 0.0f)) {
+				v.x = -v.x;
+				m_platform.setLinearVelocity(v);
+			}
+		}
+	}
 
-      case 'k':
-        m_platform.setType(BodyType.KINEMATIC);
-        m_platform.setLinearVelocity(new Vec2(-m_speed, 0.0f));
-        m_platform.setAngularVelocity(0.0f);
-        break;
-    }
-  }
+	@Override
+	public void keyPressed(char argKeyChar, int argKeyCode) {
+		switch (argKeyChar) {
+			case 'd':
+				m_platform.setType(BodyType.DYNAMIC);
+				break;
 
-  @Override
-  public String getTestName() {
-    return "Body Types";
-  }
+			case 's':
+				m_platform.setType(BodyType.STATIC);
+				break;
+
+			case 'k':
+				m_platform.setType(BodyType.KINEMATIC);
+				m_platform.setLinearVelocity(new Vec2(-m_speed, 0.0f));
+				m_platform.setAngularVelocity(0.0f);
+				break;
+		}
+	}
+
+	@Override
+	public String getTestName() {
+		return "Body Types";
+	}
 
 }

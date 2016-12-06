@@ -22,10 +22,11 @@ public class MathUtils {
 
 	/**
 	 * Returns the closest value to 'a' that is in between 'low' and 'high'
+	 *
 	 * @param a
 	 * @param low
 	 * @param high
-	 * @return 
+	 * @return
 	 */
 	public final static float clamp(final float a, final float low, final float high) {
 		return Math.max(low, Math.min(a, high));

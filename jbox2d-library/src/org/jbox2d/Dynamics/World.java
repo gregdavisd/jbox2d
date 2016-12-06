@@ -65,6 +65,7 @@ import org.jbox2d.dynamics.contacts.ContactRegister;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
+import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.particle.ParticleBodyContact;
 import org.jbox2d.particle.ParticleColor;
@@ -130,7 +131,7 @@ public class World {
 	private ParticleSystem m_particleSystem;
 
 	private ContactRegister[][] contactStacks =
-		new ContactRegister[ShapeType.values().length][ShapeType.values().length];
+		new ContactRegister[ShapeType.NUM_TYPES][ShapeType.NUM_TYPES];
 
 	/**
 	 * Construct a world object.
@@ -200,17 +201,17 @@ public class World {
 		return m_allowSleep;
 	}
 
-	private void addType(IDynamicStack<Contact> creator, ShapeType type1, ShapeType type2) {
+	private void addType(IDynamicStack<Contact> creator, byte type1, byte type2) {
 		ContactRegister register = new ContactRegister();
 		register.creator = creator;
 		register.primary = true;
-		contactStacks[type1.ordinal()][type2.ordinal()] = register;
+		contactStacks[type1][type2] = register;
 
 		if (type1 != type2) {
 			ContactRegister register2 = new ContactRegister();
 			register2.creator = creator;
 			register2.primary = false;
-			contactStacks[type2.ordinal()][type1.ordinal()] = register2;
+			contactStacks[type2][type1] = register2;
 		}
 	}
 
@@ -237,10 +238,10 @@ public class World {
 	}
 
 	public Contact popContact(Fixture fixtureA, int indexA, Fixture fixtureB, int indexB) {
-		final ShapeType type1 = fixtureA.getType();
-		final ShapeType type2 = fixtureB.getType();
+		final byte type1 = fixtureA.getType();
+		final byte type2 = fixtureB.getType();
 
-		final ContactRegister reg = contactStacks[type1.ordinal()][type2.ordinal()];
+		final ContactRegister reg = contactStacks[type1][type2];
 		if (reg != null) {
 			if (reg.primary) {
 				Contact c = reg.creator.pop();
@@ -1170,8 +1171,8 @@ public class World {
 					Body bA = fA.getBody();
 					Body bB = fB.getBody();
 
-					BodyType typeA = bA.m_type;
-					BodyType typeB = bB.m_type;
+					byte typeA = bA.m_type;
+					byte typeB = bB.m_type;
 					assert (typeA == BodyType.DYNAMIC || typeB == BodyType.DYNAMIC);
 
 					boolean activeA = bA.isAwake() && typeA != BodyType.STATIC;
@@ -1418,11 +1419,11 @@ public class World {
 
 		switch (joint.getType()) {
 			// TODO djm write after writing joints
-			case DISTANCE:
+			case JointType.DISTANCE:
 				m_debugDraw.drawSegment(p1, p2, color);
 				break;
 
-			case PULLEY: {
+			case JointType.PULLEY: {
 				PulleyJoint pulley = (PulleyJoint) joint;
 				Vec2 s1 = pulley.getGroundAnchorA();
 				Vec2 s2 = pulley.getGroundAnchorB();
@@ -1431,8 +1432,8 @@ public class World {
 				m_debugDraw.drawSegment(s1, s2, color);
 			}
 			break;
-			case CONSTANT_VOLUME:
-			case MOUSE:
+			case JointType.CONSTANT_VOLUME:
+			case JointType.MOUSE:
 				// don't draw this
 				break;
 			default:
@@ -1458,7 +1459,7 @@ public class World {
 
 	private void drawShape(Fixture fixture, Transform xf, PrimeColor3f color, boolean wireframe) {
 		switch (fixture.getType()) {
-			case CIRCLE: {
+			case ShapeType.CIRCLE: {
 				CircleShape circle = (CircleShape) fixture.getShape();
 
 				// Vec2 center = Mul(xf, circle.m_p);
@@ -1489,7 +1490,7 @@ public class World {
 			}
 			break;
 
-			case POLYGON: {
+			case ShapeType.POLYGON: {
 				PolygonShape poly = (PolygonShape) fixture.getShape();
 				int vertexCount = poly.m_count;
 				assert (vertexCount <= Settings.maxPolygonVertices);
@@ -1507,14 +1508,14 @@ public class World {
 				}
 			}
 			break;
-			case EDGE: {
+			case ShapeType.EDGE: {
 				EdgeShape edge = (EdgeShape) fixture.getShape();
 				Transform.mulToOutUnsafe(xf, edge.m_vertex1, v1);
 				Transform.mulToOutUnsafe(xf, edge.m_vertex2, v2);
 				m_debugDraw.drawSegment(v1, v2, color);
 			}
 			break;
-			case CHAIN: {
+			case ShapeType.CHAIN: {
 				ChainShape chain = (ChainShape) fixture.getShape();
 				int count = chain.m_count;
 				Vec2[] vertices = chain.m_vertices;

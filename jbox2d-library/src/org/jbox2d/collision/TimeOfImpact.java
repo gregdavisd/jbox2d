@@ -68,8 +68,13 @@ public class TimeOfImpact {
 		public float tMax;
 	}
 
-	public static enum TOIOutputState {
-		UNKNOWN, FAILED, OVERLAPPED, TOUCHING, SEPARATED
+	public static class TOIOutputState {
+
+		public static final byte UNKNOWN = 0;
+		public static final byte FAILED = 1;
+		public static final byte OVERLAPPED = 2;
+		public static final byte TOUCHING = 3;
+		public static final byte SEPARATED = 4;
 	}
 
 	/**
@@ -79,7 +84,7 @@ public class TimeOfImpact {
 	 */
 	public static class TOIOutput {
 
-		public TOIOutputState state;
+		public byte state;
 		public float t;
 	}
 
@@ -300,15 +305,18 @@ public class TimeOfImpact {
 	}
 }
 
-enum Type {
-	POINTS, FACE_A, FACE_B;
-}
-
 class SeparationFunction {
+
+	static class Type {
+
+		public static final byte POINTS = 0;
+		public static final byte FACE_A = 1;
+		public static final byte FACE_B = 2;
+	}
 
 	public DistanceProxy m_proxyA;
 	public DistanceProxy m_proxyB;
-	public Type m_type;
+	public byte m_type;
 	public final Vec2 m_localPoint = new Vec2();
 	public final Vec2 m_axis = new Vec2();
 	public Sweep m_sweepA;
@@ -358,7 +366,7 @@ class SeparationFunction {
 			Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 			m_axis.set(pointB).sub(pointA);
 			float s = m_axis.length();
-			m_axis.scale(1.0f/s);
+			m_axis.scale(1.0f / s);
 			return s;
 		} else if (cache.indexA[0] == cache.indexA[1]) {
 			// Two points on B and one on A.
@@ -368,7 +376,7 @@ class SeparationFunction {
 			localPointB2.set(m_proxyB.getVertex(cache.indexB[1]));
 
 			temp.set(localPointB2).sub(localPointB1);
-			((Vec2)m_axis.set(temp)).setLeftPerpendicular(1f);
+			((Vec2) m_axis.set(temp)).setLeftPerpendicular(1f);
 			m_axis.normalize();
 
 			Rot.mulToOutUnsafe(xfb.q, m_axis, normal);
@@ -394,7 +402,7 @@ class SeparationFunction {
 			localPointA2.set(m_proxyA.getVertex(cache.indexA[1]));
 
 			temp.set(localPointA2).sub(localPointA1);
-			( (Vec2)m_axis.set(temp)).setLeftPerpendicular(1f);
+			((Vec2) m_axis.set(temp)).setLeftPerpendicular(1f);
 			m_axis.normalize();
 
 			Rot.mulToOutUnsafe(xfa.q, m_axis, normal);
@@ -425,7 +433,7 @@ class SeparationFunction {
 		m_sweepB.getTransform(xfb, t);
 
 		switch (m_type) {
-			case POINTS: {
+			case Type.POINTS: {
 				Rot.mulTransUnsafe(xfa.q, m_axis, axisA);
 				Rot.mulTransUnsafe(xfb.q, (Vec2) m_axis.negate(), axisB);
 				m_axis.negate();
@@ -439,14 +447,14 @@ class SeparationFunction {
 				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
 				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 
-				float separation = ( (Vec2)pointB.sub(pointA)).dot(m_axis);
+				float separation = ((Vec2) pointB.sub(pointA)).dot(m_axis);
 				return separation;
 			}
-			case FACE_A: {
+			case Type.FACE_A: {
 				Rot.mulToOutUnsafe(xfa.q, m_axis, normal);
 				Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 
-				Rot.mulTransUnsafe(xfb.q, (Vec2)normal.negate(), axisB);
+				Rot.mulTransUnsafe(xfb.q, (Vec2) normal.negate(), axisB);
 				normal.negate();
 
 				indexes[0] = -1;
@@ -458,7 +466,7 @@ class SeparationFunction {
 				float separation = pointB.sub(pointA).dot(normal);
 				return separation;
 			}
-			case FACE_B: {
+			case Type.FACE_B: {
 				Rot.mulToOutUnsafe(xfb.q, m_axis, normal);
 				Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 
@@ -487,7 +495,7 @@ class SeparationFunction {
 		m_sweepB.getTransform(xfb, t);
 
 		switch (m_type) {
-			case POINTS: {
+			case Type.POINTS: {
 				localPointA.set(m_proxyA.getVertex(indexA));
 				localPointB.set(m_proxyB.getVertex(indexB));
 
@@ -497,7 +505,7 @@ class SeparationFunction {
 				float separation = pointB.sub(pointA).dot(m_axis);
 				return separation;
 			}
-			case FACE_A: {
+			case Type.FACE_A: {
 				Rot.mulToOutUnsafe(xfa.q, m_axis, normal);
 				Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 
@@ -506,7 +514,7 @@ class SeparationFunction {
 				float separation = pointB.sub(pointA).dot(normal);
 				return separation;
 			}
-			case FACE_B: {
+			case Type.FACE_B: {
 				Rot.mulToOutUnsafe(xfb.q, m_axis, normal);
 				Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 

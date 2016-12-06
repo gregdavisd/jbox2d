@@ -129,14 +129,14 @@ public class Breakable extends TestbedTest {
 		Vec2 center1 = body1.getWorldCenter();
 		Vec2 center2 = body2.getWorldCenter();
 
-		Vec2 velocity1 = (Vec2)new Vec2(m_velocity)
+		Vec2 velocity1 = (Vec2) new Vec2(m_velocity)
 			.add(new Vec2(
 				new Vec2(center1)
 					.sub(center)
 			)
 				.setRightPerpendicular(m_angularVelocity));
 
-		Vec2 velocity2 = (Vec2)new Vec2(m_velocity)
+		Vec2 velocity2 = (Vec2) new Vec2(m_velocity)
 			.add(new Vec2(
 				new Vec2(center2)
 					.sub(center)

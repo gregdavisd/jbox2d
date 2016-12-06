@@ -31,7 +31,6 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
-
 /**
  * A convex polygon shape. Polygons have a maximum number of vertices equal to _maxPolygonVertices. In most cases you
  * should not need many vertices for a convex polygon.
@@ -97,7 +96,7 @@ public class PolygonShape extends Shape {
 		shape.m_count = this.m_count;
 		return shape;
 	}
- 
+
 	/**
 	 * Create a convex hull from the given array of points. The count must be in the range [3,
 	 * Settings.maxPolygonVertices].
@@ -116,7 +115,7 @@ public class PolygonShape extends Shape {
 
 		// Perform welding and copy vertices into local buffer.
 		Vec2[] ps =
-				new Vec2[Settings.maxPolygonVertices];
+			new Vec2[Settings.maxPolygonVertices];
 		int tempCount = 0;
 		for (int i = 0; i < n; ++i) {
 			Vec2 v = verts[i];

@@ -68,7 +68,7 @@ public class DefaultWorldPool implements IWorldPool {
 		protected Contact newInstance() {
 			return new PolygonContact(world);
 		}
- 
+
 	};
 
 	private final MutableStack<Contact> ccstack =
@@ -77,7 +77,7 @@ public class DefaultWorldPool implements IWorldPool {
 		protected Contact newInstance() {
 			return new CircleContact(world);
 		}
- 
+
 	};
 
 	private final MutableStack<Contact> cpstack =
@@ -86,7 +86,7 @@ public class DefaultWorldPool implements IWorldPool {
 		protected Contact newInstance() {
 			return new PolygonAndCircleContact(world);
 		}
- 
+
 	};
 
 	private final MutableStack<Contact> ecstack =
@@ -95,7 +95,7 @@ public class DefaultWorldPool implements IWorldPool {
 		protected Contact newInstance() {
 			return new EdgeAndCircleContact(world);
 		}
- 
+
 	};
 
 	private final MutableStack<Contact> epstack =
@@ -104,7 +104,7 @@ public class DefaultWorldPool implements IWorldPool {
 		protected Contact newInstance() {
 			return new EdgeAndPolygonContact(world);
 		}
- 
+
 	};
 
 	private final MutableStack<Contact> chcstack =
@@ -113,7 +113,7 @@ public class DefaultWorldPool implements IWorldPool {
 		protected Contact newInstance() {
 			return new ChainAndCircleContact(world);
 		}
- 
+
 	};
 
 	private final MutableStack<Contact> chpstack =
@@ -122,7 +122,7 @@ public class DefaultWorldPool implements IWorldPool {
 		protected Contact newInstance() {
 			return new ChainAndPolygonContact(world);
 		}
- 
+
 	};
 
 	private final Collision collision;

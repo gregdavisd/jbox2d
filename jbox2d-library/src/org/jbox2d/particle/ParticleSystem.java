@@ -27,7 +27,7 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.particle.VoronoiDiagram.VoronoiDiagramCallback;
 
-public class ParticleSystem extends CircularWorld{
+public class ParticleSystem extends CircularWorld {
 
 	/**
 	 * All particle types that require creating pairs
@@ -123,7 +123,6 @@ public class ParticleSystem extends CircularWorld{
 	float m_powderStrength;
 	float m_ejectionStrength;
 	float m_colorMixingStrength;
-
 
 	public ParticleSystem(World world) {
 		super(world);

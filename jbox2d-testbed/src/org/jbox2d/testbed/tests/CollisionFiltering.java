@@ -1,7 +1,7 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  * 	* Redistributions of source code must retain the above copyright notice,
@@ -9,7 +9,7 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -20,7 +20,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ ***************************************************************************** */
 /**
  * Created at 2:15:39 PM Jan 23, 2011
  */
@@ -41,7 +41,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class CollisionFiltering extends TestbedTest {
-	
+
 	// This is a test of collision filtering.
 	// There is a triangle, a box, and a circle.
 	// There are 6 shapes. 3 large and 3 small.
@@ -59,17 +59,17 @@ public class CollisionFiltering extends TestbedTest {
 	final int k_triangleMask = 0xFFFF;
 	final int k_boxMask = 0xFFFF ^ k_triangleCategory;
 	final int k_circleMask = 0xFFFF;
-	
+
 	@Override
 	public boolean isSaveLoadEnabled() {
-	  return true;
+		return true;
 	}
 
 	@Override
 	public void initTest(boolean deserialized) {
-	  if(deserialized){
-	    return;
-	  }
+		if (deserialized) {
+			return;
+		}
 		// Ground body
 		{
 			EdgeShape shape = new EdgeShape();
@@ -183,7 +183,7 @@ public class CollisionFiltering extends TestbedTest {
 		BodyDef circleBodyDef = new BodyDef();
 		circleBodyDef.type = BodyType.DYNAMIC;
 		circleBodyDef.position.set(5.0f, 2.0f);
-		
+
 		Body body5 = getWorld().createBody(circleBodyDef);
 		body5.createFixture(circleShapeDef);
 
@@ -200,5 +200,5 @@ public class CollisionFiltering extends TestbedTest {
 	public String getTestName() {
 		return "Collision Filtering";
 	}
-	
+
 }

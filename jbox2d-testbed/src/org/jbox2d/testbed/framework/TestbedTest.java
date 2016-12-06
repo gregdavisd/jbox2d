@@ -64,8 +64,7 @@ import org.jbox2d.particle.ParticleGroup;
  */
 public abstract class TestbedTest
 	implements
-	ContactListener
-  {
+	ContactListener {
 
 	public static final int MAX_CONTACT_POINTS = 1;
 	public static final float ZOOM_SCALE_DIFF = .05f;
@@ -109,7 +108,7 @@ public abstract class TestbedTest
 	private final LinkedList<String> textList = new LinkedList<String>();
 
 	private TestbedCamera camera;
- 
+
 	private final Transform identity = new Transform();
 
 	public TestbedTest() {
@@ -117,8 +116,7 @@ public abstract class TestbedTest
 		for (int i = 0; i < MAX_CONTACT_POINTS; i++) {
 			points[i] = new ContactPoint();
 		}
- 
- 
+
 		destructionListener = new DestructionListener() {
 			public void sayGoodbye(Fixture fixture) {
 				fixtureDestroyed(fixture);
@@ -181,7 +179,7 @@ public abstract class TestbedTest
 		title = getTestName();
 		initTest(deserialized);
 	}
- 
+
 	/**
 	 * Gets the current world
 	 */
@@ -369,8 +367,8 @@ public abstract class TestbedTest
 		flags += settings.getSetting(TestbedSettings.DrawTree).enabled ? DebugDraw.e_dynamicTreeBit : 0;
 		flags +=
 			settings.getSetting(TestbedSettings.DrawWireframe).enabled ?
-			 DebugDraw.e_wireframeDrawingBit :
-			 0;
+			DebugDraw.e_wireframeDrawingBit :
+			0;
 		debugDraw.setFlags(flags);
 
 		m_world.setAllowSleep(settings.getSetting(TestbedSettings.AllowSleep).enabled);
@@ -401,8 +399,8 @@ public abstract class TestbedTest
 			debugDraw.drawString(5,
 				m_textLine,
 				"bodies/contacts/joints/proxies/particles/groups = " + m_world.getBodyCount() + "/" +
-				 m_world.getContactCount() + "/" + m_world.getJointCount() + "/" +
-				 m_world.getProxyCount() + "/" + particleCount + "/" + groupCount, PrimeColor3f.WHITE);
+				m_world.getContactCount() + "/" + m_world.getJointCount() + "/" +
+				m_world.getProxyCount() + "/" + particleCount + "/" + groupCount, PrimeColor3f.WHITE);
 			m_textLine += TEXT_LINE_SPACE;
 
 			debugDraw.drawString(5, m_textLine, "World mouse position: " + mouseWorld.toString(),
@@ -674,7 +672,7 @@ public abstract class TestbedTest
 	public boolean isSaveLoadEnabled() {
 		return false;
 	}
- 
+
 	public void fixtureDestroyed(Fixture fixture) {
 	}
 
@@ -696,8 +694,8 @@ public abstract class TestbedTest
 	public void postSolve(Contact contact, ContactImpulse impulse) {
 	}
 
-	private final PointState[] state1 = new PointState[Settings.maxManifoldPoints];
-	private final PointState[] state2 = new PointState[Settings.maxManifoldPoints];
+	private final byte[] state1 = new byte[Settings.maxManifoldPoints];
+	private final byte[] state2 = new byte[Settings.maxManifoldPoints];
 	private final WorldManifold worldManifold = new WorldManifold();
 
 	public void preSolve(Contact contact, Manifold oldManifold) {
@@ -781,5 +779,3 @@ class ParticleVelocityQueryCallback implements ParticleQueryCallback {
 		return true;
 	}
 }
-
- 
