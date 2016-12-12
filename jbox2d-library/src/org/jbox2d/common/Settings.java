@@ -45,7 +45,7 @@ public class Settings {
 	public static boolean FAST_ROUND = true;
 	public static boolean FAST_ATAN2 = true;
 	public static boolean FAST_POW = true;
-	public static int CONTACT_STACK_INIT_SIZE = 10;
+	public static int CONTACT_STACK_INIT_SIZE = 0;
 	public static boolean SINCOS_LUT_ENABLED = true;
 	/**
 	 * smaller the precision, the larger the table. If a small table is used (eg, precision is .006 or greater), make sure

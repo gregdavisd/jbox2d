@@ -23,8 +23,12 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics;
 
+import defactory.streambuilder.StreamBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Stream;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
@@ -37,7 +41,7 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
 
-import org.jbox2d.Dynamics.CircularWorld;
+import org.jbox2d.dynamics.CircularWorld;
 
 /**
  * A rigid body. These are created via World.createBody.
@@ -88,7 +92,7 @@ public class Body extends CircularWorld {
 
 	private final List<Fixture> m_fixtureList;
 	private final List<JointEdge> m_jointList;
-	private final List< ContactEdge> m_contactList;
+	private final List<ContactEdge> m_contactList;
 
 	public float m_mass, m_invMass;
 
@@ -101,7 +105,11 @@ public class Body extends CircularWorld {
 
 	public float m_sleepTime;
 
-	public Object m_userData;
+	private Object m_userData;
+
+	public Body(final BodyDef bd) {
+		this(bd, null);
+	}
 
 	public Body(final BodyDef bd, World world) {
 		super(world);
@@ -314,16 +322,16 @@ public class Body extends CircularWorld {
 	 * @return the world transform of the body's origin.
 	 */
 	public final Transform getTransform() {
-		return m_xf;
+		return new Transform(m_xf);
 	}
 
 	/**
-	 * Get the world body origin position. Do not modify.
+	 * Get the world body origin position.
 	 *
 	 * @return the world position of the body's origin.
 	 */
 	public final Vec2 getPosition() {
-		return m_xf.p;
+		return new Vec2(m_xf.p);
 	}
 
 	/**
@@ -336,17 +344,35 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Get the world position of the center of mass. Do not modify.
+	 * Get a world vector in the direction of this body's x axis;
+	 *
+	 * @return
 	 */
-	public final Vec2 getWorldCenter() {
-		return m_sweep.c;
+	public final Vec2 getWorldXAxis() {
+		return m_xf.q.getXAxis();
 	}
 
 	/**
-	 * Get the local position of the center of mass. Do not modify.
+	 * Get a world vector in the direction of this body's y axis;
+	 *
+	 * @return
+	 */
+	public final Vec2 getWorldYAxis() {
+		return m_xf.q.getYAxis();
+	}
+
+	/**
+	 * Get the world position of the center of mass.
+	 */
+	public final Vec2 getWorldCenter() {
+		return new Vec2(m_sweep.c);
+	}
+
+	/**
+	 * Get the local position of the center of mass.
 	 */
 	public final Vec2 getLocalCenter() {
-		return m_sweep.localCenter;
+		return new Vec2(m_sweep.localCenter);
 	}
 
 	/**
@@ -359,7 +385,7 @@ public class Body extends CircularWorld {
 			return;
 		}
 
-		if (v.lengthSquared() > 0.0f) {
+		if (!isAwake() && (v.lengthSquared() > 0.0f)) {
 			setAwake(true);
 		}
 
@@ -367,12 +393,30 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Get the linear velocity of the center of mass. Do not modify, instead use {@link #setLinearVelocity(Vec2)}.
+	 * Add to the linear velocity of the center of mass.
+	 *
+	 * @param v delta for the linear velocity of the center of mass.
+	 */
+	public final void applyLinearVelocity(Vec2 v) {
+		if (m_type == BodyType.STATIC) {
+			return;
+		}
+
+		m_linearVelocity.add(v);
+
+		if (!isAwake() && (m_linearVelocity.lengthSquared() > 0.0f)) {
+			setAwake(true);
+		}
+
+	}
+
+	/**
+	 * Get the linear velocity of the center of mass.
 	 *
 	 * @return the linear velocity of the center of mass.
 	 */
 	public final Vec2 getLinearVelocity() {
-		return m_linearVelocity;
+		return new Vec2(m_linearVelocity);
 	}
 
 	/**
@@ -619,8 +663,6 @@ public class Body extends CircularWorld {
 
 	}
 
-	private final MassData pmd = new MassData();
-
 	/**
 	 * This resets the mass properties to the sum of the mass properties of the fixtures. This normally does not need to be
 	 * called unless you called setMassData to override the mass and you later want to reset the mass.
@@ -648,7 +690,7 @@ public class Body extends CircularWorld {
 		final Vec2 localCenter = new Vec2();
 		localCenter.setZero();
 		final Vec2 temp = new Vec2();
-		final MassData massData = pmd;
+		final MassData massData = new MassData();
 		for (int i = 0; i < m_fixtureList.size(); ++i) {
 			Fixture f = m_fixtureList.get(i);
 
@@ -764,12 +806,18 @@ public class Body extends CircularWorld {
 		return out;
 	}
 
-	public final void getLocalVectorToOut(Vec2 worldVector, Vec2 out) {
-		Rot.mulTrans(m_xf.q, worldVector, out);
+	/**
+	 * Convert a world angle to an angle relative to this body.
+	 *
+	 * @param worldAngle the world angle
+	 * @return a local angle
+	 */
+	public final float getLocalAngle(float worldAngle) {
+		return worldAngle - getAngle();
 	}
 
-	public final void getLocalVectorToOutUnsafe(Vec2 worldVector, Vec2 out) {
-		Rot.mulTransUnsafe(m_xf.q, worldVector, out);
+	public final void getLocalVectorToOut(Vec2 worldVector, Vec2 out) {
+		Rot.mulTrans(m_xf.q, worldVector, out);
 	}
 
 	/**
@@ -1138,4 +1186,29 @@ public class Body extends CircularWorld {
 			getWorld().m_contactManager.destroyContact(ce.contact);
 		}
 	}
+
+	public Stream<Body> streamBody() {
+		StreamBuilder<Body> builder = new StreamBuilder<>();
+		Set<Body> added = new TreeSet<>();
+		streamBody(added, builder);
+		return builder.build();
+	}
+
+	private void streamBody(Set<Body> added, StreamBuilder<Body> builder) {
+		builder.add(this);
+		added.add(this);
+
+		for (JointEdge jointEdge : m_jointList) {
+			Body other = jointEdge.other;
+			if ((other != null) && !added.contains(other)) {
+				other.streamBody(added, builder);
+			}
+		}
+
+	}
+
+	public Stream<Fixture> streamFixture() {
+		return m_fixtureList.stream();
+	}
+
 }

@@ -32,7 +32,6 @@ import org.jbox2d.callbacks.PairCallback;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.jbox2d.Dynamics.CircularWorld;
 
 /**
  * Delegate of World.
@@ -44,7 +43,7 @@ public class ContactManager extends CircularWorld implements PairCallback {
 	public BroadPhase m_broadPhase;
 	private final List<Contact> m_contactList;
 	public ContactFilter m_contactFilter;
-	public ContactListener m_contactListener;
+	private ContactListener m_contactListener;
 
 	public ContactManager(World argPool, BroadPhase broadPhase) {
 		super(argPool);
@@ -271,5 +270,19 @@ public class ContactManager extends CircularWorld implements PairCallback {
 
 	public final int getContactCount() {
 		return m_contactList.size();
+	}
+
+	public final ContactListener getContactListener() {
+		return m_contactListener;
+	}
+
+	public final void setContactListener(ContactListener listener) {
+		m_contactListener = listener;
+	}
+
+	public final void removeContactListener(ContactListener listener) {
+		if (m_contactListener == listener) {
+			m_contactListener = null;
+		}
 	}
 }

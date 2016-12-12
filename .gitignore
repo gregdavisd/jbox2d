@@ -57,3 +57,6 @@ Temporary Items
 *.MF
 *.hprof
 *.i
+jbox2d-library/.hg/cache/branch2-served
+jbox2d-library/.hg/cache/rbc-names-v1
+jbox2d-library/.hg/cache/rbc-revs-v1

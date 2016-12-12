@@ -285,8 +285,17 @@ public class World {
 	 *
 	 * @param listener
 	 */
-	public void setContactListener(ContactListener listener) {
-		m_contactManager.m_contactListener = listener;
+	public final void setContactListener(ContactListener listener) {
+		m_contactManager.setContactListener(listener);
+	}
+
+	/**
+	 * Get the currently registered contact listener
+	 *
+	 * @return a contact listern or null if none are registered
+	 */
+	public final ContactListener getContactListener() {
+		return m_contactManager.getContactListener();
 	}
 
 	/**
@@ -307,10 +316,6 @@ public class World {
 	 * @return
 	 */
 	public Body createBody(BodyDef def) {
-		assert (isLocked() == false);
-		if (isLocked()) {
-			return null;
-		}
 		// TODO djm pooling
 		Body b = new Body(def, this);
 
@@ -319,6 +324,7 @@ public class World {
 
 		return b;
 	}
+
 
 	/**
 	 * destroy a rigid body given a definition. No reference to the definition is retained. This function is locked during
@@ -951,7 +957,7 @@ public class World {
 
 		// Size the island for the worst case.
 		island.init(getBodyCount(), m_contactManager.getContactCount(), getJointCount(),
-			m_contactManager.m_contactListener);
+			m_contactManager.getContactListener());
 
 		// Clear all the island flags.
 		for (int i = 0; i < m_bodyList.size(); ++i) {
@@ -1119,7 +1125,7 @@ public class World {
 
 		final Island island = toiIsland;
 		island.init(2 * Settings.maxTOIContacts, Settings.maxTOIContacts, 0,
-			m_contactManager.m_contactListener);
+			m_contactManager.getContactListener());
 		if (m_stepComplete) {
 			for (int i_body = 0; i_body < m_bodyList.size(); ++i_body) {
 				Body b = m_bodyList.get(i_body);
@@ -1256,7 +1262,7 @@ public class World {
 			bB.advance(minAlpha);
 
 			// The TOI contact likely has some new contact points.
-			minContact.update(m_contactManager.m_contactListener);
+			minContact.update(m_contactManager.getContactListener());
 			minContact.is_toi = false;
 			++minContact.m_toiCount;
 
@@ -1328,7 +1334,7 @@ public class World {
 						}
 
 						// Update the contact points
-						contact.update(m_contactManager.m_contactListener);
+						contact.update(m_contactManager.getContactListener());
 
 						// Was the contact disabled by the user?
 						if (contact.isEnabled() == false) {
@@ -1406,10 +1412,8 @@ public class World {
 	private void drawJoint(Joint joint) {
 		Body bodyA = joint.getBodyA();
 		Body bodyB = joint.getBodyB();
-		Transform xf1 = bodyA.getTransform();
-		Transform xf2 = bodyB.getTransform();
-		Vec2 x1 = xf1.p;
-		Vec2 x2 = xf2.p;
+		Vec2 x1 = bodyA.getPosition();
+		Vec2 x2 = bodyB.getPosition();
 		Vec2 p1 = new Vec2();
 		Vec2 p2 = new Vec2();
 		joint.getAnchorA(p1);

@@ -83,9 +83,18 @@ public class Rot implements Serializable {
 		xAxis.set(c, s);
 	}
 
+	public final Vec2 getXAxis() {
+		return new Vec2(c,s);
+	}
+
 	public final void getYAxis(Vec2 yAxis) {
 		yAxis.set(-s, c);
 	}
+
+	public final Vec2 getYAxis() {
+		return new Vec2(-s,c);
+	}
+
 
 	@Override
 	public final Rot clone() {
@@ -93,6 +102,33 @@ public class Rot implements Serializable {
 		copy.s = s;
 		copy.c = c;
 		return copy;
+	}
+
+	/**
+	 * Multiply this rotation
+	 *
+	 * @param r the rotation to multiply by
+	 * @return this for chaining
+	 */
+	public final Rot mul(Rot r) {
+		float new_c = c * r.c - s * r.s;
+		float new_s = s * r.c + c * r.s;
+		c = new_c;
+		s = new_s;
+		return this;
+	}
+	
+	/**
+	 * Scale this rotation 
+		* 
+	 * @param s scale factor
+	 * @return this for chaining
+	 */
+	public final Rot scale(float s)
+	{
+		c*=s;
+		s*=s;
+		return this;
 	}
 
 	public static final void mul(Rot q, Rot r, Rot out) {

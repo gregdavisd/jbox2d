@@ -156,11 +156,10 @@ public class Transform implements Serializable {
 		out.p.add(A.p);
 	}
 
-	private static Vec2 pool = new Vec2();
-
 	public final static Transform mulTrans(final Transform A, final Transform B) {
 		Transform C = new Transform();
 		Rot.mulTransUnsafe(A.q, B.q, C.q);
+		Vec2 pool = new Vec2();
 		pool.set(B.p).sub(A.p);
 		Rot.mulTransUnsafe(A.q, pool, C.p);
 		return C;
@@ -169,6 +168,7 @@ public class Transform implements Serializable {
 	public final static void mulTransToOut(final Transform A, final Transform B, final Transform out) {
 		assert (out != A);
 		Rot.mulTrans(A.q, B.q, out.q);
+		Vec2 pool = new Vec2();
 		pool.set(B.p).sub(A.p);
 		Rot.mulTrans(A.q, pool, out.p);
 	}
@@ -178,6 +178,7 @@ public class Transform implements Serializable {
 		assert (out != A);
 		assert (out != B);
 		Rot.mulTransUnsafe(A.q, B.q, out.q);
+		Vec2 pool = new Vec2();
 		pool.set(B.p).sub(A.p);
 		Rot.mulTransUnsafe(A.q, pool, out.p);
 	}

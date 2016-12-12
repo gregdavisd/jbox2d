@@ -35,7 +35,7 @@ import org.jbox2d.common.Vec2;
  */
 public abstract class Shape {
 
-	public final byte m_type;
+	private final byte m_type;
 	public float m_radius;
 
 	public Shape(byte type) {
@@ -87,10 +87,10 @@ public abstract class Shape {
 	/**
 	 * Cast a ray against a child shape.
 	 *
-	 * @param argOutput the ray-cast results.
-	 * @param argInput the ray-cast input parameters.
-	 * @param argTransform the transform to be applied to the shape.
-	 * @param argChildIndex the child shape index
+	 * @param output the ray-cast results.
+	 * @param input the ray-cast input parameters.
+	 * @param transform the transform to be applied to the shape.
+	 * @param childIndex the child shape index
 	 * @return if hit
 	 */
 	public abstract boolean raycast(RayCastOutput output, RayCastInput input, Transform transform,

@@ -61,14 +61,7 @@ public class PolygonShape extends Shape {
 	 * Number of active vertices in the shape.
 	 */
 	public int m_count;
-
-	// pooling
-	private final Vec2 pool1 = new Vec2();
-	private final Vec2 pool2 = new Vec2();
-	private final Vec2 pool3 = new Vec2();
-	private final Vec2 pool4 = new Vec2();
-	private Transform poolt1 = new Transform();
-
+ 
 	public PolygonShape() {
 		super(ShapeType.POLYGON);
 
@@ -167,8 +160,8 @@ public class PolygonShape extends Shape {
 					continue;
 				}
 
-				Vec2 r = (Vec2) pool1.set(ps[ie]).sub(ps[hull[m]]);
-				Vec2 v = (Vec2) pool2.set(ps[j]).sub(ps[hull[m]]);
+				Vec2 r = (Vec2) new Vec2(ps[ie]).sub(ps[hull[m]]);
+				Vec2 v = (Vec2) new Vec2(ps[j]).sub(ps[hull[m]]);
 				float c = r.cross(v);
 				if (c < 0.0f) {
 					ie = j;
@@ -198,7 +191,7 @@ public class PolygonShape extends Shape {
 			m_vertices[i].set(ps[hull[i]]);
 		}
 
-		final Vec2 edge = pool1;
+		final Vec2 edge = new Vec2();
 
 		// Compute normals. Ensure the edges have non-zero length.
 		for (int i = 0; i < m_count; ++i) {
@@ -254,7 +247,7 @@ public class PolygonShape extends Shape {
 		m_normals[3].set(-1.0f, 0.0f);
 		m_centroid.set(center);
 
-		final Transform xf = poolt1;
+		final Transform xf =  new Transform();
 		xf.p.set(center);
 		xf.q.set(angle);
 
@@ -494,11 +487,11 @@ public class PolygonShape extends Shape {
 
 		// pRef is the reference point for forming triangles.
 		// It's location doesn't change the result (except for rounding error).
-		final Vec2 pRef = pool1;
+		final Vec2 pRef = new Vec2();
 		pRef.setZero();
 
-		final Vec2 e1 = pool2;
-		final Vec2 e2 = pool3;
+		final Vec2 e1 = new Vec2();
+		final Vec2 e2 = new Vec2();
 
 		final float inv3 = 1.0f / 3.0f;
 
@@ -553,14 +546,14 @@ public class PolygonShape extends Shape {
 
 		assert (m_count >= 3);
 
-		final Vec2 center = pool1;
+		final Vec2 center = new Vec2();
 		center.setZero();
 		float area = 0.0f;
 		float I = 0.0f;
 
 		// pRef is the reference point for forming triangles.
 		// It's location doesn't change the result (except for rounding error).
-		final Vec2 s = pool2;
+		final Vec2 s = new Vec2();
 		s.setZero();
 		// This code would put the reference point inside the polygon.
 		for (int i = 0; i < m_count; ++i) {
@@ -570,8 +563,8 @@ public class PolygonShape extends Shape {
 
 		final float k_inv3 = 1.0f / 3.0f;
 
-		final Vec2 e1 = pool3;
-		final Vec2 e2 = pool4;
+		final Vec2 e1 = new Vec2();
+		final Vec2 e2 = new Vec2();
 
 		for (int i = 0; i < m_count; ++i) {
 			// Triangle vertices.
@@ -621,14 +614,14 @@ public class PolygonShape extends Shape {
 			int i1 = i;
 			int i2 = i < m_count - 1 ? i1 + 1 : 0;
 			Vec2 p = m_vertices[i1];
-			Vec2 e = (Vec2) pool1.set(m_vertices[i2]).sub(p);
+			Vec2 e = (Vec2) new Vec2(m_vertices[i2]).sub(p);
 
 			for (int j = 0; j < m_count; ++j) {
 				if (j == i1 || j == i2) {
 					continue;
 				}
 
-				Vec2 v = (Vec2) pool2.set(m_vertices[j]).sub(p);
+				Vec2 v = (Vec2) new Vec2(m_vertices[j]).sub(p);
 				float c = e.cross(v);
 				if (c < 0.0f) {
 					return false;
