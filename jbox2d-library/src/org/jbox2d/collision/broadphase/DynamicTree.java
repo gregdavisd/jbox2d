@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
@@ -46,22 +48,14 @@ import org.jbox2d.common.Vec2;
 public class DynamicTree implements BroadPhaseStrategy, Serializable {
 
 	static final long serialVersionUID = 1L;
-	public static final int MAX_STACK_SIZE = 64;
-	public static final int NULL_NODE = -1;
-
+ 
 	private DynamicTreeNode m_root;
-	private DynamicTreeNode[] m_nodes;
-	private int m_nodeCount;
-	private int m_nodeCapacity;
-
-	private int m_freeList;
-
-	private Vec2[] drawVecs;
-	private DynamicTreeNode[] nodeStack;
-	private int nodeStackIndex = 0;
+	private final List<DynamicTreeNode> m_nodes;
 
 	public DynamicTree() {
-		init();
+		m_root = null;
+		m_nodes = new ArrayList<>();
+
 	}
 
 	@Override
@@ -84,10 +78,9 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 
 	@Override
 	public final void destroyProxy(int proxyId) {
-		assert (0 <= proxyId && proxyId < m_nodeCapacity);
-		DynamicTreeNode node = m_nodes[proxyId];
+		assert (0 <= proxyId && proxyId < m_nodes.size());
+		DynamicTreeNode node = m_nodes.get(proxyId);
 		assert (node.child1 == null);
-
 		removeLeaf(node);
 		freeNode(node);
 	}
@@ -95,8 +88,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 	@Override
 	public final boolean moveProxy(int proxyId, final AABB aabb, Vec2 displacement) {
 		assert (aabb.isValid());
-		assert (0 <= proxyId && proxyId < m_nodeCapacity);
-		final DynamicTreeNode node = m_nodes[proxyId];
+		assert (0 <= proxyId && proxyId < m_nodes.size());
+		final DynamicTreeNode node = m_nodes.get(proxyId);
 		assert (node.child1 == null);
 
 		final AABB nodeAABB = node.aabb;
@@ -137,159 +130,143 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 
 	@Override
 	public final Object getUserData(int proxyId) {
-		assert (0 <= proxyId && proxyId < m_nodeCapacity);
-		return m_nodes[proxyId].userData;
+		assert (0 <= proxyId && proxyId < m_nodes.size());
+		return m_nodes.get(proxyId).userData;
 	}
 
 	@Override
 	public final AABB getFatAABB(int proxyId) {
-		assert (0 <= proxyId && proxyId < m_nodeCapacity);
-		return m_nodes[proxyId].aabb;
+		assert (0 <= proxyId && proxyId < m_nodes.size());
+		return m_nodes.get(proxyId).aabb;
+	}
+
+	private boolean query_tree(DynamicTreeNode node, QueryInfo info) {
+		if (AABB.testOverlap(node.aabb, info.aabb)) {
+			if (node.child1 == null) {
+				boolean proceed = info.callback.treeCallback(node.id);
+				if (!proceed) {
+					return false;
+				}
+			} else {
+				if (!query_tree(node.child1, info)) {
+					return false;
+				}
+				if (node.child2 != null) {
+					if (!query_tree(node.child2, info)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	@Override
 	public final void query(TreeCallback callback, AABB aabb) {
 		assert (aabb.isValid());
-		nodeStackIndex = 0;
-		nodeStack[nodeStackIndex++] = m_root;
+		if (m_root==null)
+		{
+			return;
+		}
+		QueryInfo info = new QueryInfo(callback, aabb);
+		query_tree(m_root, info);
+	}
 
-		while (nodeStackIndex > 0) {
-			DynamicTreeNode node = nodeStack[--nodeStackIndex];
-			if (node == null) {
-				continue;
+	private void raycast_tree(DynamicTreeNode node, RaycastInfo info) {
+		final AABB nodeAABB = node.aabb;
+		if (!AABB.testOverlap(nodeAABB, info.segAABB)) {
+			return;
+		}
+
+		{
+			float cx = (nodeAABB.lowerBound.x + nodeAABB.upperBound.x) * .5f;
+			float cy = (nodeAABB.lowerBound.y + nodeAABB.upperBound.y) * .5f;
+			float hx = (nodeAABB.upperBound.x - nodeAABB.lowerBound.x) * .5f;
+			float hy = (nodeAABB.upperBound.y - nodeAABB.lowerBound.y) * .5f;
+			float tempx = info.p1.x - cx;
+			float tempy = info.p1.y - cy;
+			float separation = Math.abs(info.v.x * tempx + info.v.y * tempy) - (info.abs_v.x * hx + info.abs_v.y * hy);
+			if (separation > 0.0f) {
+				return;
+			}
+		}
+		if (node.child1 == null) {
+			RayCastInput subInput = new RayCastInput();
+			subInput.p1.x = info.p1.x;
+			subInput.p1.y = info.p1.y;
+			subInput.p2.x = info.p2.x;
+			subInput.p2.y = info.p2.y;
+			subInput.maxFraction = info.maxFraction;
+
+			float value = info.callback.raycastCallback(subInput, node.id);
+
+			if (value == 0.0f) {
+				// The client has terminated the ray cast.
+				return;
 			}
 
-			if (AABB.testOverlap(node.aabb, aabb)) {
-				if (node.child1 == null) {
-					boolean proceed = callback.treeCallback(node.id);
-					if (!proceed) {
-						return;
-					}
-				} else {
-					if (nodeStack.length - nodeStackIndex - 2 <= 0) {
-						DynamicTreeNode[] newBuffer = new DynamicTreeNode[nodeStack.length * 2];
-						System.arraycopy(nodeStack, 0, newBuffer, 0, nodeStack.length);
-						nodeStack = newBuffer;
-					}
-					nodeStack[nodeStackIndex++] = node.child1;
-					nodeStack[nodeStackIndex++] = node.child2;
-				}
+			if (value > 0.0f) {
+				// Update segment bounding box.
+				info.maxFraction = value;
+				// temp.set(p2).sub(p1).scale(maxFraction).add(p1);
+				// Vec2.minToOut(p1, temp, segAABB.lowerBound);
+				// Vec2.maxToOut(p1, temp, segAABB.upperBound);
+				float tempx = (info.p2.x - info.p1.x) * info.maxFraction + info.p1.x;
+				float tempy = (info.p2.y - info.p1.y) * info.maxFraction + info.p1.y;
+				info.segAABB.lowerBound.x = info.p1.x < tempx ? info.p1.x : tempx;
+				info.segAABB.lowerBound.y = info.p1.y < tempy ? info.p1.y : tempy;
+				info.segAABB.upperBound.x = info.p1.x > tempx ? info.p1.x : tempx;
+				info.segAABB.upperBound.y = info.p1.y > tempy ? info.p1.y : tempy;
+			}
+		} else {
+			raycast_tree(node.child1, info);
+			if (node.child2 != null) {
+				raycast_tree(node.child2, info);
 			}
 		}
 	}
 
-	private final Vec2 r = new Vec2();
-	private final AABB aabb = new AABB();
-	private final RayCastInput subInput = new RayCastInput();
-
 	@Override
 	public void raycast(TreeRayCastCallback callback, RayCastInput input) {
+		if (m_root==null)
+		{
+			return;
+		}
 		final Vec2 p1 = input.p1;
 		final Vec2 p2 = input.p2;
-		float p1x = p1.x, p2x = p2.x, p1y = p1.y, p2y = p2.y;
-		float vx, vy;
-		float rx, ry;
-		float absVx, absVy;
-		float cx, cy;
-		float hx, hy;
+
 		float tempx, tempy;
-		r.x = p2x - p1x;
-		r.y = p2y - p1y;
+		Vec2 r = (Vec2) new Vec2(p2).sub(p1);
 		assert ((r.x * r.x + r.y * r.y) > 0f);
 		r.normalize();
-		rx = r.x;
-		ry = r.y;
 
 		// v is perpendicular to the segment.
-		vx = -1f * ry;
-		vy = 1f * rx;
-		absVx = Math.abs(vx);
-		absVy = Math.abs(vy);
+		Vec2 v = new Vec2(-1f * r.y, 1f * r.x);
+		Vec2 abs_v = (Vec2) new Vec2(v).absolute();
 
 		// Separating axis for segment (Gino, p80).
 		// |dot(v, p1 - c)| > dot(|v|, h)
 		float maxFraction = input.maxFraction;
 
 		// Build a bounding box for the segment.
-		final AABB segAABB = aabb;
+		final AABB segAABB = new AABB();
 		// Vec2 t = p1 + maxFraction * (p2 - p1);
 		// before inline
 		// temp.set(p2).sub(p1).scale(maxFraction).add(p1);
 		// Vec2.minToOut(p1, temp, segAABB.lowerBound);
 		// Vec2.maxToOut(p1, temp, segAABB.upperBound);
-		tempx = (p2x - p1x) * maxFraction + p1x;
-		tempy = (p2y - p1y) * maxFraction + p1y;
-		segAABB.lowerBound.x = p1x < tempx ? p1x : tempx;
-		segAABB.lowerBound.y = p1y < tempy ? p1y : tempy;
-		segAABB.upperBound.x = p1x > tempx ? p1x : tempx;
-		segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
+		tempx = (p2.x - p1.x) * maxFraction + p1.x;
+		tempy = (p2.y - p1.y) * maxFraction + p1.y;
+		segAABB.lowerBound.x = p1.x < tempx ? p1.x : tempx;
+		segAABB.lowerBound.y = p1.y < tempy ? p1.y : tempy;
+		segAABB.upperBound.x = p1.x > tempx ? p1.x : tempx;
+		segAABB.upperBound.y = p1.y > tempy ? p1.y : tempy;
 		// end inline
 
-		nodeStackIndex = 0;
-		nodeStack[nodeStackIndex++] = m_root;
-		while (nodeStackIndex > 0) {
-			final DynamicTreeNode node = nodeStack[--nodeStackIndex];
-			if (node == null) {
-				continue;
-			}
+		RaycastInfo info = new RaycastInfo(segAABB, p1, p2, v, abs_v, callback);
+		info.maxFraction = maxFraction;
+		raycast_tree(m_root, info);
 
-			final AABB nodeAABB = node.aabb;
-			if (!AABB.testOverlap(nodeAABB, segAABB)) {
-				continue;
-			}
-
-			// Separating axis for segment (Gino, p80).
-			// |dot(v, p1 - c)| > dot(|v|, h)
-			// node.aabb.getCenterToOut(c);
-			// node.aabb.getExtentsToOut(h);
-			cx = (nodeAABB.lowerBound.x + nodeAABB.upperBound.x) * .5f;
-			cy = (nodeAABB.lowerBound.y + nodeAABB.upperBound.y) * .5f;
-			hx = (nodeAABB.upperBound.x - nodeAABB.lowerBound.x) * .5f;
-			hy = (nodeAABB.upperBound.y - nodeAABB.lowerBound.y) * .5f;
-			tempx = p1x - cx;
-			tempy = p1y - cy;
-			float separation = Math.abs(vx * tempx + vy * tempy) - (absVx * hx + absVy * hy);
-			if (separation > 0.0f) {
-				continue;
-			}
-
-			if (node.child1 == null) {
-				subInput.p1.x = p1x;
-				subInput.p1.y = p1y;
-				subInput.p2.x = p2x;
-				subInput.p2.y = p2y;
-				subInput.maxFraction = maxFraction;
-
-				float value = callback.raycastCallback(subInput, node.id);
-
-				if (value == 0.0f) {
-					// The client has terminated the ray cast.
-					return;
-				}
-
-				if (value > 0.0f) {
-					// Update segment bounding box.
-					maxFraction = value;
-					// temp.set(p2).sub(p1).scale(maxFraction).add(p1);
-					// Vec2.minToOut(p1, temp, segAABB.lowerBound);
-					// Vec2.maxToOut(p1, temp, segAABB.upperBound);
-					tempx = (p2x - p1x) * maxFraction + p1x;
-					tempy = (p2y - p1y) * maxFraction + p1y;
-					segAABB.lowerBound.x = p1x < tempx ? p1x : tempx;
-					segAABB.lowerBound.y = p1y < tempy ? p1y : tempy;
-					segAABB.upperBound.x = p1x > tempx ? p1x : tempx;
-					segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
-				}
-			} else {
-				if (nodeStack.length - nodeStackIndex - 2 <= 0) {
-					DynamicTreeNode[] newBuffer = new DynamicTreeNode[nodeStack.length * 2];
-					System.arraycopy(nodeStack, 0, newBuffer, 0, nodeStack.length);
-					nodeStack = newBuffer;
-				}
-				nodeStack[nodeStackIndex++] = node.child1;
-				nodeStack[nodeStackIndex++] = node.child2;
-			}
-		}
 	}
 
 	@Override
@@ -298,7 +275,7 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 	}
 
 	private final int computeHeight(DynamicTreeNode node) {
-		assert (0 <= node.id && node.id < m_nodeCapacity);
+		assert (0 <= node.id && node.id < m_nodes.size());
 
 		if (node.child1 == null) {
 			return 0;
@@ -315,18 +292,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 		validateStructure(m_root);
 		validateMetrics(m_root);
 
-		int freeCount = 0;
-		DynamicTreeNode freeNode = m_freeList != NULL_NODE ? m_nodes[m_freeList] : null;
-		while (freeNode != null) {
-			assert (0 <= freeNode.id && freeNode.id < m_nodeCapacity);
-			assert (freeNode == m_nodes[freeNode.id]);
-			freeNode = freeNode.parent;
-			++freeCount;
-		}
-
 		assert (getHeight() == computeHeight());
 
-		assert (m_nodeCount + freeCount == m_nodeCapacity);
 	}
 
 	@Override
@@ -340,8 +307,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 	@Override
 	public int getMaxBalance() {
 		int maxBalance = 0;
-		for (int i = 0; i < m_nodeCapacity; ++i) {
-			final DynamicTreeNode node = m_nodes[i];
+		for (int i = 0; i < m_nodes.size(); ++i) {
+			final DynamicTreeNode node = m_nodes.get(i);
 			if (node.height <= 1) {
 				continue;
 			}
@@ -367,8 +334,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 		float rootArea = root.aabb.getPerimeter();
 
 		float totalArea = 0.0f;
-		for (int i = 0; i < m_nodeCapacity; ++i) {
-			final DynamicTreeNode node = m_nodes[i];
+		for (int i = 0; i < m_nodes.size(); ++i) {
+			final DynamicTreeNode node = m_nodes.get(i);
 			if (node.height < 0) {
 				// Free node in pool
 				continue;
@@ -384,17 +351,17 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 	 * Build an optimal tree. Very expensive. For testing.
 	 */
 	public void rebuildBottomUp() {
-		int[] nodes = new int[m_nodeCount];
+		int[] nodes = new int[m_nodes.size()];
 		int count = 0;
 
 		// Build array of leaves. Free the rest.
-		for (int i = 0; i < m_nodeCapacity; ++i) {
-			if (m_nodes[i].height < 0) {
+		for (int i = 0; i < m_nodes.size(); ++i) {
+			if (m_nodes.get(i).height < 0) {
 				// free node in pool
 				continue;
 			}
 
-			DynamicTreeNode node = m_nodes[i];
+			DynamicTreeNode node = m_nodes.get(i);
 			if (node.child1 == null) {
 				node.parent = null;
 				nodes[count] = i;
@@ -409,10 +376,10 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 			float minCost = Float.MAX_VALUE;
 			int iMin = -1, jMin = -1;
 			for (int i = 0; i < count; ++i) {
-				AABB aabbi = m_nodes[nodes[i]].aabb;
+				AABB aabbi = m_nodes.get(nodes[i]).aabb;
 
 				for (int j = i + 1; j < count; ++j) {
-					AABB aabbj = m_nodes[nodes[j]].aabb;
+					AABB aabbj = m_nodes.get(nodes[j]).aabb;
 					b.combine(aabbi, aabbj);
 					float cost = b.getPerimeter();
 					if (cost < minCost) {
@@ -425,8 +392,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 
 			int index1 = nodes[iMin];
 			int index2 = nodes[jMin];
-			DynamicTreeNode child1 = m_nodes[index1];
-			DynamicTreeNode child2 = m_nodes[index2];
+			DynamicTreeNode child1 = m_nodes.get(index1);
+			DynamicTreeNode child2 = m_nodes.get(index2);
 
 			DynamicTreeNode parent = allocateNode();
 			parent.child1 = child1;
@@ -443,57 +410,36 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 			--count;
 		}
 
-		m_root = m_nodes[nodes[0]];
+		m_root = m_nodes.get(nodes[0]);
 
 		validate();
 	}
 
-	private final DynamicTreeNode allocateNode() {
-		if (m_freeList == NULL_NODE) {
-			assert (m_nodeCount == m_nodeCapacity);
-
-			DynamicTreeNode[] old = m_nodes;
-			m_nodeCapacity *= 2;
-			m_nodes = new DynamicTreeNode[m_nodeCapacity];
-			System.arraycopy(old, 0, m_nodes, 0, old.length);
-
-			// Build a linked list for the free list.
-			for (int i = m_nodeCapacity - 1; i >= m_nodeCount; i--) {
-				m_nodes[i] = new DynamicTreeNode(i);
-				m_nodes[i].parent = (i == m_nodeCapacity - 1) ? null : m_nodes[i + 1];
-				m_nodes[i].height = -1;
-			}
-			m_freeList = m_nodeCount;
+	private DynamicTreeNode allocateNode() {
+		int find = m_nodes.indexOf(null);
+		int id;
+		if (find != -1) {
+			id = find;
+		} else {
+			id = m_nodes.size();
+			m_nodes.add(null);
 		}
-		int nodeId = m_freeList;
-		final DynamicTreeNode treeNode = m_nodes[nodeId];
-		m_freeList = treeNode.parent != null ? treeNode.parent.id : NULL_NODE;
-
-		treeNode.parent = null;
-		treeNode.child1 = null;
-		treeNode.child2 = null;
-		treeNode.height = 0;
-		treeNode.userData = null;
-		++m_nodeCount;
-		return treeNode;
+		DynamicTreeNode new_node = new DynamicTreeNode(id);
+		m_nodes.set(id, new_node);
+		return new_node;
 	}
 
 	/**
 	 * returns a node to the pool
 	 */
-	private final void freeNode(DynamicTreeNode node) {
-		assert (node != null);
-		assert (0 < m_nodeCount);
-		node.parent = m_freeList != NULL_NODE ? m_nodes[m_freeList] : null;
-		node.height = -1;
-		m_freeList = node.id;
-		m_nodeCount--;
+	private void freeNode(DynamicTreeNode node) {
+		int find = m_nodes.indexOf(node);
+		assert (find != -1);
+		m_nodes.set(find, null);
 	}
 
-	private final AABB combinedAABB = new AABB();
-
-	private final void insertLeaf(int leaf_index) {
-		DynamicTreeNode leaf = m_nodes[leaf_index];
+	private void insertLeaf(int leaf_index) {
+		DynamicTreeNode leaf = m_nodes.get(leaf_index);
 		if (m_root == null) {
 			m_root = leaf;
 			m_root.parent = null;
@@ -509,7 +455,7 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 			DynamicTreeNode child2 = node.child2;
 
 			float area = node.aabb.getPerimeter();
-
+			AABB combinedAABB = new AABB();
 			combinedAABB.combine(node.aabb, leafAABB);
 			float combinedArea = combinedAABB.getPerimeter();
 
@@ -557,7 +503,7 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 		}
 
 		DynamicTreeNode sibling = index;
-		DynamicTreeNode oldParent = m_nodes[sibling.id].parent;
+		DynamicTreeNode oldParent = m_nodes.get(sibling.id).parent;
 		final DynamicTreeNode newParent = allocateNode();
 		newParent.parent = oldParent;
 		newParent.userData = null;
@@ -663,8 +609,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 
 		DynamicTreeNode iB = A.child1;
 		DynamicTreeNode iC = A.child2;
-		assert (0 <= iB.id && iB.id < m_nodeCapacity);
-		assert (0 <= iC.id && iC.id < m_nodeCapacity);
+		assert (0 <= iB.id && iB.id < m_nodes.size());
+		assert (0 <= iC.id && iC.id < m_nodes.size());
 
 		DynamicTreeNode B = iB;
 		DynamicTreeNode C = iC;
@@ -679,8 +625,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 			DynamicTreeNode G = iG;
 			assert (F != null);
 			assert (G != null);
-			assert (0 <= iF.id && iF.id < m_nodeCapacity);
-			assert (0 <= iG.id && iG.id < m_nodeCapacity);
+			assert (0 <= iF.id && iF.id < m_nodes.size());
+			assert (0 <= iG.id && iG.id < m_nodes.size());
 
 			// Swap A and C
 			C.child1 = iA;
@@ -729,8 +675,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 			DynamicTreeNode iE = B.child2;
 			DynamicTreeNode D = iD;
 			DynamicTreeNode E = iE;
-			assert (0 <= iD.id && iD.id < m_nodeCapacity);
-			assert (0 <= iE.id && iE.id < m_nodeCapacity);
+			assert (0 <= iD.id && iD.id < m_nodes.size());
+			assert (0 <= iE.id && iE.id < m_nodes.size());
 
 			// Swap A and B
 			B.child1 = iA;
@@ -780,7 +726,7 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 		if (node == null) {
 			return;
 		}
-		assert (node == m_nodes[node.id]);
+		assert (node == m_nodes.get(node.id));
 
 		if (node == m_root) {
 			assert (node.parent == null);
@@ -796,8 +742,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 			return;
 		}
 
-		assert (child1 != null && 0 <= child1.id && child1.id < m_nodeCapacity);
-		assert (child2 != null && 0 <= child2.id && child2.id < m_nodeCapacity);
+		assert (child1 != null && 0 <= child1.id && child1.id < m_nodes.size());
+		assert (child2 != null && 0 <= child2.id && child2.id < m_nodes.size());
 
 		assert (child1.parent == node);
 		assert (child2.parent == node);
@@ -821,8 +767,8 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 			return;
 		}
 
-		assert (child1 != null && 0 <= child1.id && child1.id < m_nodeCapacity);
-		assert (child2 != null && 0 <= child2.id && child2.id < m_nodeCapacity);
+		assert (child1 != null && 0 <= child1.id && child1.id < m_nodes.size());
+		assert (child2 != null && 0 <= child2.id && child2.id < m_nodes.size());
 
 		int height1 = child1.height;
 		int height2 = child2.height;
@@ -849,15 +795,17 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 		drawTree(argDraw, m_root, 0, height);
 	}
 
-	private final PrimeColor3f color = new PrimeColor3f();
-	private final Vec2 textVec = new Vec2();
-
 	public void drawTree(DebugDraw argDraw, DynamicTreeNode node, int spot, int height) {
+		Vec2[] drawVecs = new Vec2[4];
+		for (int i = 0; i < drawVecs.length; i++) {
+			drawVecs[i] = new Vec2();
+		}
 		node.aabb.getVertices(drawVecs);
+		PrimeColor3f color = new PrimeColor3f(1, (height - spot) * 1f / height, (height - spot) * 1f / height);
 
-		color.set(1, (height - spot) * 1f / height, (height - spot) * 1f / height);
 		argDraw.drawPolygon(drawVecs, 4, color);
 
+		Vec2 textVec = new Vec2();
 		argDraw.getViewportTranform().getWorldToScreen(node.aabb.upperBound, textVec);
 		argDraw.drawString(textVec.x, textVec.y, node.id + "-" + (spot + 1) + "/" + height, color);
 
@@ -869,32 +817,12 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 		}
 	}
 
-	private void init() {
-		m_root = null;
-		m_nodeCount = 0;
-		m_nodeCapacity = 16;
-		m_nodes = new DynamicTreeNode[16];
-		nodeStack = new DynamicTreeNode[20];
-
-		// Build a linked list for the free list.
-		for (int i = m_nodeCapacity - 1; i >= 0; i--) {
-			m_nodes[i] = new DynamicTreeNode(i);
-			m_nodes[i].parent = (i == m_nodeCapacity - 1) ? null : m_nodes[i + 1];
-			m_nodes[i].height = -1;
-		}
-		m_freeList = 0;
-		drawVecs = new Vec2[4];
-		for (int i = 0; i < drawVecs.length; i++) {
-			drawVecs[i] = new Vec2();
-		}
-	}
-
 	private void writeObject(ObjectOutputStream o)
 		throws IOException {
 
 		o.defaultWriteObject();
-		for (int i = 0; i < m_nodes.length; ++i) {
-			DynamicTreeNode m_node = m_nodes[i];
+		for (int i = 0; i < m_nodes.size(); ++i) {
+			DynamicTreeNode m_node = m_nodes.get(i);
 			o.writeObject(m_node.parent);
 		}
 
@@ -904,10 +832,43 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 		throws IOException, ClassNotFoundException {
 
 		o.defaultReadObject();
-		for (int i = 0; i < m_nodes.length; ++i) {
-			DynamicTreeNode m_node = m_nodes[i];
+		for (int i = 0; i < m_nodes.size(); ++i) {
+			DynamicTreeNode m_node = m_nodes.get(i);
 			m_node.parent = (DynamicTreeNode) o.readObject();
 		}
+	}
+
+	private static final class QueryInfo {
+
+		final TreeCallback callback;
+		final AABB aabb;
+
+		public QueryInfo(TreeCallback callback, AABB aabb) {
+			this.callback = callback;
+			this.aabb = aabb;
+		}
+
+	}
+
+	private final static class RaycastInfo {
+
+		final AABB segAABB;
+		float maxFraction;
+		final Vec2 p1;
+		final Vec2 p2;
+		final Vec2 v;
+		final Vec2 abs_v;
+		final TreeRayCastCallback callback;
+
+		public RaycastInfo(AABB segAABB, Vec2 p1, Vec2 p2, Vec2 v, Vec2 abs_v, TreeRayCastCallback callback) {
+			this.segAABB = segAABB;
+			this.p1 = p1;
+			this.p2 = p2;
+			this.v = v;
+			this.abs_v = abs_v;
+			this.callback = callback;
+		}
+
 	}
 
 }

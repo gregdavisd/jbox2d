@@ -37,7 +37,7 @@ public final class Mat22 extends Matrix2f implements Serializable {
 	 * Construct zero matrix. Note: this is NOT an identity matrix! djm fixed double allocation problem
 	 */
 	public Mat22() {
-		super();
+
 	}
 
 	/**

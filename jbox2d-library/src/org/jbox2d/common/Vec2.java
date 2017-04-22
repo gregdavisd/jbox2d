@@ -38,8 +38,7 @@ public final class Vec2 extends Tuple2f implements Serializable {
 	}
 
 	public Vec2() {
-		this.x = 0;
-		this.y = 0;
+
 	}
 
 }

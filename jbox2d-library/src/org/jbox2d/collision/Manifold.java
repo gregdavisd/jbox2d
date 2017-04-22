@@ -52,13 +52,6 @@ public class Manifold implements Serializable {
 
 	static final long serialVersionUID = 1L;
 
-	public static class ManifoldType implements Serializable {
-
-		static final long serialVersionUID = 1L;
-		public static final byte CIRCLES = 0;
-		public static final byte FACE_A = 1;
-		public static final byte FACE_B = 2;
-	}
 
 	/**
 	 * The points of contact.
@@ -126,5 +119,12 @@ public class Manifold implements Serializable {
 		localNormal.set(cp.localNormal);
 		localPoint.set(cp.localPoint);
 		pointCount = cp.pointCount;
+	}
+	public static class ManifoldType implements Serializable {
+		
+		static final long serialVersionUID = 1L;
+		public static final byte CIRCLES = 0;
+		public static final byte FACE_A = 1;
+		public static final byte FACE_B = 2;
 	}
 }

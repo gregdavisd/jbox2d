@@ -312,14 +312,6 @@ class SeparationFunction implements Serializable {
 
 	static final long serialVersionUID = 1L;
 
-	static class Type implements Serializable {
-
-		static final long serialVersionUID = 1L;
-		public static final byte POINTS = 0;
-		public static final byte FACE_A = 1;
-		public static final byte FACE_B = 2;
-	}
-
 	public DistanceProxy m_proxyA;
 	public DistanceProxy m_proxyB;
 	public byte m_type;
@@ -329,16 +321,6 @@ class SeparationFunction implements Serializable {
 	public Sweep m_sweepB;
 
 	// djm pooling
-	private final Vec2 localPointA = new Vec2();
-	private final Vec2 localPointB = new Vec2();
-	private final Vec2 pointA = new Vec2();
-	private final Vec2 pointB = new Vec2();
-	private final Vec2 localPointA1 = new Vec2();
-	private final Vec2 localPointA2 = new Vec2();
-	private final Vec2 normal = new Vec2();
-	private final Vec2 localPointB1 = new Vec2();
-	private final Vec2 localPointB2 = new Vec2();
-	private final Vec2 temp = new Vec2();
 	private final Transform xfa = new Transform();
 	private final Transform xfb = new Transform();
 
@@ -362,13 +344,15 @@ class SeparationFunction implements Serializable {
 		if (count == 1) {
 			m_type = Type.POINTS;
 			/*
-			 * Vec2 localPointA = m_proxyA.GetVertex(cache.indexA[0]); Vec2 localPointB = m_proxyB.GetVertex(cache.indexB[0]);
-			 * Vec2 pointA = Mul(transformA, localPointA); Vec2 pointB = Mul(transformB, localPointB); m_axis = pointB - pointA;
-			 * m_axis.Normalize();
+			* Vec2 localPointA = m_proxyA.GetVertex(cache.indexA[0]); Vec2 localPointB = m_proxyB.GetVertex(cache.indexB[0]);
+			* Vec2 pointA = Mul(transformA, localPointA); Vec2 pointB = Mul(transformB, localPointB); m_axis = pointB - pointA;
+			* m_axis.Normalize();
 			 */
-			localPointA.set(m_proxyA.getVertex(cache.indexA[0]));
-			localPointB.set(m_proxyB.getVertex(cache.indexB[0]));
+			final Vec2 pointA = new Vec2();
+			Vec2 localPointA = new Vec2(m_proxyA.getVertex(cache.indexA[0]));
+			Vec2 localPointB = new Vec2(m_proxyB.getVertex(cache.indexB[0]));
 			Transform.mulToOutUnsafe(xfa, localPointA, pointA);
+			final Vec2 pointB = new Vec2();
 			Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 			m_axis.set(pointB).sub(pointA);
 			float s = m_axis.length();
@@ -378,19 +362,24 @@ class SeparationFunction implements Serializable {
 			// Two points on B and one on A.
 			m_type = Type.FACE_B;
 
+			final Vec2 localPointB1 = new Vec2();
 			localPointB1.set(m_proxyB.getVertex(cache.indexB[0]));
+			final Vec2 localPointB2 = new Vec2();
 			localPointB2.set(m_proxyB.getVertex(cache.indexB[1]));
-
+			final Vec2 temp = new Vec2();
 			temp.set(localPointB2).sub(localPointB1);
 			((Vec2) m_axis.set(temp)).setLeftPerpendicular(1f);
 			m_axis.normalize();
 
+			final Vec2 normal = new Vec2();
 			Rot.mulToOutUnsafe(xfb.q, m_axis, normal);
 
 			m_localPoint.set(localPointB1).add(localPointB2).scale(.5f);
+			final Vec2 pointB = new Vec2();
 			Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 
-			localPointA.set(proxyA.getVertex(cache.indexA[0]));
+			Vec2 localPointA = new Vec2(proxyA.getVertex(cache.indexA[0]));
+			final Vec2 pointA = new Vec2();
 			Transform.mulToOutUnsafe(xfa, localPointA, pointA);
 
 			temp.set(pointA).sub(pointB);
@@ -403,20 +392,25 @@ class SeparationFunction implements Serializable {
 		} else {
 			// Two points on A and one or two points on B.
 			m_type = Type.FACE_A;
-
+			final Vec2 localPointA1 = new Vec2();
 			localPointA1.set(m_proxyA.getVertex(cache.indexA[0]));
+			final Vec2 localPointA2 = new Vec2();
 			localPointA2.set(m_proxyA.getVertex(cache.indexA[1]));
 
+			final Vec2 temp = new Vec2();
 			temp.set(localPointA2).sub(localPointA1);
 			((Vec2) m_axis.set(temp)).setLeftPerpendicular(1f);
 			m_axis.normalize();
 
+			final Vec2 normal = new Vec2();
 			Rot.mulToOutUnsafe(xfa.q, m_axis, normal);
 
 			m_localPoint.set(localPointA1).add(localPointA2).scale(.5f);
+			final Vec2 pointA = new Vec2();
 			Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 
-			localPointB.set(m_proxyB.getVertex(cache.indexB[0]));
+			Vec2 localPointB = new Vec2(m_proxyB.getVertex(cache.indexB[0]));
+			final Vec2 pointB = new Vec2();
 			Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 
 			temp.set(pointB).sub(pointA);
@@ -429,9 +423,6 @@ class SeparationFunction implements Serializable {
 		}
 	}
 
-	private final Vec2 axisA = new Vec2();
-	private final Vec2 axisB = new Vec2();
-
 	// float FindMinSeparation(int* indexA, int* indexB, float t) const
 	public float findMinSeparation(int[] indexes, float t) {
 
@@ -440,40 +431,50 @@ class SeparationFunction implements Serializable {
 
 		switch (m_type) {
 			case Type.POINTS: {
+				final Vec2 axisA = new Vec2();
 				Rot.mulTransUnsafe(xfa.q, m_axis, axisA);
+				final Vec2 axisB = new Vec2();
 				Rot.mulTransUnsafe(xfb.q, (Vec2) m_axis.negate(), axisB);
 				m_axis.negate();
 
 				indexes[0] = m_proxyA.getSupport(axisA);
 				indexes[1] = m_proxyB.getSupport(axisB);
 
-				localPointA.set(m_proxyA.getVertex(indexes[0]));
-				localPointB.set(m_proxyB.getVertex(indexes[1]));
-
+				Vec2 localPointA = new Vec2(m_proxyA.getVertex(indexes[0]));
+				Vec2 localPointB = new Vec2(m_proxyB.getVertex(indexes[1]));
+				final Vec2 pointA = new Vec2();
 				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
+				final Vec2 pointB = new Vec2();
 				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 
 				float separation = ((Vec2) pointB.sub(pointA)).dot(m_axis);
 				return separation;
 			}
 			case Type.FACE_A: {
+				final Vec2 normal = new Vec2();
 				Rot.mulToOutUnsafe(xfa.q, m_axis, normal);
+				final Vec2 pointA = new Vec2();
 				Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 
+				final Vec2 axisB = new Vec2();
 				Rot.mulTransUnsafe(xfb.q, (Vec2) normal.negate(), axisB);
 				normal.negate();
 
 				indexes[0] = -1;
 				indexes[1] = m_proxyB.getSupport(axisB);
 
-				localPointB.set(m_proxyB.getVertex(indexes[1]));
+				Vec2 localPointB = new Vec2(m_proxyB.getVertex(indexes[1]));
+				final Vec2 pointB = new Vec2();
 				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 
 				float separation = pointB.sub(pointA).dot(normal);
 				return separation;
 			}
 			case Type.FACE_B: {
+				final Vec2 axisA = new Vec2();
+				final Vec2 normal = new Vec2();
 				Rot.mulToOutUnsafe(xfb.q, m_axis, normal);
+				final Vec2 pointB = new Vec2();
 				Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 
 				Rot.mulTransUnsafe(xfa.q, (Vec2) normal.negate(), axisA);
@@ -482,7 +483,8 @@ class SeparationFunction implements Serializable {
 				indexes[1] = -1;
 				indexes[0] = m_proxyA.getSupport(axisA);
 
-				localPointA.set(m_proxyA.getVertex(indexes[0]));
+				Vec2 localPointA = new Vec2(m_proxyA.getVertex(indexes[0]));
+				final Vec2 pointA = new Vec2();
 				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
 
 				float separation = pointA.sub(pointB).dot(normal);
@@ -502,29 +504,37 @@ class SeparationFunction implements Serializable {
 
 		switch (m_type) {
 			case Type.POINTS: {
-				localPointA.set(m_proxyA.getVertex(indexA));
-				localPointB.set(m_proxyB.getVertex(indexB));
+				Vec2 localPointA = new Vec2(m_proxyA.getVertex(indexA));
+				Vec2 localPointB = new Vec2(m_proxyB.getVertex(indexB));
 
+				final Vec2 pointA = new Vec2();
 				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
+				final Vec2 pointB = new Vec2();
 				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 
 				float separation = pointB.sub(pointA).dot(m_axis);
 				return separation;
 			}
 			case Type.FACE_A: {
+				final Vec2 normal = new Vec2();
 				Rot.mulToOutUnsafe(xfa.q, m_axis, normal);
+				final Vec2 pointA = new Vec2();
 				Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 
-				localPointB.set(m_proxyB.getVertex(indexB));
+				Vec2 localPointB = new Vec2(m_proxyB.getVertex(indexB));
+				final Vec2 pointB = new Vec2();
 				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 				float separation = pointB.sub(pointA).dot(normal);
 				return separation;
 			}
 			case Type.FACE_B: {
+				final Vec2 normal = new Vec2();
 				Rot.mulToOutUnsafe(xfb.q, m_axis, normal);
+				final Vec2 pointB = new Vec2();
 				Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 
-				localPointA.set(m_proxyA.getVertex(indexA));
+				Vec2 localPointA = new Vec2(m_proxyA.getVertex(indexA));
+				final Vec2 pointA = new Vec2();
 				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
 
 				float separation = pointA.sub(pointB).dot(normal);
@@ -534,5 +544,13 @@ class SeparationFunction implements Serializable {
 				assert (false);
 				return 0f;
 		}
+	}
+
+	static class Type implements Serializable {
+
+		static final long serialVersionUID = 1L;
+		public static final byte POINTS = 0;
+		public static final byte FACE_A = 1;
+		public static final byte FACE_B = 2;
 	}
 }

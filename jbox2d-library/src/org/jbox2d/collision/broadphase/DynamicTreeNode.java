@@ -36,12 +36,18 @@ public class DynamicTreeNode implements Serializable {
 
 	public Object userData;
 
+	/* parent link makes all the  tree nodes reachable via recursion, which causes serialization to crash with a stack overflow assertion.
+	 */
 	transient protected DynamicTreeNode parent;
 
 	protected DynamicTreeNode child1;
 	protected DynamicTreeNode child2;
 	protected final int id;
 	protected int height;
+
+	protected DynamicTreeNode(int id) {
+		this.id = id;
+	}
 
 	public Object getUserData() {
 		return userData;
@@ -51,7 +57,4 @@ public class DynamicTreeNode implements Serializable {
 		userData = argData;
 	}
 
-	protected DynamicTreeNode(int id) {
-		this.id = id;
-	}
 }

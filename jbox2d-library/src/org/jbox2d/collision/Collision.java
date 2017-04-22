@@ -34,7 +34,6 @@ import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-
 import org.jbox2d.pooling.IWorldPool;
 
 /**
@@ -47,46 +46,7 @@ public class Collision implements Serializable {
 
 	static final long serialVersionUID = 1L;
 	public static final int NULL_FEATURE = Integer.MAX_VALUE;
-
-	private final IWorldPool pool;
-
-	public Collision(IWorldPool argPool) {
-		incidentEdge[0] = new ClipVertex();
-		incidentEdge[1] = new ClipVertex();
-		clipPoints1[0] = new ClipVertex();
-		clipPoints1[1] = new ClipVertex();
-		clipPoints2[0] = new ClipVertex();
-		clipPoints2[1] = new ClipVertex();
-		pool = argPool;
-	}
-
-	private final DistanceInput input = new DistanceInput();
-	private final SimplexCache cache = new SimplexCache();
-	private final DistanceOutput output = new DistanceOutput();
-
-	/**
-	 * Determine if two generic shapes overlap.
-	 *
-	 * @param shapeA
-	 * @param shapeB
-	 * @param xfA
-	 * @param xfB
-	 * @return
-	 */
-	public final boolean testOverlap(Shape shapeA, int indexA, Shape shapeB, int indexB,
-		Transform xfA, Transform xfB) {
-		input.proxyA.set(shapeA, indexA);
-		input.proxyB.set(shapeB, indexB);
-		input.transformA.set(xfA);
-		input.transformB.set(xfB);
-		input.useRadii = true;
-
-		cache.count = 0;
-
-		pool.getDistance().distance(output, cache, input);
-		// djm note: anything significant about 10.0f?
-		return output.distance < 10.0f * Settings.EPSILON;
-	}
+	// #### COLLISION STUFF (not from collision.h or collision.cpp) ####
 
 	/**
 	 * Compute the point states given two manifolds. The states pertain to the transition from manifold1 to manifold2. So state1 is
@@ -186,9 +146,42 @@ public class Collision implements Serializable {
 		return numOut;
 	}
 
-	// #### COLLISION STUFF (not from collision.h or collision.cpp) ####
-	// djm pooling
-	private static Vec2 d = new Vec2();
+	private final IWorldPool pool;
+
+	private final SimplexCache cache = new SimplexCache();
+
+	private final EPCollider collider = new EPCollider();
+
+	public Collision(IWorldPool argPool) {
+
+		pool = argPool;
+	}
+
+	/**
+	 * Determine if two generic shapes overlap.
+	 *
+	 * @param shapeA
+	 * @param shapeB
+	 * @param xfA
+	 * @param xfB
+	 * @return
+	 */
+	public final boolean testOverlap(Shape shapeA, int indexA, Shape shapeB, int indexB,
+		Transform xfA, Transform xfB) {
+		DistanceInput input = new DistanceInput();
+		input.proxyA.set(shapeA, indexA);
+		input.proxyB.set(shapeB, indexB);
+		input.transformA.set(xfA);
+		input.transformB.set(xfB);
+		input.useRadii = true;
+
+		cache.count = 0;
+		DistanceOutput output = new DistanceOutput();
+		pool.getDistance().distance(output, cache, input);
+		// djm note: anything significant about 10.0f?
+
+		return output.distance < 10.0f * Settings.EPSILON;
+	}
 
 	/**
 	 * Compute the collision manifold between two circles.
@@ -423,12 +416,6 @@ public class Collision implements Serializable {
 		}
 	}
 
-	// djm pooling, and from above
-	private final Vec2 temp = new Vec2();
-	private final Transform xf = new Transform();
-	private final Vec2 n = new Vec2();
-	private final Vec2 v1 = new Vec2();
-
 	/**
 	 * Find the max separation between poly1 and poly2 using edge normals from poly1.
 	 *
@@ -447,11 +434,14 @@ public class Collision implements Serializable {
 		Vec2[] v1s = poly1.m_vertices;
 		Vec2[] v2s = poly2.m_vertices;
 
+		Transform xf = new Transform();
 		Transform.mulTransToOutUnsafe(xf2, xf1, xf);
 		final Rot xfq = xf.q;
 
 		int bestIndex = 0;
 		float maxSeparation = -Float.MAX_VALUE;
+		Vec2 n = new Vec2();
+		Vec2 v1 = new Vec2();
 		for (int i = 0; i < count1; i++) {
 			// Get poly1 normal in frame2.
 			Rot.mulToOutUnsafe(xfq, n1s[i], n);
@@ -543,18 +533,6 @@ public class Collision implements Serializable {
 		c1.id.typeB = (byte) ContactID.Type.VERTEX;
 	}
 
-	private final EdgeResults results1 = new EdgeResults();
-	private final EdgeResults results2 = new EdgeResults();
-	private final ClipVertex[] incidentEdge = new ClipVertex[2];
-	private final Vec2 localTangent = new Vec2();
-	private final Vec2 localNormal = new Vec2();
-	private final Vec2 planePoint = new Vec2();
-	private final Vec2 tangent = new Vec2();
-	private final Vec2 v11 = new Vec2();
-	private final Vec2 v12 = new Vec2();
-	private final ClipVertex[] clipPoints1 = new ClipVertex[2];
-	private final ClipVertex[] clipPoints2 = new ClipVertex[2];
-
 	/**
 	 * Compute the collision manifold between two polygons.
 	 *
@@ -576,11 +554,13 @@ public class Collision implements Serializable {
 		manifold.pointCount = 0;
 		float totalRadius = polyA.m_radius + polyB.m_radius;
 
+		final EdgeResults results1 = new EdgeResults();
 		findMaxSeparation(results1, polyA, xfA, polyB, xfB);
 		if (results1.separation > totalRadius) {
 			return;
 		}
 
+		final EdgeResults results2 = new EdgeResults();
 		findMaxSeparation(results2, polyB, xfB, polyA, xfA);
 		if (results2.separation > totalRadius) {
 			return;
@@ -612,6 +592,7 @@ public class Collision implements Serializable {
 		}
 		final Rot xf1q = xf1.q;
 
+		final ClipVertex[] incidentEdge = new ClipVertex[]{new ClipVertex(), new ClipVertex()};
 		findIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
 
 		int count1 = poly1.m_count;
@@ -619,23 +600,18 @@ public class Collision implements Serializable {
 
 		final int iv1 = edge1;
 		final int iv2 = edge1 + 1 < count1 ? edge1 + 1 : 0;
-		v11.set(vertices1[iv1]);
-		v12.set(vertices1[iv2]);
-		localTangent.x = v12.x - v11.x;
-		localTangent.y = v12.y - v11.y;
-		localTangent.normalize();
+		final Vec2 v11 = new Vec2(vertices1[iv1]);
+		final Vec2 v12 = new Vec2(vertices1[iv2]);
+		final Vec2 localTangent = (Vec2) new Vec2(v12.x - v11.x, v12.y - v11.y).normalize();
 
 		// Vec2 localNormal = Vec2.cross(dv, 1.0f);
-		localNormal.x = 1f * localTangent.y;
-		localNormal.y = -1f * localTangent.x;
+		final Vec2 localNormal = new Vec2(localTangent.y, -localTangent.x);
 
 		// Vec2 planePoint = 0.5f * (v11+ v12);
-		planePoint.x = (v11.x + v12.x) * .5f;
-		planePoint.y = (v11.y + v12.y) * .5f;
+		final Vec2 planePoint = new Vec2((v11.x + v12.x) * .5f, (v11.y + v12.y) * .5f);
 
 		// Rot.mulToOutUnsafe(xf1.q, localTangent, tangent);
-		tangent.x = xf1q.c * localTangent.x - xf1q.s * localTangent.y;
-		tangent.y = xf1q.s * localTangent.x + xf1q.c * localTangent.y;
+		final Vec2 tangent = new Vec2(xf1q.c * localTangent.x - xf1q.s * localTangent.y, xf1q.s * localTangent.x + xf1q.c * localTangent.y);
 
 		// Vec2.crossToOutUnsafe(tangent, 1f, normal);
 		final float normalx = 1f * tangent.y;
@@ -664,6 +640,7 @@ public class Collision implements Serializable {
 		// Clip to box side 1
 		// np = ClipSegmentToLine(clipPoints1, incidentEdge, -sideNormal, sideOffset1);
 		tangent.negate();
+		final ClipVertex[] clipPoints1 = new ClipVertex[]{new ClipVertex(), new ClipVertex()};
 		np = clipSegmentToLine(clipPoints1, incidentEdge, tangent, sideOffset1, iv1);
 		tangent.negate();
 
@@ -672,6 +649,7 @@ public class Collision implements Serializable {
 		}
 
 		// Clip to negative box side 1
+		final ClipVertex[] clipPoints2 = new ClipVertex[]{new ClipVertex(), new ClipVertex()};
 		np = clipSegmentToLine(clipPoints2, clipPoints1, tangent, sideOffset2, iv2);
 
 		if (np < 2) {
@@ -707,12 +685,6 @@ public class Collision implements Serializable {
 		manifold.pointCount = pointCount;
 	}
 
-	private final Vec2 Q = new Vec2();
-	private final Vec2 e = new Vec2();
-	private final ContactID cf = new ContactID();
-	private final Vec2 e1 = new Vec2();
-	private final Vec2 P = new Vec2();
-
 	// Compute contact points for edge versus circle.
 	// This accounts for edge connectivity.
 	public void collideEdgeAndCircle(Manifold manifold, final EdgeShape edgeA, final Transform xfA,
@@ -721,12 +693,14 @@ public class Collision implements Serializable {
 
 		// Compute circle in frame of edge
 		// Vec2 Q = MulT(xfA, Mul(xfB, circleB.m_p));
+		Vec2 temp = new Vec2();
 		Transform.mulToOutUnsafe(xfB, circleB.m_p, temp);
+		final Vec2 Q = new Vec2();
 		Transform.mulTransToOutUnsafe(xfA, temp, Q);
 
 		final Vec2 A = edgeA.m_vertex1;
 		final Vec2 B = edgeA.m_vertex2;
-		e.set(B).sub(A);
+		final Vec2 e = (Vec2) new Vec2(B).sub(A);
 
 		// Barycentric coordinates
 		float u = e.dot((Vec2) temp.set(B).sub(Q));
@@ -735,10 +709,12 @@ public class Collision implements Serializable {
 		float radius = edgeA.m_radius + circleB.m_radius;
 
 		// ContactFeature cf;
+		final ContactID cf = new ContactID();
 		cf.indexB = 0;
 		cf.typeB = (byte) ContactID.Type.VERTEX;
 
 		// Region A
+		final Vec2 d = new Vec2();
 		if (v <= 0.0f) {
 			final Vec2 P = A;
 			d.set(Q).sub(P);
@@ -748,6 +724,7 @@ public class Collision implements Serializable {
 			}
 
 			// Is there an edge connected to A?
+			final Vec2 e1 = new Vec2();
 			if (edgeA.m_hasVertex0) {
 				final Vec2 A1 = edgeA.m_vertex0;
 				final Vec2 B1 = A;
@@ -785,8 +762,7 @@ public class Collision implements Serializable {
 			if (edgeA.m_hasVertex3) {
 				final Vec2 B2 = edgeA.m_vertex3;
 				final Vec2 A2 = B;
-				final Vec2 e2 = e1;
-				e2.set(B2).sub(A2);
+				final Vec2 e2 = (Vec2) new Vec2(B2).sub(A2);
 				float v2 = e2.dot((Vec2) temp.set(Q).sub(A2));
 
 				// Is the circle in Region AB of the next edge?
@@ -812,6 +788,7 @@ public class Collision implements Serializable {
 		assert (den > 0.0f);
 
 		// Vec2 P = (1.0f / den) * (u * A + v * B);
+		final Vec2 P = new Vec2();
 		P.set(A).scale(u).add(temp.set(B).scale(v));
 		P.scale(1.0f / den);
 		d.set(Q).sub(P);
@@ -820,8 +797,8 @@ public class Collision implements Serializable {
 			return;
 		}
 
-		n.x = -e.y;
-		n.y = e.x;
+		Vec2 n = new Vec2(-e.y, e.x);
+
 		if (n.dot((Vec2) temp.set(Q).sub(A)) < 0.0f) {
 			n.set(-n.x, -n.y);
 		}
@@ -837,8 +814,6 @@ public class Collision implements Serializable {
 		manifold.points[0].id.set(cf);
 		manifold.points[0].localPoint.set(circleB.m_p);
 	}
-
-	private final EPCollider collider = new EPCollider();
 
 	public void collideEdgeAndPolygon(Manifold manifold, final EdgeShape edgeA, final Transform xfA,
 		final PolygonShape polygonB, final Transform xfB) {
@@ -980,12 +955,6 @@ public class Collision implements Serializable {
 
 		final TempPolygon m_polygonB = new TempPolygon();
 
-		final Transform m_xf = new Transform();
-		final Vec2 m_centroidB = new Vec2();
-		Vec2 m_v0 = new Vec2();
-		Vec2 m_v1 = new Vec2();
-		Vec2 m_v2 = new Vec2();
-		Vec2 m_v3 = new Vec2();
 		final Vec2 m_normal0 = new Vec2();
 		final Vec2 m_normal1 = new Vec2();
 		final Vec2 m_normal2 = new Vec2();
@@ -999,61 +968,62 @@ public class Collision implements Serializable {
 		boolean m_front;
 
 		public EPCollider() {
-			for (int i = 0; i < 2; i++) {
-				ie[i] = new ClipVertex();
-				clipPoints1[i] = new ClipVertex();
-				clipPoints2[i] = new ClipVertex();
-			}
+
 		}
 
-		private final Vec2 edge1 = new Vec2();
-		private final Vec2 temp = new Vec2();
-		private final Vec2 edge0 = new Vec2();
-		private final Vec2 edge2 = new Vec2();
-		private final ClipVertex[] ie = new ClipVertex[2];
-		private final ClipVertex[] clipPoints1 = new ClipVertex[2];
-		private final ClipVertex[] clipPoints2 = new ClipVertex[2];
+		private final ClipVertex[] ie = new ClipVertex[]{new ClipVertex(), new ClipVertex()};
+
 		private final ReferenceFace rf = new ReferenceFace();
 		private final EPAxis edgeAxis = new EPAxis();
 		private final EPAxis polygonAxis = new EPAxis();
 
 		public void collide(Manifold manifold, final EdgeShape edgeA, final Transform xfA,
 			final PolygonShape polygonB, final Transform xfB) {
-
+			final Transform m_xf = new Transform();
 			Transform.mulTransToOutUnsafe(xfA, xfB, m_xf);
+			final Vec2 m_centroidB = new Vec2();
 			Transform.mulToOutUnsafe(m_xf, polygonB.m_centroid, m_centroidB);
 
-			m_v0 = edgeA.m_vertex0;
-			m_v1 = edgeA.m_vertex1;
-			m_v2 = edgeA.m_vertex2;
-			m_v3 = edgeA.m_vertex3;
+			Vec2 m_v0 = edgeA.m_vertex0;
+			 Vec2 m_v1 = edgeA.m_vertex1;
+			Vec2  m_v2 = edgeA.m_vertex2;
+			Vec2 m_v3 = edgeA.m_vertex3;
 
 			boolean hasVertex0 = edgeA.m_hasVertex0;
 			boolean hasVertex3 = edgeA.m_hasVertex3;
 
-			edge1.set(m_v2).sub(m_v1);
+			final Vec2 edge1 = (Vec2) new Vec2(m_v2).sub(m_v1);
 			edge1.normalize();
 			m_normal1.set(edge1.y, -edge1.x);
-			float offset1 = m_normal1.dot((Vec2) temp.set(m_centroidB).sub(m_v1));
+
+			float offset1 = m_normal1
+				.dot((Vec2) new Vec2(m_centroidB)
+					.sub(m_v1));
 			float offset0 = 0.0f, offset2 = 0.0f;
 			boolean convex1 = false, convex2 = false;
 
 			// Is there a preceding edge?
 			if (hasVertex0) {
-				edge0.set(m_v1).sub(m_v0);
-				edge0.normalize();
+				final Vec2 edge0
+					= (Vec2) new Vec2(m_v1)
+						.sub(m_v0)
+						.normalize();
 				m_normal0.set(edge0.y, -edge0.x);
 				convex1 = edge0.cross(edge1) >= 0.0f;
-				offset0 = m_normal0.dot((Vec2) temp.set(m_centroidB).sub(m_v0));
+				offset0 = m_normal0.dot((Vec2) new Vec2(m_centroidB).sub(m_v0));
 			}
 
 			// Is there a following edge?
 			if (hasVertex3) {
-				edge2.set(m_v3).sub(m_v2);
-				edge2.normalize();
+				final Vec2 edge2
+					= (Vec2) new Vec2(m_v3)
+						.sub(m_v2)
+						.normalize();
 				m_normal2.set(edge2.y, -edge2.x);
 				convex2 = edge1.cross(edge2) > 0.0f;
-				offset2 = m_normal2.dot((Vec2) temp.set(m_centroidB).sub(m_v2));
+				offset2 = m_normal2
+					.dot((Vec2) new Vec2(m_centroidB)
+						.sub(m_v2));
 			}
 
 			// Determine front or back collision. Determine collision normal limits.
@@ -1229,7 +1199,7 @@ public class Collision implements Serializable {
 
 			manifold.pointCount = 0;
 
-			computeEdgeSeparation(edgeAxis);
+			computeEdgeSeparation(edgeAxis,m_v1);
 
 			// If no valid normal can be found than this edge should not collide.
 			if (edgeAxis.type == EPAxis.Type.UNKNOWN) {
@@ -1240,7 +1210,7 @@ public class Collision implements Serializable {
 				return;
 			}
 
-			computePolygonSeparation(polygonAxis);
+			computePolygonSeparation(polygonAxis,m_v1,m_v2);
 			if (polygonAxis.type != EPAxis.Type.UNKNOWN && polygonAxis.separation > m_radius) {
 				return;
 			}
@@ -1334,6 +1304,7 @@ public class Collision implements Serializable {
 			int np;
 
 			// Clip to box side 1
+			final ClipVertex[] clipPoints1 = new ClipVertex[]{new ClipVertex(), new ClipVertex()};
 			np = clipSegmentToLine(clipPoints1, ie, rf.sideNormal1, rf.sideOffset1, rf.i1);
 
 			if (np < Settings.maxManifoldPoints) {
@@ -1341,6 +1312,7 @@ public class Collision implements Serializable {
 			}
 
 			// Clip to negative box side 1
+			final ClipVertex[] clipPoints2 = new ClipVertex[]{new ClipVertex(), new ClipVertex()};
 			np = clipSegmentToLine(clipPoints2, clipPoints1, rf.sideNormal2, rf.sideOffset2, rf.i2);
 
 			if (np < Settings.maxManifoldPoints) {
@@ -1360,7 +1332,7 @@ public class Collision implements Serializable {
 			for (int i = 0; i < Settings.maxManifoldPoints; ++i) {
 				float separation;
 
-				separation = rf.normal.dot((Vec2) temp.set(clipPoints2[i].v).sub(rf.v1));
+				separation = rf.normal.dot((Vec2) new Vec2(clipPoints2[i].v).sub(rf.v1));
 
 				if (separation <= m_radius) {
 					ManifoldPoint cp = manifold.points[pointCount];
@@ -1384,7 +1356,7 @@ public class Collision implements Serializable {
 			manifold.pointCount = pointCount;
 		}
 
-		public void computeEdgeSeparation(EPAxis axis) {
+		public void computeEdgeSeparation(EPAxis axis, Vec2 m_v1) {
 			axis.type = EPAxis.Type.EDGE_A;
 			axis.index = m_front ? 0 : 1;
 			axis.separation = Float.MAX_VALUE;
@@ -1403,9 +1375,8 @@ public class Collision implements Serializable {
 		}
 
 		private final Vec2 perp = new Vec2();
-		private final Vec2 n = new Vec2();
-
-		public void computePolygonSeparation(EPAxis axis) {
+ 
+		public void computePolygonSeparation(EPAxis axis,Vec2 m_v1,Vec2 m_v2) {
 			axis.type = EPAxis.Type.UNKNOWN;
 			axis.index = -1;
 			axis.separation = -Float.MAX_VALUE;
@@ -1416,11 +1387,8 @@ public class Collision implements Serializable {
 			for (int i = 0; i < m_polygonB.count; ++i) {
 				Vec2 normalB = m_polygonB.normals[i];
 				Vec2 vB = m_polygonB.vertices[i];
-				n.x = -normalB.x;
-				n.y = -normalB.y;
+				 final Vec2 n = new Vec2(-normalB.x,-normalB.y);
 
-				// float s1 = Vec2.dot(n, temp.set(vB).sub(m_v1));
-				// float s2 = Vec2.dot(n, temp.set(vB).sub(m_v2));
 				float tempx = vB.x - m_v1.x;
 				float tempy = vB.y - m_v1.y;
 				float s1 = n.x * tempx + n.y * tempy;
@@ -1439,11 +1407,11 @@ public class Collision implements Serializable {
 
 				// Adjacency
 				if (n.x * perp.x + n.y * perp.y >= 0.0f) {
-					if (((Vec2) temp.set(n).sub(m_upperLimit)).dot(m_normal) < -Settings.angularSlop) {
+					if (((Vec2) new Vec2(n).sub(m_upperLimit)).dot(m_normal) < -Settings.angularSlop) {
 						continue;
 					}
 				} else {
-					if (((Vec2) temp.set(n).sub(m_lowerLimit)).dot(m_normal) < -Settings.angularSlop) {
+					if (((Vec2) new Vec2(n).sub(m_lowerLimit)).dot(m_normal) < -Settings.angularSlop) {
 						continue;
 					}
 				}

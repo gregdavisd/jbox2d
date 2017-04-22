@@ -619,10 +619,7 @@ public class Distance implements Serializable {
 	private int[] saveA = new int[3];
 	private int[] saveB = new int[3];
 	private Vec2 closestPoint = new Vec2();
-	private Vec2 d = new Vec2();
-	private Vec2 temp = new Vec2();
-	private Vec2 normal = new Vec2();
-
+ 
 	/**
 	 * Compute the closest points between two shapes. Supports any combination of: CircleShape and PolygonShape. The simplex cache is
 	 * input/output. On the first call set SimplexCache.count to zero.
@@ -696,6 +693,7 @@ public class Distance implements Serializable {
 			distanceSqr1 = distanceSqr2;
 
 			// get search direction;
+			Vec2 d = new Vec2();
 			simplex.getSearchDirection(d);
 
 			// Ensure the search direction is numerically fit.
@@ -717,7 +715,7 @@ public class Distance implements Serializable {
 
 			// Compute a tentative new simplex vertex using support points.
 			SimplexVertex vertex = vertices[simplex.m_count];
-
+ Vec2 temp = new Vec2();
 			Rot.mulTransUnsafe(transformA.q, (Vec2) d.negate(), temp);
 			vertex.indexA = proxyA.getSupport(temp);
 			Transform.mulToOutUnsafe(transformA, proxyA.getVertex(vertex.indexA), vertex.wA);
@@ -768,8 +766,10 @@ public class Distance implements Serializable {
 				// Shapes are still no overlapped.
 				// Move the witness points to the outer surface.
 				output.distance -= rA + rB;
+				Vec2 normal = new Vec2();
 				normal.set(output.pointB).sub(output.pointA);
 				normal.normalize();
+				 Vec2 temp = new Vec2();
 				temp.set(normal).scale(rA);
 				output.pointA.add(temp);
 				temp.set(normal).scale(rB);
