@@ -1,5 +1,6 @@
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
@@ -8,7 +9,9 @@ import org.jbox2d.dynamics.Body;
  *
  * @author dmurph
  */
-public class MotorJointDef extends JointDef {
+public class MotorJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Position of bodyB minus the position of bodyA, in bodyA's frame, in meters.

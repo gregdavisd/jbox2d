@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
 /**
@@ -30,7 +31,9 @@ import org.jbox2d.common.Vec2;
  *
  * @author Daniel
  */
-public class MouseJointDef extends JointDef {
+public class MouseJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The initial world target point. This is assumed to coincide with the body anchor initially.
@@ -38,8 +41,8 @@ public class MouseJointDef extends JointDef {
 	public final Vec2 target = new Vec2();
 
 	/**
-	 * The maximum constraint force that can be exerted to move the candidate body. Usually you will express as some
-	 * multiple of the weight (multiplier * mass * gravity).
+	 * The maximum constraint force that can be exerted to move the candidate body. Usually you will express as some multiple of the
+	 * weight (multiplier * mass * gravity).
 	 */
 	public float maxForce;
 

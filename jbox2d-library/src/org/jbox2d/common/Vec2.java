@@ -11,27 +11,35 @@
  ***************************************************************************** */
 package org.jbox2d.common;
 
+import java.io.Serializable;
 import javax.vecmath.Tuple2f;
 
 /**
  *
  * @author Gregery Barton
  */
-public class Vec2 extends Tuple2f {
+public final class Vec2 extends Tuple2f implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public Vec2(float x, float y) {
-		super(x, y);
+		this.x = x;
+		this.y = y;
 	}
 
 	public Vec2(float[] t) {
-		super(t);
+		this.x = t[0];
+		this.y = t[1];
 	}
 
 	public Vec2(Tuple2f t1) {
-		super(t1);
+		this.x = t1.x;
+		this.y = t1.y;
 	}
 
 	public Vec2() {
+		this.x = 0;
+		this.y = 0;
 	}
 
 }

@@ -25,24 +25,24 @@ public class ParticleTypes extends TestbedTest {
 
 			{
 				PolygonShape shape = new PolygonShape();
-				Vec2[] vertices =
-					new Vec2[]{new Vec2(-40, -10), new Vec2(40, -10), new Vec2(40, 0), new Vec2(-40, 0)};
+				Vec2[] vertices
+					= new Vec2[]{new Vec2(-40, -10), new Vec2(40, -10), new Vec2(40, 0), new Vec2(-40, 0)};
 				shape.set(vertices, 4);
 				ground.createFixture(shape, 0.0f);
 			}
 
 			{
 				PolygonShape shape = new PolygonShape();
-				Vec2[] vertices =
-					new Vec2[]{new Vec2(-40, -1), new Vec2(-20, -1), new Vec2(-20, 20), new Vec2(-40, 30)};
+				Vec2[] vertices
+					= new Vec2[]{new Vec2(-40, -1), new Vec2(-20, -1), new Vec2(-20, 20), new Vec2(-40, 30)};
 				shape.set(vertices, 4);
 				ground.createFixture(shape, 0.0f);
 			}
 
 			{
 				PolygonShape shape = new PolygonShape();
-				Vec2[] vertices =
-					new Vec2[]{new Vec2(20, -1), new Vec2(40, -1), new Vec2(40, 30), new Vec2(20, 20)};
+				Vec2[] vertices
+					= new Vec2[]{new Vec2(20, -1), new Vec2(40, -1), new Vec2(40, 30), new Vec2(20, 20)};
 				shape.set(vertices, 4);
 				ground.createFixture(shape, 0.0f);
 			}
@@ -120,7 +120,7 @@ public class ParticleTypes extends TestbedTest {
 	public void step(TestbedSettings settings) {
 		super.step(settings);
 
-		Vec2 p = circle.getTransform().p;
+		Vec2 p = circle.getPosition();
 		Vec2 v = circle.getLinearVelocity();
 
 		if ((p.x < -10.0f && v.x < 0.0f) || (p.x > 10.0f && v.x > 0.0f)) {

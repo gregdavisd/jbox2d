@@ -24,8 +24,8 @@ package org.jbox2d.testbed.pooling;
 import java.util.HashMap;
 
 /**
- * Sun just HAD to make {@link Color} immutable, so now I have to make another stupid pool and now I'm all hot and
- * bothered. Also, this pool isn't thread safe!
+ * Sun just HAD to make {@link Color} immutable, so now I have to make another stupid pool and now I'm all hot and bothered. Also,
+ * this pool isn't thread safe!
  *
  * @author Daniel Murphy
  */

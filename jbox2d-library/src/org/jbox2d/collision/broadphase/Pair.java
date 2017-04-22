@@ -24,11 +24,14 @@
 package org.jbox2d.collision.broadphase;
 
 // updated to rev 100
+import java.io.Serializable;
+
 /**
  * Java note: at the "creation" of each node, a random key is given to that node, and that's what we sort from.
  */
-public class Pair implements Comparable<Pair> {
+public class Pair implements Comparable<Pair>, Serializable {
 
+	static final long serialVersionUID = 1L;
 	public int proxyIdA;
 	public int proxyIdB;
 

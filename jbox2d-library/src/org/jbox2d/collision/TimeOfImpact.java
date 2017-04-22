@@ -23,9 +23,9 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.collision.Distance.DistanceProxy;
 import org.jbox2d.collision.Distance.SimplexCache;
-import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
@@ -40,8 +40,9 @@ import org.jbox2d.pooling.IWorldPool;
  *
  * @author daniel
  */
-public class TimeOfImpact {
+public class TimeOfImpact implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public static final int MAX_ITERATIONS = 20;
 	public static final int MAX_ROOT_ITERATIONS = 50;
 
@@ -56,8 +57,9 @@ public class TimeOfImpact {
 	 *
 	 * @author Daniel Murphy
 	 */
-	public static class TOIInput {
+	public static class TOIInput implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public final DistanceProxy proxyA = new DistanceProxy();
 		public final DistanceProxy proxyB = new DistanceProxy();
 		public final Sweep sweepA = new Sweep();
@@ -68,8 +70,9 @@ public class TimeOfImpact {
 		public float tMax;
 	}
 
-	public static class TOIOutputState {
+	public static class TOIOutputState implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public static final byte UNKNOWN = 0;
 		public static final byte FAILED = 1;
 		public static final byte OVERLAPPED = 2;
@@ -82,8 +85,9 @@ public class TimeOfImpact {
 	 *
 	 * @author daniel
 	 */
-	public static class TOIOutput {
+	public static class TOIOutput implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public byte state;
 		public float t;
 	}
@@ -106,10 +110,9 @@ public class TimeOfImpact {
 	}
 
 	/**
-	 * Compute the upper bound on time before two shapes penetrate. Time is represented as a fraction between [0,tMax].
-	 * This uses a swept separating axis and may miss some intermediate, non-tunneling collision. If you change the time
-	 * interval, you should call this function again. Note: use Distance to compute the contact point and normal at the
-	 * time of impact.
+	 * Compute the upper bound on time before two shapes penetrate. Time is represented as a fraction between [0,tMax]. This uses a
+	 * swept separating axis and may miss some intermediate, non-tunneling collision. If you change the time interval, you should
+	 * call this function again. Note: use Distance to compute the contact point and normal at the time of impact.
 	 *
 	 * @param output
 	 * @param input
@@ -305,10 +308,13 @@ public class TimeOfImpact {
 	}
 }
 
-class SeparationFunction {
+class SeparationFunction implements Serializable {
 
-	static class Type {
+	static final long serialVersionUID = 1L;
 
+	static class Type implements Serializable {
+
+		static final long serialVersionUID = 1L;
 		public static final byte POINTS = 0;
 		public static final byte FACE_A = 1;
 		public static final byte FACE_B = 2;

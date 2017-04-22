@@ -26,6 +26,7 @@
  */
 package org.jbox2d.pooling.normal;
 
+import java.io.Serializable;
 import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.TimeOfImpact;
@@ -51,19 +52,22 @@ import org.jbox2d.pooling.IWorldPool;
  * class factory of contact types.
  */
 /**
- * Provides object pooling for all objects used in the engine. Objects retrieved from here should only be used
- * temporarily, and then pushed back (with the exception of arrays).
+ * Provides object pooling for all objects used in the engine. Objects retrieved from here should only be used temporarily, and
+ * then pushed back (with the exception of arrays).
  *
  *
  *
  * @author Daniel Murphy
  */
-public class DefaultWorldPool implements IWorldPool {
+public class DefaultWorldPool implements IWorldPool, Serializable {
 
+	static final long serialVersionUID = 1L;
 	private final IWorldPool world = this;
 
-	private final MutableStack<Contact> pcstack =
-		new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+	private final MutableStack<Contact> pcstack
+		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+		static final long serialVersionUID = 1L;
+
 		@Override
 		protected Contact newInstance() {
 			return new PolygonContact(world);
@@ -71,8 +75,10 @@ public class DefaultWorldPool implements IWorldPool {
 
 	};
 
-	private final MutableStack<Contact> ccstack =
-		new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+	private final MutableStack<Contact> ccstack
+		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+		static final long serialVersionUID = 1L;
+
 		@Override
 		protected Contact newInstance() {
 			return new CircleContact(world);
@@ -80,8 +86,10 @@ public class DefaultWorldPool implements IWorldPool {
 
 	};
 
-	private final MutableStack<Contact> cpstack =
-		new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+	private final MutableStack<Contact> cpstack
+		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+		static final long serialVersionUID = 1L;
+
 		@Override
 		protected Contact newInstance() {
 			return new PolygonAndCircleContact(world);
@@ -89,8 +97,10 @@ public class DefaultWorldPool implements IWorldPool {
 
 	};
 
-	private final MutableStack<Contact> ecstack =
-		new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+	private final MutableStack<Contact> ecstack
+		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+		static final long serialVersionUID = 1L;
+
 		@Override
 		protected Contact newInstance() {
 			return new EdgeAndCircleContact(world);
@@ -98,8 +108,10 @@ public class DefaultWorldPool implements IWorldPool {
 
 	};
 
-	private final MutableStack<Contact> epstack =
-		new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+	private final MutableStack<Contact> epstack
+		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+		static final long serialVersionUID = 1L;
+
 		@Override
 		protected Contact newInstance() {
 			return new EdgeAndPolygonContact(world);
@@ -107,8 +119,10 @@ public class DefaultWorldPool implements IWorldPool {
 
 	};
 
-	private final MutableStack<Contact> chcstack =
-		new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+	private final MutableStack<Contact> chcstack
+		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+		static final long serialVersionUID = 1L;
+
 		@Override
 		protected Contact newInstance() {
 			return new ChainAndCircleContact(world);
@@ -116,8 +130,10 @@ public class DefaultWorldPool implements IWorldPool {
 
 	};
 
-	private final MutableStack<Contact> chpstack =
-		new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+	private final MutableStack<Contact> chpstack
+		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+		static final long serialVersionUID = 1L;
+
 		@Override
 		protected Contact newInstance() {
 			return new ChainAndPolygonContact(world);

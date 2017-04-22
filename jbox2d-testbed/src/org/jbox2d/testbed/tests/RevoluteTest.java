@@ -157,8 +157,8 @@ public class RevoluteTest extends TestbedTest {
 	@Override
 	public void step(TestbedSettings settings) {
 		super.step(settings);
-		addTextLine("Limits " + (m_joint.isLimitEnabled() ? "on" : "off") + ", Motor " +
-			(m_joint.isMotorEnabled() ? "on " : "off ") + (isLeft ? "left" : "right"));
+		addTextLine("Limits " + (m_joint.isLimitEnabled() ? "on" : "off") + ", Motor "
+			+ (m_joint.isMotorEnabled() ? "on " : "off ") + (isLeft ? "left" : "right"));
 		addTextLine("Keys: (l) limits, (m) motor, (a) left, (d) right");
 
 	}

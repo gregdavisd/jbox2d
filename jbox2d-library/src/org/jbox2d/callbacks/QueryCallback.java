@@ -26,15 +26,17 @@
  */
 package org.jbox2d.callbacks;
 
+import java.io.Serializable;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.World;
 
 /**
  * Callback class for AABB queries. See {@link World#queryAABB(QueryCallback, org.jbox2d.collision.AABB)}.
  *
  * @author Daniel Murphy
  */
-public interface QueryCallback {
+public interface QueryCallback extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Called for each fixture found in the query AABB.

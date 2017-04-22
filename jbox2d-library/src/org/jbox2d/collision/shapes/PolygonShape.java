@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision.shapes;
 
+import java.io.Serializable;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
@@ -32,10 +33,12 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
 /**
- * A convex polygon shape. Polygons have a maximum number of vertices equal to _maxPolygonVertices. In most cases you
- * should not need many vertices for a convex polygon.
+ * A convex polygon shape. Polygons have a maximum number of vertices equal to _maxPolygonVertices. In most cases you should not
+ * need many vertices for a convex polygon.
  */
-public class PolygonShape extends Shape {
+public class PolygonShape extends Shape implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Dump lots of debug information.
@@ -61,7 +64,7 @@ public class PolygonShape extends Shape {
 	 * Number of active vertices in the shape.
 	 */
 	public int m_count;
- 
+
 	public PolygonShape() {
 		super(ShapeType.POLYGON);
 
@@ -91,8 +94,7 @@ public class PolygonShape extends Shape {
 	}
 
 	/**
-	 * Create a convex hull from the given array of points. The count must be in the range [3,
-	 * Settings.maxPolygonVertices].
+	 * Create a convex hull from the given array of points. The count must be in the range [3, Settings.maxPolygonVertices].
 	 *
 	 * @warning the points may be re-ordered, even if they form a convex polygon.
 	 * @warning collinear points are removed.
@@ -107,8 +109,8 @@ public class PolygonShape extends Shape {
 		int n = Math.min(num, Settings.maxPolygonVertices);
 
 		// Perform welding and copy vertices into local buffer.
-		Vec2[] ps =
-			new Vec2[Settings.maxPolygonVertices];
+		Vec2[] ps
+			= new Vec2[Settings.maxPolygonVertices];
 		int tempCount = 0;
 		for (int i = 0; i < n; ++i) {
 			Vec2 v = verts[i];
@@ -247,7 +249,7 @@ public class PolygonShape extends Shape {
 		m_normals[3].set(-1.0f, 0.0f);
 		m_centroid.set(center);
 
-		final Transform xf =  new Transform();
+		final Transform xf = new Transform();
 		xf.p.set(center);
 		xf.q.set(angle);
 

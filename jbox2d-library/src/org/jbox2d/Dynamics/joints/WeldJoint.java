@@ -26,6 +26,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Mat33;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
@@ -48,12 +49,14 @@ import org.jbox2d.pooling.IWorldPool;
 //J = [0 0 -1 0 0 1]
 //K = invI1 + invI2
 /**
- * A weld joint essentially glues two bodies together. A weld joint may distort somewhat because the island constraint
- * solver is approximate.
+ * A weld joint essentially glues two bodies together. A weld joint may distort somewhat because the island constraint solver is
+ * approximate.
  *
  * @author Daniel Murphy
  */
-public class WeldJoint extends Joint {
+public class WeldJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	private float m_frequencyHz;
 	private float m_dampingRatio;

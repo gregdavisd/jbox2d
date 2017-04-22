@@ -1,5 +1,6 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +28,9 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.particle.VoronoiDiagram.VoronoiDiagramCallback;
 
-public class ParticleSystem extends CircularWorld {
+public class ParticleSystem extends CircularWorld implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * All particle types that require creating pairs
@@ -193,28 +196,28 @@ public class ParticleSystem extends CircularWorld {
 			capacity = limitCapacity(capacity, m_colorBuffer.userSuppliedCapacity);
 			capacity = limitCapacity(capacity, m_userDataBuffer.userSuppliedCapacity);
 			if (m_internalAllocatedCapacity < capacity) {
-				m_flagsBuffer.data =
-					reallocateBuffer(m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
-				m_positionBuffer.data =
-					reallocateBuffer(m_positionBuffer, m_internalAllocatedCapacity, capacity, false);
-				m_velocityBuffer.data =
-					reallocateBuffer(m_velocityBuffer, m_internalAllocatedCapacity, capacity, false);
-				m_accumulationBuffer =
-					BufferUtils.reallocateBuffer(m_accumulationBuffer, 0, m_internalAllocatedCapacity,
+				m_flagsBuffer.data
+					= reallocateBuffer(m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
+				m_positionBuffer.data
+					= reallocateBuffer(m_positionBuffer, m_internalAllocatedCapacity, capacity, false);
+				m_velocityBuffer.data
+					= reallocateBuffer(m_velocityBuffer, m_internalAllocatedCapacity, capacity, false);
+				m_accumulationBuffer
+					= BufferUtils.reallocateBuffer(m_accumulationBuffer, 0, m_internalAllocatedCapacity,
 						capacity, false);
-				m_accumulation2Buffer =
-					BufferUtils.reallocateBuffer(Vec2.class, m_accumulation2Buffer, 0,
+				m_accumulation2Buffer
+					= BufferUtils.reallocateBuffer(Vec2.class, m_accumulation2Buffer, 0,
 						m_internalAllocatedCapacity, capacity, true);
-				m_depthBuffer =
-					BufferUtils.reallocateBuffer(m_depthBuffer, 0, m_internalAllocatedCapacity, capacity,
+				m_depthBuffer
+					= BufferUtils.reallocateBuffer(m_depthBuffer, 0, m_internalAllocatedCapacity, capacity,
 						true);
-				m_colorBuffer.data =
-					reallocateBuffer(m_colorBuffer, m_internalAllocatedCapacity, capacity, true);
-				m_groupBuffer =
-					BufferUtils.reallocateBuffer(ParticleGroup.class, m_groupBuffer, 0,
+				m_colorBuffer.data
+					= reallocateBuffer(m_colorBuffer, m_internalAllocatedCapacity, capacity, true);
+				m_groupBuffer
+					= BufferUtils.reallocateBuffer(ParticleGroup.class, m_groupBuffer, 0,
 						m_internalAllocatedCapacity, capacity, false);
-				m_userDataBuffer.data =
-					reallocateBuffer(m_userDataBuffer, m_internalAllocatedCapacity, capacity, true);
+				m_userDataBuffer.data
+					= reallocateBuffer(m_userDataBuffer, m_internalAllocatedCapacity, capacity, true);
 				m_internalAllocatedCapacity = capacity;
 			}
 		}
@@ -235,15 +238,15 @@ public class ParticleSystem extends CircularWorld {
 			m_colorBuffer.data[index].set(def.color);
 		}
 		if (m_userDataBuffer.data != null || def.userData != null) {
-			m_userDataBuffer.data =
-				requestParticleBuffer(m_userDataBuffer.dataClass, m_userDataBuffer.data);
+			m_userDataBuffer.data
+				= requestParticleBuffer(m_userDataBuffer.dataClass, m_userDataBuffer.data);
 			m_userDataBuffer.data[index] = def.userData;
 		}
 		if (m_proxyCount >= m_proxyCapacity) {
 			int oldCapacity = m_proxyCapacity;
 			int newCapacity = m_proxyCount != 0 ? 2 * m_proxyCount : Settings.minParticleBufferCapacity;
-			m_proxyBuffer =
-				BufferUtils.reallocateBuffer(Proxy.class, m_proxyBuffer, oldCapacity, newCapacity);
+			m_proxyBuffer
+				= BufferUtils.reallocateBuffer(Proxy.class, m_proxyBuffer, oldCapacity, newCapacity);
 			m_proxyCapacity = newCapacity;
 		}
 		m_proxyBuffer[m_proxyCount++].index = index;
@@ -274,8 +277,8 @@ public class ParticleSystem extends CircularWorld {
 		}
 	}
 
-	private CreateParticleGroupCallback createParticleGroupCallback =
-		new CreateParticleGroupCallback();
+	private CreateParticleGroupCallback createParticleGroupCallback
+		= new CreateParticleGroupCallback();
 
 	public ParticleGroup createParticleGroup(ParticleGroupDef groupDef) {
 		float stride = getParticleStride();
@@ -304,10 +307,10 @@ public class ParticleSystem extends CircularWorld {
 			}
 			final float upperBoundY = aabb.upperBound.y;
 			final float upperBoundX = aabb.upperBound.x;
-			for (float y = (float) Math.floor(aabb.lowerBound.y / stride) * stride; y < upperBoundY; y +=
-				stride) {
-				for (float x = (float) Math.floor(aabb.lowerBound.x / stride) * stride; x < upperBoundX; x +=
-					stride) {
+			for (float y = (float) Math.floor(aabb.lowerBound.y / stride) * stride; y < upperBoundY; y
+				+= stride) {
+				for (float x = (float) Math.floor(aabb.lowerBound.x / stride) * stride; x < upperBoundX; x
+					+= stride) {
 					Vec2 p = new Vec2();
 					p.x = x;
 					p.y = y;
@@ -353,10 +356,10 @@ public class ParticleSystem extends CircularWorld {
 				if (firstIndex <= a && b < lastIndex) {
 					if (m_pairCount >= m_pairCapacity) {
 						int oldCapacity = m_pairCapacity;
-						int newCapacity =
-							m_pairCount != 0 ? 2 * m_pairCount : Settings.minParticleBufferCapacity;
-						m_pairBuffer =
-							BufferUtils.reallocateBuffer(Pair.class, m_pairBuffer, oldCapacity, newCapacity);
+						int newCapacity
+							= m_pairCount != 0 ? 2 * m_pairCount : Settings.minParticleBufferCapacity;
+						m_pairBuffer
+							= BufferUtils.reallocateBuffer(Pair.class, m_pairBuffer, oldCapacity, newCapacity);
 						m_pairCapacity = newCapacity;
 					}
 					Pair pair = m_pairBuffer[m_pairCount];
@@ -410,14 +413,14 @@ public class ParticleSystem extends CircularWorld {
 					a = b;
 					b = temp;
 				}
-				if (groupA.m_firstIndex <= a && a < groupA.m_lastIndex && groupB.m_firstIndex <= b &&
-					b < groupB.m_lastIndex) {
+				if (groupA.m_firstIndex <= a && a < groupA.m_lastIndex && groupB.m_firstIndex <= b
+					&& b < groupB.m_lastIndex) {
 					if (m_pairCount >= m_pairCapacity) {
 						int oldCapacity = m_pairCapacity;
-						int newCapacity =
-							m_pairCount != 0 ? 2 * m_pairCount : Settings.minParticleBufferCapacity;
-						m_pairBuffer =
-							BufferUtils.reallocateBuffer(Pair.class, m_pairBuffer, oldCapacity, newCapacity);
+						int newCapacity
+							= m_pairCount != 0 ? 2 * m_pairCount : Settings.minParticleBufferCapacity;
+						m_pairBuffer
+							= BufferUtils.reallocateBuffer(Pair.class, m_pairBuffer, oldCapacity, newCapacity);
 						m_pairCapacity = newCapacity;
 					}
 					Pair pair = m_pairBuffer[m_pairCount];
@@ -494,8 +497,8 @@ public class ParticleSystem extends CircularWorld {
 			final ParticleContact contact = m_contactBuffer[k];
 			int a = contact.indexA;
 			int b = contact.indexB;
-			if (a >= group.m_firstIndex && a < group.m_lastIndex && b >= group.m_firstIndex &&
-				b < group.m_lastIndex) {
+			if (a >= group.m_firstIndex && a < group.m_lastIndex && b >= group.m_firstIndex
+				&& b < group.m_lastIndex) {
 				float w = contact.weight;
 				m_accumulationBuffer[a] += w;
 				m_accumulationBuffer[b] += w;
@@ -513,8 +516,8 @@ public class ParticleSystem extends CircularWorld {
 				final ParticleContact contact = m_contactBuffer[k];
 				int a = contact.indexA;
 				int b = contact.indexB;
-				if (a >= group.m_firstIndex && a < group.m_lastIndex && b >= group.m_firstIndex &&
-					b < group.m_lastIndex) {
+				if (a >= group.m_firstIndex && a < group.m_lastIndex && b >= group.m_firstIndex
+					&& b < group.m_lastIndex) {
 					float r = 1 - contact.weight;
 					float ap0 = m_depthBuffer[a];
 					float bp0 = m_depthBuffer[b];
@@ -555,10 +558,10 @@ public class ParticleSystem extends CircularWorld {
 		if (d2 < m_squaredDiameter) {
 			if (m_contactCount >= m_contactCapacity) {
 				int oldCapacity = m_contactCapacity;
-				int newCapacity =
-					m_contactCount != 0 ? 2 * m_contactCount : Settings.minParticleBufferCapacity;
-				m_contactBuffer =
-					BufferUtils.reallocateBuffer(ParticleContact.class, m_contactBuffer, oldCapacity,
+				int newCapacity
+					= m_contactCount != 0 ? 2 * m_contactCount : Settings.minParticleBufferCapacity;
+				m_contactBuffer
+					= BufferUtils.reallocateBuffer(ParticleContact.class, m_contactBuffer, oldCapacity,
 						newCapacity);
 				m_contactCapacity = newCapacity;
 			}
@@ -786,10 +789,10 @@ public class ParticleSystem extends CircularWorld {
 		float pressurePerWeight = m_pressureStrength * getCriticalPressure(step);
 		for (int i = 0; i < m_count; i++) {
 			float w = m_accumulationBuffer[i];
-			float h =
-				pressurePerWeight *
-				Math.max(0.0f, Math.min(w, Settings.maxParticleWeight) -
-					Settings.minParticleWeight);
+			float h
+				= pressurePerWeight
+				* Math.max(0.0f, Math.min(w, Settings.maxParticleWeight)
+					- Settings.minParticleWeight);
 			m_accumulationBuffer[i] = h;
 		}
 		// applies pressure between each particles in contact
@@ -1379,6 +1382,7 @@ public class ParticleSystem extends CircularWorld {
 
 	private static class NewIndices {
 
+		static final long serialVersionUID = 1L;
 		int start, mid, end;
 
 		final int getIndex(final int i) {
@@ -1648,11 +1652,11 @@ public class ParticleSystem extends CircularWorld {
 		final float lowerBoundY = aabb.lowerBound.y;
 		final float upperBoundX = aabb.upperBound.x;
 		final float upperBoundY = aabb.upperBound.y;
-		int firstProxy =
-			lowerBound(m_proxyBuffer, m_proxyCount,
+		int firstProxy
+			= lowerBound(m_proxyBuffer, m_proxyCount,
 				computeTag(m_inverseDiameter * lowerBoundX, m_inverseDiameter * lowerBoundY));
-		int lastProxy =
-			upperBound(m_proxyBuffer, m_proxyCount,
+		int lastProxy
+			= upperBound(m_proxyBuffer, m_proxyCount,
 				computeTag(m_inverseDiameter * upperBoundX, m_inverseDiameter * upperBoundY));
 		for (int proxy = firstProxy; proxy < lastProxy; ++proxy) {
 			int i = m_proxyBuffer[proxy].index;
@@ -1674,18 +1678,18 @@ public class ParticleSystem extends CircularWorld {
 		if (m_proxyCount == 0) {
 			return;
 		}
-		int firstProxy =
-			lowerBound(
+		int firstProxy
+			= lowerBound(
 				m_proxyBuffer,
 				m_proxyCount,
-				computeTag(m_inverseDiameter * Math.min(point1.x, point2.x) - 1, m_inverseDiameter *
-					Math.min(point1.y, point2.y) - 1));
-		int lastProxy =
-			upperBound(
+				computeTag(m_inverseDiameter * Math.min(point1.x, point2.x) - 1, m_inverseDiameter
+					* Math.min(point1.y, point2.y) - 1));
+		int lastProxy
+			= upperBound(
 				m_proxyBuffer,
 				m_proxyCount,
-				computeTag(m_inverseDiameter * Math.max(point1.x, point2.x) + 1, m_inverseDiameter *
-					Math.max(point1.y, point2.y) + 1));
+				computeTag(m_inverseDiameter * Math.max(point1.x, point2.x) + 1, m_inverseDiameter
+					* Math.max(point1.y, point2.y) + 1));
 		float fraction = 1;
 		// solving the following equation:
 		// ((1-t)*point1+t*point2-position)^2=diameter^2
@@ -1789,8 +1793,9 @@ public class ParticleSystem extends CircularWorld {
 		return buffer;
 	}
 
-	public static class ParticleBuffer<T> {
+	public static class ParticleBuffer<T> implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public T[] data;
 		final Class<T> dataClass;
 		int userSuppliedCapacity;
@@ -1800,8 +1805,9 @@ public class ParticleSystem extends CircularWorld {
 		}
 	}
 
-	static class ParticleBufferInt {
+	static class ParticleBufferInt implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		int[] data;
 		int userSuppliedCapacity;
 	}
@@ -1811,6 +1817,7 @@ public class ParticleSystem extends CircularWorld {
 	 */
 	public static class Proxy implements Comparable<Proxy> {
 
+		static final long serialVersionUID = 1L;
 		int index;
 		long tag;
 
@@ -1843,6 +1850,7 @@ public class ParticleSystem extends CircularWorld {
 	 */
 	public static class Pair {
 
+		static final long serialVersionUID = 1L;
 		int indexA, indexB;
 		int flags;
 		float strength;
@@ -1854,6 +1862,7 @@ public class ParticleSystem extends CircularWorld {
 	 */
 	public static class Triad {
 
+		static final long serialVersionUID = 1L;
 		int indexA, indexB, indexC;
 		int flags;
 		float strength;
@@ -1862,7 +1871,9 @@ public class ParticleSystem extends CircularWorld {
 	}
 
 	// Callback used with VoronoiDiagram.
-	static class CreateParticleGroupCallback implements VoronoiDiagramCallback {
+	static class CreateParticleGroupCallback implements VoronoiDiagramCallback, Serializable {
+
+		static final long serialVersionUID = 1L;
 
 		@Override
 		public void callback(int a, int b, int c) {
@@ -1876,17 +1887,17 @@ public class ParticleSystem extends CircularWorld {
 			final float dcax = pc.x - pa.x;
 			final float dcay = pc.y - pa.y;
 			float maxDistanceSquared = Settings.maxTriadDistanceSquared * system.m_squaredDiameter;
-			if (dabx * dabx + daby * daby < maxDistanceSquared &&
-				dbcx * dbcx + dbcy * dbcy < maxDistanceSquared &&
-				dcax * dcax + dcay * dcay < maxDistanceSquared) {
+			if (dabx * dabx + daby * daby < maxDistanceSquared
+				&& dbcx * dbcx + dbcy * dbcy < maxDistanceSquared
+				&& dcax * dcax + dcay * dcay < maxDistanceSquared) {
 				if (system.m_triadCount >= system.m_triadCapacity) {
 					int oldCapacity = system.m_triadCapacity;
-					int newCapacity =
-						system.m_triadCount != 0 ?
-							2 * system.m_triadCount :
-							Settings.minParticleBufferCapacity;
-					system.m_triadBuffer =
-						BufferUtils.reallocateBuffer(Triad.class, system.m_triadBuffer, oldCapacity,
+					int newCapacity
+						= system.m_triadCount != 0
+							? 2 * system.m_triadCount
+							: Settings.minParticleBufferCapacity;
+					system.m_triadBuffer
+						= BufferUtils.reallocateBuffer(Triad.class, system.m_triadBuffer, oldCapacity,
 							newCapacity);
 					system.m_triadCapacity = newCapacity;
 				}
@@ -1894,9 +1905,9 @@ public class ParticleSystem extends CircularWorld {
 				triad.indexA = a;
 				triad.indexB = b;
 				triad.indexC = c;
-				triad.flags =
-					system.m_flagsBuffer.data[a] | system.m_flagsBuffer.data[b] |
-					system.m_flagsBuffer.data[c];
+				triad.flags
+					= system.m_flagsBuffer.data[a] | system.m_flagsBuffer.data[b]
+					| system.m_flagsBuffer.data[c];
 				triad.strength = def.strength;
 				final float midPointx = (float) 1 / 3 * (pa.x + pb.x + pc.x);
 				final float midPointy = (float) 1 / 3 * (pa.y + pb.y + pc.y);
@@ -1922,11 +1933,13 @@ public class ParticleSystem extends CircularWorld {
 	// Callback used with VoronoiDiagram.
 	static class JoinParticleGroupsCallback implements VoronoiDiagramCallback {
 
+		static final long serialVersionUID = 1L;
+
 		public void callback(int a, int b, int c) {
 			// Create a triad if it will contain particles from both groups.
-			int countA =
-				((a < groupB.m_firstIndex) ? 1 : 0) + ((b < groupB.m_firstIndex) ? 1 : 0) +
-				((c < groupB.m_firstIndex) ? 1 : 0);
+			int countA
+				= ((a < groupB.m_firstIndex) ? 1 : 0) + ((b < groupB.m_firstIndex) ? 1 : 0)
+				+ ((c < groupB.m_firstIndex) ? 1 : 0);
 			if (countA > 0 && countA < 3) {
 				int af = system.m_flagsBuffer.data[a];
 				int bf = system.m_flagsBuffer.data[b];
@@ -1942,17 +1955,17 @@ public class ParticleSystem extends CircularWorld {
 					final float dcax = pc.x - pa.x;
 					final float dcay = pc.y - pa.y;
 					float maxDistanceSquared = Settings.maxTriadDistanceSquared * system.m_squaredDiameter;
-					if (dabx * dabx + daby * daby < maxDistanceSquared &&
-						dbcx * dbcx + dbcy * dbcy < maxDistanceSquared &&
-						dcax * dcax + dcay * dcay < maxDistanceSquared) {
+					if (dabx * dabx + daby * daby < maxDistanceSquared
+						&& dbcx * dbcx + dbcy * dbcy < maxDistanceSquared
+						&& dcax * dcax + dcay * dcay < maxDistanceSquared) {
 						if (system.m_triadCount >= system.m_triadCapacity) {
 							int oldCapacity = system.m_triadCapacity;
-							int newCapacity =
-								system.m_triadCount != 0 ?
-									2 * system.m_triadCount :
-									Settings.minParticleBufferCapacity;
-							system.m_triadBuffer =
-								BufferUtils.reallocateBuffer(Triad.class, system.m_triadBuffer, oldCapacity,
+							int newCapacity
+								= system.m_triadCount != 0
+									? 2 * system.m_triadCount
+									: Settings.minParticleBufferCapacity;
+							system.m_triadBuffer
+								= BufferUtils.reallocateBuffer(Triad.class, system.m_triadBuffer, oldCapacity,
 									newCapacity);
 							system.m_triadCapacity = newCapacity;
 						}
@@ -1985,8 +1998,9 @@ public class ParticleSystem extends CircularWorld {
 		ParticleGroup groupB;
 	};
 
-	static class DestroyParticlesInShapeCallback implements ParticleQueryCallback {
+	static class DestroyParticlesInShapeCallback implements ParticleQueryCallback, Serializable {
 
+		static final long serialVersionUID = 1L;
 		ParticleSystem system;
 		Shape shape;
 		Transform xf;
@@ -2017,8 +2031,9 @@ public class ParticleSystem extends CircularWorld {
 		}
 	}
 
-	static class UpdateBodyContactsCallback implements QueryCallback {
+	static class UpdateBodyContactsCallback implements QueryCallback, Serializable {
 
+		static final long serialVersionUID = 1L;
 		ParticleSystem system;
 
 		private final Vec2 tempVec = new Vec2();
@@ -2042,42 +2057,42 @@ public class ParticleSystem extends CircularWorld {
 				final float aabblowerBoundy = aabb.lowerBound.y - system.m_particleDiameter;
 				final float aabbupperBoundx = aabb.upperBound.x + system.m_particleDiameter;
 				final float aabbupperBoundy = aabb.upperBound.y + system.m_particleDiameter;
-				int firstProxy =
-					lowerBound(
+				int firstProxy
+					= lowerBound(
 						system.m_proxyBuffer,
 						system.m_proxyCount,
-						computeTag(system.m_inverseDiameter * aabblowerBoundx, system.m_inverseDiameter *
-							aabblowerBoundy));
-				int lastProxy =
-					upperBound(
+						computeTag(system.m_inverseDiameter * aabblowerBoundx, system.m_inverseDiameter
+							* aabblowerBoundy));
+				int lastProxy
+					= upperBound(
 						system.m_proxyBuffer,
 						system.m_proxyCount,
-						computeTag(system.m_inverseDiameter * aabbupperBoundx, system.m_inverseDiameter *
-							aabbupperBoundy));
+						computeTag(system.m_inverseDiameter * aabbupperBoundx, system.m_inverseDiameter
+							* aabbupperBoundy));
 
 				for (int proxy = firstProxy; proxy != lastProxy; ++proxy) {
 					int a = system.m_proxyBuffer[proxy].index;
 					Vec2 ap = system.m_positionBuffer.data[a];
-					if (aabblowerBoundx <= ap.x && ap.x <= aabbupperBoundx && aabblowerBoundy <= ap.y &&
-						ap.y <= aabbupperBoundy) {
+					if (aabblowerBoundx <= ap.x && ap.x <= aabbupperBoundx && aabblowerBoundy <= ap.y
+						&& ap.y <= aabbupperBoundy) {
 						float d;
 						final Vec2 n = tempVec;
 						d = fixture.computeDistance(ap, childIndex, n);
 						if (d < system.m_particleDiameter) {
-							float invAm =
-								(system.m_flagsBuffer.data[a] & ParticleType.b2_wallParticle) != 0 ? 0 : system
+							float invAm
+								= (system.m_flagsBuffer.data[a] & ParticleType.b2_wallParticle) != 0 ? 0 : system
 										.getParticleInvMass();
 							final float rpx = ap.x - bp.x;
 							final float rpy = ap.y - bp.y;
 							float rpn = rpx * n.y - rpy * n.x;
 							if (system.m_bodyContactCount >= system.m_bodyContactCapacity) {
 								int oldCapacity = system.m_bodyContactCapacity;
-								int newCapacity =
-									system.m_bodyContactCount != 0 ?
-										2 * system.m_bodyContactCount :
-										Settings.minParticleBufferCapacity;
-								system.m_bodyContactBuffer =
-									BufferUtils.reallocateBuffer(ParticleBodyContact.class,
+								int newCapacity
+									= system.m_bodyContactCount != 0
+										? 2 * system.m_bodyContactCount
+										: Settings.minParticleBufferCapacity;
+								system.m_bodyContactBuffer
+									= BufferUtils.reallocateBuffer(ParticleBodyContact.class,
 										system.m_bodyContactBuffer, oldCapacity, newCapacity);
 								system.m_bodyContactCapacity = newCapacity;
 							}
@@ -2097,8 +2112,9 @@ public class ParticleSystem extends CircularWorld {
 		}
 	}
 
-	static class SolveCollisionCallback implements QueryCallback {
+	static class SolveCollisionCallback implements QueryCallback, Serializable {
 
+		static final long serialVersionUID = 1L;
 		ParticleSystem system;
 		TimeStep step;
 
@@ -2119,24 +2135,24 @@ public class ParticleSystem extends CircularWorld {
 				final float aabblowerBoundy = aabb.lowerBound.y - system.m_particleDiameter;
 				final float aabbupperBoundx = aabb.upperBound.x + system.m_particleDiameter;
 				final float aabbupperBoundy = aabb.upperBound.y + system.m_particleDiameter;
-				int firstProxy =
-					lowerBound(
+				int firstProxy
+					= lowerBound(
 						system.m_proxyBuffer,
 						system.m_proxyCount,
-						computeTag(system.m_inverseDiameter * aabblowerBoundx, system.m_inverseDiameter *
-							aabblowerBoundy));
-				int lastProxy =
-					upperBound(
+						computeTag(system.m_inverseDiameter * aabblowerBoundx, system.m_inverseDiameter
+							* aabblowerBoundy));
+				int lastProxy
+					= upperBound(
 						system.m_proxyBuffer,
 						system.m_proxyCount,
-						computeTag(system.m_inverseDiameter * aabbupperBoundx, system.m_inverseDiameter *
-							aabbupperBoundy));
+						computeTag(system.m_inverseDiameter * aabbupperBoundx, system.m_inverseDiameter
+							* aabbupperBoundy));
 
 				for (int proxy = firstProxy; proxy != lastProxy; ++proxy) {
 					int a = system.m_proxyBuffer[proxy].index;
 					Vec2 ap = system.m_positionBuffer.data[a];
-					if (aabblowerBoundx <= ap.x && ap.x <= aabbupperBoundx && aabblowerBoundy <= ap.y &&
-						ap.y <= aabbupperBoundy) {
+					if (aabblowerBoundx <= ap.x && ap.x <= aabbupperBoundx && aabblowerBoundy <= ap.y
+						&& ap.y <= aabbupperBoundy) {
 						Vec2 av = system.m_velocityBuffer.data[a];
 						final Vec2 temp = new Vec2();
 						Transform.mulTransToOutUnsafe(body.m_xf0, ap, temp);
@@ -2146,12 +2162,12 @@ public class ParticleSystem extends CircularWorld {
 						input.maxFraction = 1;
 						if (fixture.raycast(output, input, childIndex)) {
 							final Vec2 p = new Vec2();
-							p.x =
-								(1 - output.fraction) * input.p1.x + output.fraction * input.p2.x +
-								Settings.linearSlop * output.normal.x;
-							p.y =
-								(1 - output.fraction) * input.p1.y + output.fraction * input.p2.y +
-								Settings.linearSlop * output.normal.y;
+							p.x
+								= (1 - output.fraction) * input.p1.x + output.fraction * input.p2.x
+								+ Settings.linearSlop * output.normal.x;
+							p.y
+								= (1 - output.fraction) * input.p1.y + output.fraction * input.p2.y
+								+ Settings.linearSlop * output.normal.y;
 
 							final float vx = step.inv_dt * (p.x - ap.x);
 							final float vy = step.inv_dt * (p.y - ap.y);
@@ -2175,6 +2191,8 @@ public class ParticleSystem extends CircularWorld {
 	}
 
 	static class Test {
+
+		static final long serialVersionUID = 1L;
 
 		static boolean IsProxyInvalid(final Proxy proxy) {
 			return proxy.index < 0;

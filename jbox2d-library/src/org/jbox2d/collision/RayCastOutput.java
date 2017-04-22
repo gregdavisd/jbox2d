@@ -23,14 +23,16 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
 // updated to rev 100
 /**
  * Ray-cast output data. The ray hits at p1 + fraction * (p2 - p1), where p1 and p2 come from b2RayCastInput.
  */
-public class RayCastOutput {
+public class RayCastOutput implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public final Vec2 normal;
 	public float fraction;
 

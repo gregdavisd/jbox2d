@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,8 +39,9 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
  *
  * @author Daniel Murphy
  */
-public class ContactManager extends CircularWorld implements PairCallback {
+public class ContactManager extends CircularWorld implements PairCallback, Serializable {
 
+	static final long serialVersionUID = 1L;
 	public BroadPhase m_broadPhase;
 	private final List<Contact> m_contactList;
 	public ContactFilter m_contactFilter;
@@ -202,8 +204,8 @@ public class ContactManager extends CircularWorld implements PairCallback {
 	}
 
 	/**
-	 * This is the top level collision call for the time step. Here all the narrow phase collision is processed for the
-	 * world contact list.
+	 * This is the top level collision call for the time step. Here all the narrow phase collision is processed for the world contact
+	 * list.
 	 */
 	public void collide() {
 		// Update awake contacts.
@@ -211,7 +213,7 @@ public class ContactManager extends CircularWorld implements PairCallback {
 		 * need iterator because items may be removed from the list
 		 *
 		 */
-		for (Iterator i_contacts = m_contactList.iterator(); i_contacts.hasNext();) {
+		for (Iterator<Contact> i_contacts = m_contactList.iterator(); i_contacts.hasNext();) {
 			Contact c = (Contact) i_contacts.next();
 			Fixture fixtureA = c.getFixtureA();
 			Fixture fixtureB = c.getFixtureB();

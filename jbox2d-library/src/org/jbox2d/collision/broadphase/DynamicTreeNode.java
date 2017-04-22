@@ -23,10 +23,12 @@
  ***************************************************************************** */
 package org.jbox2d.collision.broadphase;
 
+import java.io.Serializable;
 import org.jbox2d.collision.AABB;
 
-public class DynamicTreeNode {
+public class DynamicTreeNode implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	/**
 	 * Enlarged AABB
 	 */
@@ -34,7 +36,7 @@ public class DynamicTreeNode {
 
 	public Object userData;
 
-	protected DynamicTreeNode parent;
+	transient protected DynamicTreeNode parent;
 
 	protected DynamicTreeNode child1;
 	protected DynamicTreeNode child2;

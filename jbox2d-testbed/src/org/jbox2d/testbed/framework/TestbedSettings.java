@@ -26,14 +26,13 @@
  */
 package org.jbox2d.testbed.framework;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * Stores all the testbed settings. Automatically populates default settings.
@@ -69,8 +68,8 @@ public class TestbedSettings {
 	private final Map<String, TestbedSetting> settingsMap;
 
 	public TestbedSettings() {
-		settings = Lists.newArrayList();
-		settingsMap = Maps.newHashMap();
+		settings = new ArrayList<>();
+		settingsMap = new HashMap<>();
 		populateDefaultSettings();
 	}
 
@@ -103,8 +102,8 @@ public class TestbedSettings {
 	 */
 	public void addSetting(TestbedSetting argSetting) {
 		if (settingsMap.containsKey(argSetting.name)) {
-			throw new IllegalArgumentException("Settings already contain a setting with name: " +
-				argSetting.name);
+			throw new IllegalArgumentException("Settings already contain a setting with name: "
+				+ argSetting.name);
 		}
 		settings.add(argSetting);
 		settingsMap.put(argSetting.name, argSetting);

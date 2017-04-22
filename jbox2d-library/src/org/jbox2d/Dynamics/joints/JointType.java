@@ -23,7 +23,11 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
-public class JointType {
+import java.io.Serializable;
+
+public class JointType implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static final byte UNKNOWN = 0;
 	public static final byte REVOLUTE = 1;

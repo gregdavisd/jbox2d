@@ -26,17 +26,20 @@
  */
 package org.jbox2d.callbacks;
 
+import java.io.Serializable;
 import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.Fixture;
 
 // updated to rev 100
 /**
- * Implement this class to provide collision filtering. In other words, you can implement this class if you want finer
- * control over contact creation.
+ * Implement this class to provide collision filtering. In other words, you can implement this class if you want finer control
+ * over contact creation.
  *
  * @author Daniel Murphy
  */
-public class ContactFilter {
+public class ContactFilter implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Return true if contact calculations should be performed between these two shapes.
@@ -54,8 +57,8 @@ public class ContactFilter {
 			return filterA.groupIndex > 0;
 		}
 
-		boolean collide = (filterA.maskBits & filterB.categoryBits) != 0 &&
-			(filterA.categoryBits & filterB.maskBits) != 0;
+		boolean collide = (filterA.maskBits & filterB.categoryBits) != 0
+			&& (filterA.categoryBits & filterB.maskBits) != 0;
 		return collide;
 	}
 }

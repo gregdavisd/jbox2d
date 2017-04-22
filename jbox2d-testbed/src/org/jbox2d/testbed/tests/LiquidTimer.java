@@ -19,8 +19,8 @@ public class LiquidTimer extends TestbedTest {
 			Body ground = m_world.createBody(bd);
 
 			ChainShape shape = new ChainShape();
-			final Vec2[] vertices =
-				new Vec2[]{new Vec2(-20, 0), new Vec2(20, 0), new Vec2(20, 40), new Vec2(-20, 40)};
+			final Vec2[] vertices
+				= new Vec2[]{new Vec2(-20, 0), new Vec2(20, 0), new Vec2(20, 40), new Vec2(-20, 40)};
 			shape.createLoop(vertices, 4);
 			ground.createFixture(shape, 0.0f);
 

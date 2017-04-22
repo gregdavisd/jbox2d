@@ -1,9 +1,12 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
-public class ParticleBodyContact {
+public class ParticleBodyContact implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Index of the particle making contact.

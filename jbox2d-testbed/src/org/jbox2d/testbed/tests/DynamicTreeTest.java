@@ -341,11 +341,11 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		}
 
 		if (bruteActor != null) {
-			if (Math.abs(bruteOutput.fraction -
-				m_rayCastOutput.fraction) > Settings.EPSILON) {
+			if (Math.abs(bruteOutput.fraction
+				- m_rayCastOutput.fraction) > Settings.EPSILON) {
 				System.out.println("wrong!");
-				assert (Math.abs(bruteOutput.fraction -
-					m_rayCastOutput.fraction) <= 20 * Settings.EPSILON);
+				assert (Math.abs(bruteOutput.fraction
+					- m_rayCastOutput.fraction) <= 20 * Settings.EPSILON);
 			}
 
 		}

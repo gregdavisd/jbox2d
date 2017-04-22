@@ -23,11 +23,14 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
-public interface ContactCreator {
+public interface ContactCreator extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public Contact contactCreateFcn(IWorldPool argPool, Fixture fixtureA, Fixture fixtureB);
 

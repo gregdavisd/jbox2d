@@ -1,8 +1,11 @@
 package org.jbox2d.common;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 
-public class BufferUtils {
+public class BufferUtils implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Reallocate a buffer.
@@ -50,8 +53,8 @@ public class BufferUtils {
 	}
 
 	/**
-	 * Reallocate a buffer. A 'deferred' buffer is reallocated only if it is not NULL. If 'userSuppliedCapacity' is not
-	 * zero, buffer is user supplied and must be kept.
+	 * Reallocate a buffer. A 'deferred' buffer is reallocated only if it is not NULL. If 'userSuppliedCapacity' is not zero, buffer
+	 * is user supplied and must be kept.
 	 */
 	public static <T> T[] reallocateBuffer(Class<T> klass, T[] buffer, int userSuppliedCapacity,
 		int oldCapacity, int newCapacity, boolean deferred) {
@@ -64,8 +67,8 @@ public class BufferUtils {
 	}
 
 	/**
-	 * Reallocate an int buffer. A 'deferred' buffer is reallocated only if it is not NULL. If 'userSuppliedCapacity' is
-	 * not zero, buffer is user supplied and must be kept.
+	 * Reallocate an int buffer. A 'deferred' buffer is reallocated only if it is not NULL. If 'userSuppliedCapacity' is not zero,
+	 * buffer is user supplied and must be kept.
 	 */
 	public static int[] reallocateBuffer(int[] buffer, int userSuppliedCapacity, int oldCapacity,
 		int newCapacity, boolean deferred) {
@@ -78,8 +81,8 @@ public class BufferUtils {
 	}
 
 	/**
-	 * Reallocate a float buffer. A 'deferred' buffer is reallocated only if it is not NULL. If 'userSuppliedCapacity' is
-	 * not zero, buffer is user supplied and must be kept.
+	 * Reallocate a float buffer. A 'deferred' buffer is reallocated only if it is not NULL. If 'userSuppliedCapacity' is not zero,
+	 * buffer is user supplied and must be kept.
 	 */
 	public static float[] reallocateBuffer(float[] buffer, int userSuppliedCapacity, int oldCapacity,
 		int newCapacity, boolean deferred) {

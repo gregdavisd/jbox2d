@@ -23,8 +23,8 @@
  ***************************************************************************** */
 package org.jbox2d.callbacks;
 
+import java.io.Serializable;
 import org.jbox2d.collision.RayCastInput;
-import org.jbox2d.collision.broadphase.DynamicTree;
 
 // updated to rev 100
 /**
@@ -33,7 +33,9 @@ import org.jbox2d.collision.broadphase.DynamicTree;
  * @author Daniel Murphy
  *
  */
-public interface TreeRayCastCallback {
+public interface TreeRayCastCallback extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 *

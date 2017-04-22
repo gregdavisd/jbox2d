@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
 /**
@@ -30,8 +31,9 @@ import org.jbox2d.common.Vec2;
  *
  * @author Daniel
  */
-public class DistanceOutput {
+public class DistanceOutput implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	/**
 	 * Closest point on shapeA
 	 */

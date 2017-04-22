@@ -23,7 +23,11 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
-public class LimitState {
+import java.io.Serializable;
+
+public class LimitState implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static final byte INACTIVE = 0;
 	public static final byte AT_LOWER = 1;

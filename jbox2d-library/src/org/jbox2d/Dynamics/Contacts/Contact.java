@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
@@ -35,12 +36,14 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
- * The class manages contact between two shapes. A contact exists for each overlapping AABB in the broad-phase (except
- * if filtered). Therefore a contact object may exist that has no contact points.
+ * The class manages contact between two shapes. A contact exists for each overlapping AABB in the broad-phase (except if
+ * filtered). Therefore a contact object may exist that has no contact points.
  *
  * @author daniel
  */
-public abstract class Contact {
+public abstract class Contact implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 //  // Flags stored in m_flags
 //  // Used when crawling contact graph when forming islands.
@@ -134,8 +137,8 @@ public abstract class Contact {
 	}
 
 	/**
-	 * Enable/disable this contact. This can be used inside the pre-solve contact listener. The contact is only disabled
-	 * for the current time step (or sub-step in continuous collisions).
+	 * Enable/disable this contact. This can be used inside the pre-solve contact listener. The contact is only disabled for the
+	 * current time step (or sub-step in continuous collisions).
 	 *
 	 * @param flag
 	 */
@@ -306,8 +309,8 @@ public abstract class Contact {
 	}
 
 	/**
-	 * Friction mixing law. The idea is to allow either fixture to drive the restitution to zero. For example, anything
-	 * slides on ice.
+	 * Friction mixing law. The idea is to allow either fixture to drive the restitution to zero. For example, anything slides on
+	 * ice.
 	 *
 	 * @param friction1
 	 * @param friction2
@@ -318,8 +321,8 @@ public abstract class Contact {
 	}
 
 	/**
-	 * Restitution mixing law. The idea is allow for anything to bounce off an inelastic surface. For example, a superball
-	 * bounces on anything.
+	 * Restitution mixing law. The idea is allow for anything to bounce off an inelastic surface. For example, a superball bounces on
+	 * anything.
 	 *
 	 * @param restitution1
 	 * @param restitution2

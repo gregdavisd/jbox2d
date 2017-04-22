@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision.shapes;
 
+import java.io.Serializable;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
@@ -32,13 +33,15 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
 /**
- * A chain shape is a free form sequence of line segments. The chain has two-sided collision, so you can use inside and
- * outside collision. Therefore, you may use any winding order. Connectivity information is used to create smooth
- * collisions. WARNING: The chain will not collide properly if there are self-intersections.
+ * A chain shape is a free form sequence of line segments. The chain has two-sided collision, so you can use inside and outside
+ * collision. Therefore, you may use any winding order. Connectivity information is used to create smooth collisions. WARNING: The
+ * chain will not collide properly if there are self-intersections.
  *
  * @author Daniel
  */
-public class ChainShape extends Shape {
+public class ChainShape extends Shape implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public Vec2[] m_vertices;
 	public int m_count;

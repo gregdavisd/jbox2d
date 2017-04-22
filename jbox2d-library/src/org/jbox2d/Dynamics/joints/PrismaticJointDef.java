@@ -23,20 +23,23 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
 /**
- * Prismatic joint definition. This requires defining a line of motion using an axis and an anchor point. The definition
- * uses local anchor points and a local axis so that the initial configuration can violate the constraint slightly. The
- * joint translation is zero when the local anchor points coincide in world space. Using local anchors and a local axis
- * helps when saving and loading a game.
+ * Prismatic joint definition. This requires defining a line of motion using an axis and an anchor point. The definition uses
+ * local anchor points and a local axis so that the initial configuration can violate the constraint slightly. The joint
+ * translation is zero when the local anchor points coincide in world space. Using local anchors and a local axis helps when
+ * saving and loading a game.
  *
  * @warning at least one body should by dynamic with a non-fixed rotation.
  * @author Daniel
  *
  */
-public class PrismaticJointDef extends JointDef {
+public class PrismaticJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The local anchor point relative to body1's origin.

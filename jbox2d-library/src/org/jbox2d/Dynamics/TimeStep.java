@@ -24,11 +24,14 @@
 package org.jbox2d.dynamics;
 
 //updated to rev 100
+import java.io.Serializable;
+
 /**
  * This is an internal structure.
  */
-public class TimeStep {
+public class TimeStep implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	/**
 	 * time step
 	 */

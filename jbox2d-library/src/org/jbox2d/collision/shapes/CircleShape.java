@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision.shapes;
 
+import java.io.Serializable;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
@@ -35,7 +36,9 @@ import org.jbox2d.common.Vec2;
 /**
  * A circle shape.
  */
-public class CircleShape extends Shape {
+public class CircleShape extends Shape implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public final Vec2 m_p;
 

@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision.shapes;
 
+import java.io.Serializable;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
@@ -30,10 +31,12 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
 /**
- * A shape is used for collision detection. You can create a shape however you like. Shapes used for simulation in World
- * are created automatically when a Fixture is created. Shapes may encapsulate a one or more child shapes.
+ * A shape is used for collision detection. You can create a shape however you like. Shapes used for simulation in World are
+ * created automatically when a Fixture is created. Shapes may encapsulate a one or more child shapes.
  */
-public abstract class Shape {
+public abstract class Shape implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	private final byte m_type;
 	public float m_radius;
@@ -105,8 +108,8 @@ public abstract class Shape {
 	public abstract void computeAABB(final AABB aabb, final Transform xf, int childIndex);
 
 	/**
-	 * Compute the mass properties of this shape using its dimensions and density. The inertia tensor is computed about the
-	 * local origin.
+	 * Compute the mass properties of this shape using its dimensions and density. The inertia tensor is computed about the local
+	 * origin.
 	 *
 	 * @param massData returns the mass data for this shape.
 	 * @param density the density in kilograms per meter squared.

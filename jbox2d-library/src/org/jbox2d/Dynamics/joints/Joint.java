@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.SolverData;
@@ -31,12 +32,14 @@ import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
 /**
- * The base joint class. Joints are used to constrain two bodies together in various fashions. Some joints also feature
- * limits and motors.
+ * The base joint class. Joints are used to constrain two bodies together in various fashions. Some joints also feature limits and
+ * motors.
  *
  * @author Daniel Murphy
  */
-public abstract class Joint {
+public abstract class Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static Joint create(World world, JointDef def) {
 		// Joint joint = null;
@@ -181,8 +184,8 @@ public abstract class Joint {
 	}
 
 	/**
-	 * Get collide connected. Note: modifying the collide connect flag won't work correctly because the flag is only
-	 * checked when fixture AABBs begin to overlap.
+	 * Get collide connected. Note: modifying the collide connect flag won't work correctly because the flag is only checked when
+	 * fixture AABBs begin to overlap.
 	 */
 	public final boolean getCollideConnected() {
 		return m_collideConnected;

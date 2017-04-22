@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.WorldManifold;
@@ -42,7 +43,9 @@ import org.jbox2d.dynamics.contacts.ContactVelocityConstraint.VelocityConstraint
 /**
  * @author Daniel
  */
-public class ContactSolver {
+public class ContactSolver implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static final boolean DEBUG_SOLVER = false;
 	public static final float k_errorTol = 1e-3f;
@@ -372,8 +375,8 @@ public class ContactSolver {
 
 				// Clamp the accumulated force
 				final float maxFriction = friction * vcp.normalImpulse;
-				final float newImpulse =
-					MathUtils.clamp(vcp.tangentImpulse + lambda, -maxFriction, maxFriction);
+				final float newImpulse
+					= MathUtils.clamp(vcp.tangentImpulse + lambda, -maxFriction, maxFriction);
 				lambda = newImpulse - vcp.tangentImpulse;
 				vcp.tangentImpulse = newImpulse;
 
@@ -849,8 +852,8 @@ public class ContactSolver {
 				minSeparation = Math.min(minSeparation, separation);
 
 				// Prevent large corrections and allow slop.
-				final float C =
-					MathUtils.clamp(Settings.baumgarte * (separation + Settings.linearSlop),
+				final float C
+					= MathUtils.clamp(Settings.baumgarte * (separation + Settings.linearSlop),
 						-Settings.maxLinearCorrection, 0.0f);
 
 				// Compute the effective mass.
@@ -949,8 +952,8 @@ public class ContactSolver {
 				minSeparation = Math.min(minSeparation, separation);
 
 				// Prevent large corrections and allow slop.
-				float C =
-					MathUtils.clamp(Settings.toiBaugarte * (separation + Settings.linearSlop),
+				float C
+					= MathUtils.clamp(Settings.toiBaugarte * (separation + Settings.linearSlop),
 						-Settings.maxLinearCorrection, 0.0f);
 
 				// Compute the effective mass.
@@ -985,8 +988,9 @@ public class ContactSolver {
 		return minSeparation >= -1.5f * Settings.linearSlop;
 	}
 
-	public static class ContactSolverDef {
+	public static class ContactSolverDef implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public TimeStep step;
 		public Contact[] contacts;
 		public int count;
@@ -995,8 +999,9 @@ public class ContactSolver {
 	}
 }
 
-class PositionSolverManifold {
+class PositionSolverManifold implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public final Vec2 normal = new Vec2();
 	public final Vec2 point = new Vec2();
 	public float separation;

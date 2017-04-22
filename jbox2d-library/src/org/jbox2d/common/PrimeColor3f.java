@@ -46,6 +46,7 @@
 package org.jbox2d.common;
 
 // updated to rev 100
+import java.io.Serializable;
 import javax.vecmath.Color3f;
 
 /**
@@ -54,7 +55,9 @@ import javax.vecmath.Color3f;
  * @author ewjordan
  *
  */
-public class PrimeColor3f extends Color3f {
+public class PrimeColor3f extends Color3f implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static final PrimeColor3f WHITE = new PrimeColor3f(1, 1, 1);
 	public static final PrimeColor3f BLACK = new PrimeColor3f(0, 0, 0);

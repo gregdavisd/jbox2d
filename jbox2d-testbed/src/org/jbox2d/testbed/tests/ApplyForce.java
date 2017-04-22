@@ -186,15 +186,15 @@ public class ApplyForce extends TestbedTest {
 		addTextLine("Use 'wasd' to move, 'e' and 's' drift.");
 		if (getModel().getKeys()['w']) {
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
-			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(0.0f, 2.0f)));
+			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) m_body.getLocalCenter().add(new Vec2(0.0f, 2.0f)));
 			m_body.applyForce(f, p);
 		} else if (getModel().getKeys()['q']) {
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
-			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(-.2f, 0f)));
+			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) m_body.getLocalCenter().add(new Vec2(-.2f, 0f)));
 			m_body.applyForce(f, p);
 		} else if (getModel().getKeys()['e']) {
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
-			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) new Vec2(m_body.getLocalCenter()).add(new Vec2(.2f, 0f)));
+			Vec2 p = (Vec2) m_body.getWorldPoint((Vec2) m_body.getLocalCenter().add(new Vec2(.2f, 0f)));
 			m_body.applyForce(f, p);
 		} else if (getModel().getKeys()['s']) {
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, 30.0f));

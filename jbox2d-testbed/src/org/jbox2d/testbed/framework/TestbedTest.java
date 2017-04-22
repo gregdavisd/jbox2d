@@ -51,7 +51,6 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.dynamics.Profile;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.joints.Joint;
@@ -362,13 +361,13 @@ public abstract class TestbedTest
 		flags += settings.getSetting(TestbedSettings.DrawShapes).enabled ? DebugDraw.e_shapeBit : 0;
 		flags += settings.getSetting(TestbedSettings.DrawJoints).enabled ? DebugDraw.e_jointBit : 0;
 		flags += settings.getSetting(TestbedSettings.DrawAABBs).enabled ? DebugDraw.e_aabbBit : 0;
-		flags +=
-			settings.getSetting(TestbedSettings.DrawCOMs).enabled ? DebugDraw.e_centerOfMassBit : 0;
+		flags
+			+= settings.getSetting(TestbedSettings.DrawCOMs).enabled ? DebugDraw.e_centerOfMassBit : 0;
 		flags += settings.getSetting(TestbedSettings.DrawTree).enabled ? DebugDraw.e_dynamicTreeBit : 0;
-		flags +=
-			settings.getSetting(TestbedSettings.DrawWireframe).enabled ?
-			DebugDraw.e_wireframeDrawingBit :
-			0;
+		flags
+			+= settings.getSetting(TestbedSettings.DrawWireframe).enabled
+			? DebugDraw.e_wireframeDrawingBit
+			: 0;
 		debugDraw.setFlags(flags);
 
 		m_world.setAllowSleep(settings.getSetting(TestbedSettings.AllowSleep).enabled);
@@ -398,9 +397,9 @@ public abstract class TestbedTest
 			int groupCount = m_world.getParticleGroupCount();
 			debugDraw.drawString(5,
 				m_textLine,
-				"bodies/contacts/joints/proxies/particles/groups = " + m_world.getBodyCount() + "/" +
-				m_world.getContactCount() + "/" + m_world.getJointCount() + "/" +
-				m_world.getProxyCount() + "/" + particleCount + "/" + groupCount, PrimeColor3f.WHITE);
+				"bodies/contacts/joints/proxies/particles/groups = " + m_world.getBodyCount() + "/"
+				+ m_world.getContactCount() + "/" + m_world.getJointCount() + "/"
+				+ m_world.getProxyCount() + "/" + particleCount + "/" + groupCount, PrimeColor3f.WHITE);
 			m_textLine += TEXT_LINE_SPACE;
 
 			debugDraw.drawString(5, m_textLine, "World mouse position: " + mouseWorld.toString(),
@@ -408,8 +407,6 @@ public abstract class TestbedTest
 			m_textLine += TEXT_LINE_SPACE;
 
 			statsList.clear();
-			Profile p = getWorld().getProfile();
-			p.toDebugStrings(statsList);
 
 			for (String s : statsList) {
 				debugDraw.drawString(5, m_textLine, s, PrimeColor3f.WHITE);
@@ -441,10 +438,10 @@ public abstract class TestbedTest
 
 		if (mouseTracing && mouseJoint == null) {
 			float delay = 0.1f;
-			acceleration.x =
-				2 / delay * (1 / delay * (mouseWorld.x - mouseTracerPosition.x) - mouseTracerVelocity.x);
-			acceleration.y =
-				2 / delay * (1 / delay * (mouseWorld.y - mouseTracerPosition.y) - mouseTracerVelocity.y);
+			acceleration.x
+				= 2 / delay * (1 / delay * (mouseWorld.x - mouseTracerPosition.x) - mouseTracerVelocity.x);
+			acceleration.y
+				= 2 / delay * (1 / delay * (mouseWorld.y - mouseTracerPosition.y) - mouseTracerVelocity.y);
 			mouseTracerVelocity.x += timeStep * acceleration.x;
 			mouseTracerVelocity.y += timeStep * acceleration.y;
 			mouseTracerPosition.x += timeStep * mouseTracerVelocity.x;
@@ -664,8 +661,8 @@ public abstract class TestbedTest
 	 * ********** SERIALIZATION ************
 	 */
 	/**
-	 * Override to enable saving and loading. Remember to also override the {@link ObjectListener} and {@link ObjectSigner}
-	 * methods if you need to
+	 * Override to enable saving and loading. Remember to also override the {@link ObjectListener} and {@link ObjectSigner} methods
+	 * if you need to
 	 *
 	 * @return
 	 */

@@ -23,12 +23,16 @@
  ***************************************************************************** */
 package org.jbox2d.common;
 
+import java.io.Serializable;
+
 /**
  * Orientated bounding box viewport transform
  *
  * @author Daniel Murphy
  */
-public class OBBViewportTransform implements IViewportTransform {
+public class OBBViewportTransform implements IViewportTransform, Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static class OBB {
 

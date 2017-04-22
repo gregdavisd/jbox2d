@@ -26,13 +26,17 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
+
 /**
- * Gear joint definition. This definition requires two existing revolute or prismatic joints (any combination will
- * work). The provided joints must attach a dynamic body to a static body.
+ * Gear joint definition. This definition requires two existing revolute or prismatic joints (any combination will work). The
+ * provided joints must attach a dynamic body to a static body.
  *
  * @author Daniel Murphy
  */
-public class GearJointDef extends JointDef {
+public class GearJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The first revolute/prismatic joint attached to the gear joint.

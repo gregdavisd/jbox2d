@@ -23,15 +23,18 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.jbox2d.dynamics.Body;
 
 /**
- * Definition for a {@link ConstantVolumeJoint}, which connects a group a bodies together so they maintain a constant
- * volume within them.
+ * Definition for a {@link ConstantVolumeJoint}, which connects a group a bodies together so they maintain a constant volume
+ * within them.
  */
-public class ConstantVolumeJointDef extends JointDef {
+public class ConstantVolumeJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public float frequencyHz;
 	public float dampingRatio;

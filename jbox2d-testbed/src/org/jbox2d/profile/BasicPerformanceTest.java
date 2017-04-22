@@ -117,8 +117,8 @@ public abstract class BasicPerformanceTest {
 			double mean = stats[i].getMean() / format.divisor;
 			double stddev = stats[i].getStandardDeviation() / format.divisor;
 			double diff = 1.96 * stddev / (float) Math.sqrt(stats[i].getN());
-			printf("%-20s%20.3f%20.3f  (%7.3f,%7.3f)\n", getTestName(i), mean, stddev, mean - diff, mean +
-				diff);
+			printf("%-20s%20.3f%20.3f  (%7.3f,%7.3f)\n", getTestName(i), mean, stddev, mean - diff, mean
+				+ diff);
 		}
 	}
 

@@ -23,10 +23,13 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
-public class ContactPositionConstraint {
+public class ContactPositionConstraint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	Vec2[] localPoints = new Vec2[Settings.maxManifoldPoints];
 	final Vec2 localNormal = new Vec2();

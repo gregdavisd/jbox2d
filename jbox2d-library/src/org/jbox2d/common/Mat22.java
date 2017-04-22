@@ -29,7 +29,9 @@ import javax.vecmath.Matrix2f;
 /**
  * A 2-by-2 matrix. Stored in column-major order.
  */
-public class Mat22 extends Matrix2f implements Serializable {
+public final class Mat22 extends Matrix2f implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Construct zero matrix. Note: this is NOT an identity matrix! djm fixed double allocation problem

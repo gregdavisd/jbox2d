@@ -26,16 +26,19 @@
  */
 package org.jbox2d.callbacks;
 
+import java.io.Serializable;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.joints.Joint;
 
 /**
- * Joints and fixtures are destroyed when their associated body is destroyed. Implement this listener so that you may
- * nullify references to these joints and shapes.
+ * Joints and fixtures are destroyed when their associated body is destroyed. Implement this listener so that you may nullify
+ * references to these joints and shapes.
  *
  * @author Daniel Murphy
  */
-public interface DestructionListener {
+public interface DestructionListener extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Called when any joint is about to be destroyed due to the destruction of one of its attached bodies.

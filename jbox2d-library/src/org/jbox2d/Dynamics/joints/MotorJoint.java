@@ -1,5 +1,6 @@
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
@@ -19,12 +20,14 @@ import org.jbox2d.pooling.IWorldPool;
 //J = [0 0 -1 0 0 1]
 //K = invI1 + invI2
 /**
- * A motor joint is used to control the relative motion between two bodies. A typical usage is to control the movement
- * of a dynamic body with respect to the ground.
+ * A motor joint is used to control the relative motion between two bodies. A typical usage is to control the movement of a
+ * dynamic body with respect to the ground.
  *
  * @author dmurph
  */
-public class MotorJoint extends Joint {
+public class MotorJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	// Solver shared
 	private final Vec2 m_linearOffset = new Vec2();
@@ -287,10 +290,10 @@ public class MotorJoint extends Joint {
 		{
 			// Cdot = vB + b2Cross(wB, m_rB) - vA - b2Cross(wA, m_rA) + inv_h * m_correctionFactor *
 			// m_linearError;
-			Cdot.x =
-				vB.x + -wB * m_rB.y - vA.x - -wA * m_rA.y + inv_h * m_correctionFactor * m_linearError.x;
-			Cdot.y =
-				vB.y + wB * m_rB.x - vA.y - wA * m_rA.x + inv_h * m_correctionFactor * m_linearError.y;
+			Cdot.x
+				= vB.x + -wB * m_rB.y - vA.x - -wA * m_rA.y + inv_h * m_correctionFactor * m_linearError.x;
+			Cdot.y
+				= vB.y + wB * m_rB.x - vA.y - wA * m_rA.x + inv_h * m_correctionFactor * m_linearError.y;
 
 			final Vec2 impulse = temp;
 			Mat22.mulToOutUnsafe(m_linearMass, Cdot, impulse);

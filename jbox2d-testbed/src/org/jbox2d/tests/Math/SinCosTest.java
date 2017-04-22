@@ -58,9 +58,9 @@ public class SinCosTest {
 			overall = Integer.parseInt(args[6]);
 		} catch (Exception e) {
 			System.out
-				.println("Parameters: <number of tables to use> <most precise table value (smallest)> " +
-					"<least precise table value> <number of accuracy test iterations> <number of speed test trials>" +
-					"<number of speed test iterations> <number of overall speed test sets>");
+				.println("Parameters: <number of tables to use> <most precise table value (smallest)> "
+					+ "<least precise table value> <number of accuracy test iterations> <number of speed test trials>"
+					+ "<number of speed test iterations> <number of overall speed test sets>");
 			System.out.println("Sample parameters: 200 .00001 .01 100000 20 5000 2");
 			// return;
 		}
@@ -93,15 +93,15 @@ public class SinCosTest {
 		System.out.println("constructing tables");
 		for (int i = 0; i < numTables; i++) {
 			// well... basic lerp
-			float precision = i * 1f / numTables * (leastPreciseTable - mostPreciseTable) +
-				mostPreciseTable;
+			float precision = i * 1f / numTables * (leastPreciseTable - mostPreciseTable)
+				+ mostPreciseTable;
 			tables[i] = new SinCosTable(precision);
 		}
 	}
 
 	/**
-	 * accuracy test from the static parameters, the tables array needs to be constructed as well, returns
-	 * double[tables][0-3 (no lerp, lerp, then the difference)]
+	 * accuracy test from the static parameters, the tables array needs to be constructed as well, returns double[tables][0-3 (no
+	 * lerp, lerp, then the difference)]
 	 *
 	 * @return
 	 */
@@ -141,8 +141,8 @@ public class SinCosTest {
 	}
 
 	/**
-	 * speed test from the static parameters the tables array needs to be constructed as well, returns double[tables][0-3
-	 * (no lerp, lerp, then the difference)]
+	 * speed test from the static parameters the tables array needs to be constructed as well, returns double[tables][0-3 (no lerp,
+	 * lerp, then the difference)]
 	 *
 	 * @return
 	 */

@@ -12,7 +12,6 @@
 package org.jbox2d.dynamics;
 
 import java.io.Serializable;
-import java.lang.ref.WeakReference;
 
 /**
  *
@@ -20,26 +19,24 @@ import java.lang.ref.WeakReference;
  */
 public class CircularWorld implements Serializable {
 
-	transient private WeakReference<org.jbox2d.dynamics.World> m_world;
+	static final long serialVersionUID = 1L;
+	private org.jbox2d.dynamics.World m_world;
 
 	public CircularWorld(World world) {
-		m_world = new WeakReference<>(world);
+		m_world = world;
 	}
 
 	public CircularWorld() {
-		m_world = new WeakReference<>(null);
+		m_world = null;
 	}
 
 	public final World getWorld() {
-		World world = m_world.get();
-		if (world == null) {
-			throw new AssertionError();
-		}
-		return world;
+
+		return m_world;
 	}
 
 	public final void setWorld(World world) {
-		m_world = new WeakReference<>(world);
+		m_world = world;
 	}
 
 }

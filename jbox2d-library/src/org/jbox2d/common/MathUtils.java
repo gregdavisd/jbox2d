@@ -4,13 +4,16 @@
  */
 package org.jbox2d.common;
 
+import java.io.Serializable;
 import java.util.Random;
 
 /**
  *
  * @author Gregery Barton
  */
-public class MathUtils {
+public class MathUtils implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static final float randomFloat(float argLow, float argHigh) {
 		return (float) Math.random() * (argHigh - argLow) + argLow;

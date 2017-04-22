@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
@@ -31,7 +32,9 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
 
-public class EdgeAndCircleContact extends Contact {
+public class EdgeAndCircleContact extends Contact implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public EdgeAndCircleContact(IWorldPool argPool) {
 		super(argPool);

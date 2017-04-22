@@ -23,9 +23,12 @@
  ***************************************************************************** */
 package org.jbox2d.pooling.normal;
 
+import java.io.Serializable;
 import org.jbox2d.pooling.IDynamicStack;
 
-public abstract class MutableStack<E> implements IDynamicStack<E> {
+public abstract class MutableStack<E> implements IDynamicStack<E>, Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public MutableStack(int argInitSize) {
 	}

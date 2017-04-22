@@ -26,6 +26,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -34,14 +35,16 @@ import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
- * The pulley joint is connected to two bodies and two fixed ground points. The pulley supports a ratio such that:
- * length1 + ratio * length2 <= constant Yes, the force transmitted is scaled by the ratio. Warning: the pulley joint
- * can get a bit squirrelly by itself. They often work better when combined with prismatic joints. You should also cover
- * the the anchor points with static shapes to prevent one side from going to zero length.
+ * The pulley joint is connected to two bodies and two fixed ground points. The pulley supports a ratio such that: length1 + ratio
+ * * length2 <= constant Yes, the force transmitted is scaled by the ratio. Warning: the pulley joint can get a bit squirrelly by
+ * itself. They often work better when combined with prismatic joints. You should also cover the the anchor points with static
+ * shapes to prevent one side from going to zero length.
  *
  * @author Daniel Murphy
  */
-public class PulleyJoint extends Joint {
+public class PulleyJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static final float MIN_PULLEY_LENGTH = 2.0f;
 

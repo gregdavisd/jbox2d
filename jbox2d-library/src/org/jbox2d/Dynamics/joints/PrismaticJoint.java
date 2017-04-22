@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Mat33;
 import org.jbox2d.common.MathUtils;
@@ -98,13 +99,15 @@ import org.jbox2d.pooling.IWorldPool;
 //Now compute impulse to be applied:
 //df = f2 - f1
 /**
- * A prismatic joint. This joint provides one degree of freedom: translation along an axis fixed in bodyA. Relative
- * rotation is prevented. You can use a joint limit to restrict the range of motion and a joint motor to drive the
- * motion or to model joint friction.
+ * A prismatic joint. This joint provides one degree of freedom: translation along an axis fixed in bodyA. Relative rotation is
+ * prevented. You can use a joint limit to restrict the range of motion and a joint motor to drive the motion or to model joint
+ * friction.
  *
  * @author Daniel
  */
-public class PrismaticJoint extends Joint {
+public class PrismaticJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	// Solver shared
 	protected final Vec2 m_localAnchorA;
@@ -695,22 +698,22 @@ public class PrismaticJoint extends Joint {
 			float translation = axis.dot(d);
 			if (Math.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop) {
 				// Prevent large angular corrections
-				C2 =
-					MathUtils.clamp(translation, -Settings.maxLinearCorrection,
+				C2
+					= MathUtils.clamp(translation, -Settings.maxLinearCorrection,
 						Settings.maxLinearCorrection);
 				linearError = Math.max(linearError, Math.abs(translation));
 				active = true;
 			} else if (translation <= m_lowerTranslation) {
 				// Prevent large linear corrections and allow some slop.
-				C2 =
-					MathUtils.clamp(translation - m_lowerTranslation + Settings.linearSlop,
+				C2
+					= MathUtils.clamp(translation - m_lowerTranslation + Settings.linearSlop,
 						-Settings.maxLinearCorrection, 0.0f);
 				linearError = Math.max(linearError, m_lowerTranslation - translation);
 				active = true;
 			} else if (translation >= m_upperTranslation) {
 				// Prevent large linear corrections and allow some slop.
-				C2 =
-					MathUtils.clamp(translation - m_upperTranslation - Settings.linearSlop, 0.0f,
+				C2
+					= MathUtils.clamp(translation - m_upperTranslation - Settings.linearSlop, 0.0f,
 						Settings.maxLinearCorrection);
 				linearError = Math.max(linearError, translation - m_upperTranslation);
 				active = true;

@@ -1,5 +1,6 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
 import org.jbox2d.common.PrimeColor3f;
 
 /**
@@ -7,7 +8,9 @@ import org.jbox2d.common.PrimeColor3f;
  *
  * @author dmurph
  */
-public class ParticleColor {
+public class ParticleColor implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public byte r, g, b, a;
 

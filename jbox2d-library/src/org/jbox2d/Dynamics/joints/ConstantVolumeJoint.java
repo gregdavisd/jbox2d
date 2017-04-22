@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
@@ -32,7 +33,9 @@ import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Position;
 import org.jbox2d.dynamics.contacts.Velocity;
 
-public class ConstantVolumeJoint extends Joint {
+public class ConstantVolumeJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	private final Body[] bodies;
 	private float[] targetLengths;
@@ -111,9 +114,9 @@ public class ConstantVolumeJoint extends Joint {
 		float area = 0.0f;
 		for (int i = 0; i < bodies.length; ++i) {
 			final int next = (i == bodies.length - 1) ? 0 : i + 1;
-			area +=
-				bodies[i].getWorldCenter().x * bodies[next].getWorldCenter().y -
-				bodies[next].getWorldCenter().x * bodies[i].getWorldCenter().y;
+			area
+				+= bodies[i].getWorldCenter().x * bodies[next].getWorldCenter().y
+				- bodies[next].getWorldCenter().x * bodies[i].getWorldCenter().y;
 		}
 		area *= .5f;
 		return area;
@@ -123,9 +126,9 @@ public class ConstantVolumeJoint extends Joint {
 		float area = 0.0f;
 		for (int i = 0; i < bodies.length; ++i) {
 			final int next = (i == bodies.length - 1) ? 0 : i + 1;
-			area +=
-				positions[bodies[i].m_islandIndex].c.x * positions[bodies[next].m_islandIndex].c.y -
-				positions[bodies[next].m_islandIndex].c.x * positions[bodies[i].m_islandIndex].c.y;
+			area
+				+= positions[bodies[i].m_islandIndex].c.x * positions[bodies[next].m_islandIndex].c.y
+				- positions[bodies[next].m_islandIndex].c.x * positions[bodies[i].m_islandIndex].c.y;
 		}
 		area *= .5f;
 		return area;
@@ -154,8 +157,8 @@ public class ConstantVolumeJoint extends Joint {
 		boolean done = true;
 		for (int i = 0; i < bodies.length; ++i) {
 			final int next = (i == bodies.length - 1) ? 0 : i + 1;
-			delta.set(toExtrude * (normals[i].x + normals[next].x), toExtrude *
-				(normals[i].y + normals[next].y));
+			delta.set(toExtrude * (normals[i].x + normals[next].x), toExtrude
+				* (normals[i].y + normals[next].y));
 			// sumdeltax += dx;
 			float normSqrd = delta.lengthSquared();
 			if (normSqrd > Settings.maxLinearCorrection * Settings.maxLinearCorrection) {

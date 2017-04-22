@@ -26,6 +26,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Settings;
 
 import org.jbox2d.common.Vec2;
@@ -36,7 +37,9 @@ import org.jbox2d.dynamics.Body;
  *
  * @author Daniel Murphy
  */
-public class PulleyJointDef extends JointDef {
+public class PulleyJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The first ground anchor in world coordinates. This point never moves.

@@ -45,6 +45,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
@@ -60,10 +61,12 @@ import org.jbox2d.pooling.IWorldPool;
 //K = J * invM * JT
 //= invMass1 + invI1 * cross(r1, u)^2 + invMass2 + invI2 * cross(r2, u)^2
 /**
- * A distance joint constrains two points on two bodies to remain at a fixed distance from each other. You can view this
- * as a massless, rigid rod.
+ * A distance joint constrains two points on two bodies to remain at a fixed distance from each other. You can view this as a
+ * massless, rigid rod.
  */
-public class DistanceJoint extends Joint {
+public class DistanceJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	private float m_frequencyHz;
 	private float m_dampingRatio;

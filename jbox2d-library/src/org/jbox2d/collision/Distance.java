@@ -23,13 +23,13 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
-import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 
@@ -38,13 +38,13 @@ import org.jbox2d.common.Vec2;
 
 // updated to rev 100
 /**
- * This is non-static for faster pooling. To get an instance, use the {@link SingletonPool}, don't construct a distance
- * object.
+ * This is non-static for faster pooling. To get an instance, use the {@link SingletonPool}, don't construct a distance object.
  *
  * @author Daniel Murphy
  */
-public class Distance {
+public class Distance implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public static final int MAX_ITERS = 20;
 
 	public static int GJK_CALLS = 0;
@@ -54,8 +54,9 @@ public class Distance {
 	/**
 	 * GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.
 	 */
-	private class SimplexVertex {
+	private class SimplexVertex implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public final Vec2 wA = new Vec2(); // support point in shapeA
 		public final Vec2 wB = new Vec2(); // support point in shapeB
 		public final Vec2 w = new Vec2(); // wB - wA
@@ -78,8 +79,9 @@ public class Distance {
 	 *
 	 * @author daniel
 	 */
-	public static class SimplexCache {
+	public static class SimplexCache implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		/**
 		 * length or area
 		 */
@@ -113,8 +115,9 @@ public class Distance {
 		}
 	}
 
-	private class Simplex {
+	private class Simplex implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public final SimplexVertex m_v1 = new SimplexVertex();
 		public final SimplexVertex m_v2 = new SimplexVertex();
 		public final SimplexVertex m_v3 = new SimplexVertex();
@@ -480,13 +483,14 @@ public class Distance {
 	}
 
 	/**
-	 * A distance proxy is used by the GJK algorithm. It encapsulates any shape. TODO: see if we can just do assignments
-	 * with m_vertices, instead of copying stuff over
+	 * A distance proxy is used by the GJK algorithm. It encapsulates any shape. TODO: see if we can just do assignments with
+	 * m_vertices, instead of copying stuff over
 	 *
 	 * @author daniel
 	 */
-	public static class DistanceProxy {
+	public static class DistanceProxy implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public final Vec2[] m_vertices;
 		public int m_count;
 		public float m_radius;
@@ -620,8 +624,8 @@ public class Distance {
 	private Vec2 normal = new Vec2();
 
 	/**
-	 * Compute the closest points between two shapes. Supports any combination of: CircleShape and PolygonShape. The
-	 * simplex cache is input/output. On the first call set SimplexCache.count to zero.
+	 * Compute the closest points between two shapes. Supports any combination of: CircleShape and PolygonShape. The simplex cache is
+	 * input/output. On the first call set SimplexCache.count to zero.
 	 *
 	 * @param output
 	 * @param cache

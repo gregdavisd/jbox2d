@@ -45,18 +45,21 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
 //Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
 /**
- * Distance joint definition. This requires defining an anchor point on both bodies and the non-zero length of the
- * distance joint. The definition uses local anchor points so that the initial configuration can violate the constraint
- * slightly. This helps when saving and loading a game.
+ * Distance joint definition. This requires defining an anchor point on both bodies and the non-zero length of the distance joint.
+ * The definition uses local anchor points so that the initial configuration can violate the constraint slightly. This helps when
+ * saving and loading a game.
  *
  * @warning Do not use a zero or short length.
  */
-public class DistanceJointDef extends JointDef {
+public class DistanceJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The local anchor point relative to body1's origin.

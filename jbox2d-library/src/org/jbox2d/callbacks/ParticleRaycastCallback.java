@@ -1,8 +1,11 @@
 package org.jbox2d.callbacks;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
-public interface ParticleRaycastCallback {
+public interface ParticleRaycastCallback extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Called for each particle found in the query. See

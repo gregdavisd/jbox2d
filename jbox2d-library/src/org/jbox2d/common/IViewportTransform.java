@@ -23,12 +23,16 @@
  ***************************************************************************** */
 package org.jbox2d.common;
 
+import java.io.Serializable;
+
 /**
  * This is the viewport transform used from drawing. Use yFlip if you are drawing from the top-left corner.
  *
  * @author Daniel
  */
-public interface IViewportTransform {
+public interface IViewportTransform extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * @return if the transform flips the y axis
@@ -41,20 +45,20 @@ public interface IViewportTransform {
 	void setYFlip(boolean yFlip);
 
 	/**
-	 * This is the half-width and half-height. This should be the actual half-width and half-height, not anything
-	 * transformed or scaled. Not a copy.
+	 * This is the half-width and half-height. This should be the actual half-width and half-height, not anything transformed or
+	 * scaled. Not a copy.
 	 */
 	Vec2 getExtents();
 
 	/**
-	 * This sets the half-width and half-height. This should be the actual half-width and half-height, not anything
-	 * transformed or scaled.
+	 * This sets the half-width and half-height. This should be the actual half-width and half-height, not anything transformed or
+	 * scaled.
 	 */
 	void setExtents(Vec2 extents);
 
 	/**
-	 * This sets the half-width and half-height of the viewport. This should be the actual half-width and half-height, not
-	 * anything transformed or scaled.
+	 * This sets the half-width and half-height of the viewport. This should be the actual half-width and half-height, not anything
+	 * transformed or scaled.
 	 */
 	void setExtents(float halfWidth, float halfHeight);
 
@@ -91,14 +95,14 @@ public interface IViewportTransform {
 	Mat22 getMat22Representation();
 
 	/**
-	 * takes the world coordinate (world) puts the corresponding screen coordinate in screen. It should be safe to give the
-	 * same object as both parameters.
+	 * takes the world coordinate (world) puts the corresponding screen coordinate in screen. It should be safe to give the same
+	 * object as both parameters.
 	 */
 	void getWorldToScreen(Vec2 world, Vec2 screen);
 
 	/**
-	 * takes the screen coordinates (screen) and puts the corresponding world coordinates in world. It should be safe to
-	 * give the same object as both parameters.
+	 * takes the screen coordinates (screen) and puts the corresponding world coordinates in world. It should be safe to give the
+	 * same object as both parameters.
 	 */
 	void getScreenToWorld(Vec2 screen, Vec2 world);
 

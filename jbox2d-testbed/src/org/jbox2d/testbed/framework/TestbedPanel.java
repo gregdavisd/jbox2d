@@ -27,8 +27,8 @@
 package org.jbox2d.testbed.framework;
 
 /**
- * A TestbedPanel encapsulates the graphical panel displayed to the user. Also it is responsible for populating
- * panel-specific data in the model (like panel width).
+ * A TestbedPanel encapsulates the graphical panel displayed to the user. Also it is responsible for populating panel-specific
+ * data in the model (like panel width).
  *
  * @author Daniel Murphy
  */

@@ -1,18 +1,23 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.normal.MutableStack;
 
-public class VoronoiDiagram {
+public class VoronoiDiagram implements Serializable {
 
-	public static class Generator {
+	static final long serialVersionUID = 1L;
 
+	public static class Generator implements Serializable {
+
+		static final long serialVersionUID = 1L;
 		final Vec2 center = new Vec2();
 		int tag;
 	}
 
-	public static class VoronoiDiagramTask {
+	public static class VoronoiDiagramTask implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		int m_x, m_y, m_i;
 		Generator m_generator;
 
@@ -35,7 +40,9 @@ public class VoronoiDiagram {
 		}
 	}
 
-	public static interface VoronoiDiagramCallback {
+	public static interface VoronoiDiagramCallback extends Serializable {
+
+		static final long serialVersionUID = 1L;
 
 		void callback(int aTag, int bTag, int cTag);
 	}
@@ -85,8 +92,10 @@ public class VoronoiDiagram {
 
 	private final Vec2 lower = new Vec2();
 	private final Vec2 upper = new Vec2();
-	private MutableStack<VoronoiDiagramTask> taskPool =
-		new MutableStack<VoronoiDiagram.VoronoiDiagramTask>(50) {
+	private MutableStack<VoronoiDiagramTask> taskPool
+		= new MutableStack<VoronoiDiagram.VoronoiDiagramTask>(50) {
+		static final long serialVersionUID = 1L;
+
 		@Override
 		protected VoronoiDiagramTask newInstance() {
 			return new VoronoiDiagramTask();

@@ -23,6 +23,10 @@
  ***************************************************************************** */
 package org.jbox2d.collision.broadphase;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
@@ -33,14 +37,15 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
 /**
- * A dynamic tree arranges data in a binary tree to accelerate queries such as volume queries and ray casts. Leafs are
- * proxies with an AABB. In the tree we expand the proxy AABB by _fatAABBFactor so that the proxy AABB is bigger than
- * the client object. This allows the client object to move by small amounts without triggering a tree update.
+ * A dynamic tree arranges data in a binary tree to accelerate queries such as volume queries and ray casts. Leafs are proxies
+ * with an AABB. In the tree we expand the proxy AABB by _fatAABBFactor so that the proxy AABB is bigger than the client object.
+ * This allows the client object to move by small amounts without triggering a tree update.
  *
  * @author daniel
  */
-public class DynamicTree implements BroadPhaseStrategy {
+public class DynamicTree implements BroadPhaseStrategy, Serializable {
 
+	static final long serialVersionUID = 1L;
 	public static final int MAX_STACK_SIZE = 64;
 	public static final int NULL_NODE = -1;
 
@@ -51,27 +56,12 @@ public class DynamicTree implements BroadPhaseStrategy {
 
 	private int m_freeList;
 
-	private final Vec2[] drawVecs = new Vec2[4];
-	private DynamicTreeNode[] nodeStack = new DynamicTreeNode[20];
+	private Vec2[] drawVecs;
+	private DynamicTreeNode[] nodeStack;
 	private int nodeStackIndex = 0;
 
 	public DynamicTree() {
-		m_root = null;
-		m_nodeCount = 0;
-		m_nodeCapacity = 16;
-		m_nodes = new DynamicTreeNode[16];
-
-		// Build a linked list for the free list.
-		for (int i = m_nodeCapacity - 1; i >= 0; i--) {
-			m_nodes[i] = new DynamicTreeNode(i);
-			m_nodes[i].parent = (i == m_nodeCapacity - 1) ? null : m_nodes[i + 1];
-			m_nodes[i].height = -1;
-		}
-		m_freeList = 0;
-
-		for (int i = 0; i < drawVecs.length; i++) {
-			drawVecs[i] = new Vec2();
-		}
+		init();
 	}
 
 	@Override
@@ -111,8 +101,8 @@ public class DynamicTree implements BroadPhaseStrategy {
 
 		final AABB nodeAABB = node.aabb;
 		// if (nodeAABB.contains(aabb)) {
-		if (nodeAABB.lowerBound.x <= aabb.lowerBound.x && nodeAABB.lowerBound.y <= aabb.lowerBound.y &&
-			aabb.upperBound.x <= nodeAABB.upperBound.x && aabb.upperBound.y <= nodeAABB.upperBound.y) {
+		if (nodeAABB.lowerBound.x <= aabb.lowerBound.x && nodeAABB.lowerBound.y <= aabb.lowerBound.y
+			&& aabb.upperBound.x <= nodeAABB.upperBound.x && aabb.upperBound.y <= nodeAABB.upperBound.y) {
 			return false;
 		}
 
@@ -878,4 +868,46 @@ public class DynamicTree implements BroadPhaseStrategy {
 			drawTree(argDraw, node.child2, spot + 1, height);
 		}
 	}
+
+	private void init() {
+		m_root = null;
+		m_nodeCount = 0;
+		m_nodeCapacity = 16;
+		m_nodes = new DynamicTreeNode[16];
+		nodeStack = new DynamicTreeNode[20];
+
+		// Build a linked list for the free list.
+		for (int i = m_nodeCapacity - 1; i >= 0; i--) {
+			m_nodes[i] = new DynamicTreeNode(i);
+			m_nodes[i].parent = (i == m_nodeCapacity - 1) ? null : m_nodes[i + 1];
+			m_nodes[i].height = -1;
+		}
+		m_freeList = 0;
+		drawVecs = new Vec2[4];
+		for (int i = 0; i < drawVecs.length; i++) {
+			drawVecs[i] = new Vec2();
+		}
+	}
+
+	private void writeObject(ObjectOutputStream o)
+		throws IOException {
+
+		o.defaultWriteObject();
+		for (int i = 0; i < m_nodes.length; ++i) {
+			DynamicTreeNode m_node = m_nodes[i];
+			o.writeObject(m_node.parent);
+		}
+
+	}
+
+	private void readObject(ObjectInputStream o)
+		throws IOException, ClassNotFoundException {
+
+		o.defaultReadObject();
+		for (int i = 0; i < m_nodes.length; ++i) {
+			DynamicTreeNode m_node = m_nodes[i];
+			m_node.parent = (DynamicTreeNode) o.readObject();
+		}
+	}
+
 }

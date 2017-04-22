@@ -23,9 +23,12 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.pooling.IDynamicStack;
 
-public class ContactRegister {
+public class ContactRegister implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public IDynamicStack<Contact> creator;
 	public boolean primary;

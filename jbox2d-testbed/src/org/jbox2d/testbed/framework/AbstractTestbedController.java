@@ -19,29 +19,19 @@
 package org.jbox2d.testbed.framework;
 
 import java.awt.event.KeyEvent;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.LinkedList;
 
 import org.jbox2d.common.IViewportTransform;
-import org.jbox2d.dynamics.World;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import org.jbox2d.common.Vec2;
 
 /**
- * This class contains most control logic for the testbed and the update loop. It also watches the model to switch tests
- * and populates the model with some loop statistics.
+ * This class contains most control logic for the testbed and the update loop. It also watches the model to switch tests and
+ * populates the model with some loop statistics.
  *
  * @author Daniel Murphy
  */
 public abstract class AbstractTestbedController {
-
-	private static final Logger log = LoggerFactory.getLogger(AbstractTestbedController.class);
 
 	public static enum UpdateBehavior {
 		UPDATE_CALLED, UPDATE_IGNORED
@@ -77,7 +67,7 @@ public abstract class AbstractTestbedController {
 	public AbstractTestbedController(TestbedModel argModel, UpdateBehavior behavior,
 		MouseBehavior mouseBehavior, TestbedErrorHandler errorHandler) {
 		model = argModel;
-		inputQueue = Lists.newLinkedList();
+		inputQueue = new LinkedList<>();
 		setFrameRate(DEFAULT_FPS);
 		updateBehavior = behavior;
 		this.errorHandler = errorHandler;
@@ -180,8 +170,8 @@ public abstract class AbstractTestbedController {
 	}
 
 	/**
-	 * Called by the main run loop. If the update behavior is set to {@link UpdateBehavior#UPDATE_IGNORED}, then this needs
-	 * to be called manually to update the input and test.
+	 * Called by the main run loop. If the update behavior is set to {@link UpdateBehavior#UPDATE_IGNORED}, then this needs to be
+	 * called manually to update the input and test.
 	 */
 	public void updateTest() {
 		if (resetPending) {
@@ -333,7 +323,7 @@ public abstract class AbstractTestbedController {
 		if (isAnimating() != true) {
 			startAnimator();
 		} else {
-			log.warn("Animation is already animating.");
+			//log.warn("Animation is already animating.");
 		}
 	}
 

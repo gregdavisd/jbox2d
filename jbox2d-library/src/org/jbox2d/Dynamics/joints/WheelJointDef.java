@@ -26,18 +26,21 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
 /**
- * Wheel joint definition. This requires defining a line of motion using an axis and an anchor point. The definition
- * uses local anchor points and a local axis so that the initial configuration can violate the constraint slightly. The
- * joint translation is zero when the local anchor points coincide in world space. Using local anchors and a local axis
- * helps when saving and loading a game.
+ * Wheel joint definition. This requires defining a line of motion using an axis and an anchor point. The definition uses local
+ * anchor points and a local axis so that the initial configuration can violate the constraint slightly. The joint translation is
+ * zero when the local anchor points coincide in world space. Using local anchors and a local axis helps when saving and loading a
+ * game.
  *
  * @author Daniel Murphy
  */
-public class WheelJointDef extends JointDef {
+public class WheelJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The local anchor point relative to body1's origin.

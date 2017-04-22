@@ -23,11 +23,14 @@
  ***************************************************************************** */
 package org.jbox2d.common;
 
+import java.io.Serializable;
+
 /**
  * Global tuning constants based on MKS units and various integer maximums (vertices per shape, pairs, etc.).
  */
-public class Settings {
+public class Settings implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	/**
 	 * A "close to zero" float epsilon value for use
 	 */
@@ -48,8 +51,8 @@ public class Settings {
 	public static int CONTACT_STACK_INIT_SIZE = 0;
 	public static boolean SINCOS_LUT_ENABLED = true;
 	/**
-	 * smaller the precision, the larger the table. If a small table is used (eg, precision is .006 or greater), make sure
-	 * you set the table to lerp it's results. Accuracy chart is in the MathUtils source. Or, run the tests yourself in
+	 * smaller the precision, the larger the table. If a small table is used (eg, precision is .006 or greater), make sure you set
+	 * the table to lerp it's results. Accuracy chart is in the MathUtils source. Or, run the tests yourself in
 	 * {@link SinCosTest}.</br> </br> Good lerp precision values:
 	 * <ul>
 	 * <li>.0092</li>
@@ -73,9 +76,9 @@ public class Settings {
 	public static final float SINCOS_LUT_PRECISION = .00011f;
 	public static final int SINCOS_LUT_LENGTH = (int) Math.ceil(Math.PI * 2 / SINCOS_LUT_PRECISION);
 	/**
-	 * Use if the table's precision is large (eg .006 or greater). Although it is more expensive, it greatly increases
-	 * accuracy. Look in the MathUtils source for some test results on the accuracy and speed of lerp vs non lerp. Or, run
-	 * the tests yourself in {@link SinCosTest}.
+	 * Use if the table's precision is large (eg .006 or greater). Although it is more expensive, it greatly increases accuracy. Look
+	 * in the MathUtils source for some test results on the accuracy and speed of lerp vs non lerp. Or, run the tests yourself in
+	 * {@link SinCosTest}.
 	 */
 	public static boolean SINCOS_LUT_LERP = false;
 
@@ -91,8 +94,8 @@ public class Settings {
 	public static int maxPolygonVertices = 8;
 
 	/**
-	 * This is used to fatten AABBs in the dynamic tree. This allows proxies to move by a small amount without triggering a
-	 * tree adjustment. This is in meters.
+	 * This is used to fatten AABBs in the dynamic tree. This allows proxies to move by a small amount without triggering a tree
+	 * adjustment. This is in meters.
 	 */
 	public static float aabbExtension = 0.1f;
 
@@ -103,20 +106,20 @@ public class Settings {
 	public static float aabbMultiplier = 2.0f;
 
 	/**
-	 * A small length used as a collision and constraint tolerance. Usually it is chosen to be numerically significant, but
-	 * visually insignificant.
+	 * A small length used as a collision and constraint tolerance. Usually it is chosen to be numerically significant, but visually
+	 * insignificant.
 	 */
 	public static float linearSlop = 0.005f;
 
 	/**
-	 * A small angle used as a collision and constraint tolerance. Usually it is chosen to be numerically significant, but
-	 * visually insignificant.
+	 * A small angle used as a collision and constraint tolerance. Usually it is chosen to be numerically significant, but visually
+	 * insignificant.
 	 */
 	public static float angularSlop = (2.0f / 180.0f * PI);
 
 	/**
-	 * The radius of the polygon/edge shape skin. This should not be modified. Making this smaller means polygons will have
-	 * and insufficient for continuous collision. Making it larger may create artifacts for vertex collision.
+	 * The radius of the polygon/edge shape skin. This should not be modified. Making this smaller means polygons will have and
+	 * insufficient for continuous collision. Making it larger may create artifacts for vertex collision.
 	 */
 	public static float polygonRadius = (2.0f * linearSlop);
 
@@ -132,8 +135,8 @@ public class Settings {
 	public static int maxTOIContacts = 32;
 
 	/**
-	 * A velocity threshold for elastic collisions. Any collision with a relative linear velocity below this threshold will
-	 * be treated as inelastic.
+	 * A velocity threshold for elastic collisions. Any collision with a relative linear velocity below this threshold will be
+	 * treated as inelastic.
 	 */
 	public static float velocityThreshold = 1.0f;
 
@@ -148,22 +151,22 @@ public class Settings {
 	public static float maxAngularCorrection = (8.0f / 180.0f * PI);
 
 	/**
-	 * The maximum linear velocity of a body. This limit is very large and is used to prevent numerical problems. You
-	 * shouldn't need to adjust this.
+	 * The maximum linear velocity of a body. This limit is very large and is used to prevent numerical problems. You shouldn't need
+	 * to adjust this.
 	 */
 	public static float maxTranslation = 2.0f;
 	public static float maxTranslationSquared = (maxTranslation * maxTranslation);
 
 	/**
-	 * The maximum angular velocity of a body. This limit is very large and is used to prevent numerical problems. You
-	 * shouldn't need to adjust this.
+	 * The maximum angular velocity of a body. This limit is very large and is used to prevent numerical problems. You shouldn't need
+	 * to adjust this.
 	 */
 	public static float maxRotation = (0.5f * PI);
 	public static float maxRotationSquared = (maxRotation * maxRotation);
 
 	/**
-	 * This scale factor controls how fast overlap is resolved. Ideally this would be 1 so that overlap is removed in one
-	 * time step. However using values close to 1 often lead to overshoot.
+	 * This scale factor controls how fast overlap is resolved. Ideally this would be 1 so that overlap is removed in one time step.
+	 * However using values close to 1 often lead to overshoot.
 	 */
 	public static float baumgarte = 0.2f;
 	public static float toiBaugarte = 0.75f;

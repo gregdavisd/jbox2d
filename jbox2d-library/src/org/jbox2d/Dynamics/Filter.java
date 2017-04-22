@@ -24,13 +24,16 @@
 package org.jbox2d.dynamics;
 
 // updated to rev 100
+import java.io.Serializable;
+
 /**
  * This holds contact filtering data.
  *
  * @author daniel
  */
-public class Filter {
+public class Filter implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	/**
 	 * The collision category bits. Normally you would just set one bit.
 	 */
@@ -42,8 +45,8 @@ public class Filter {
 	public int maskBits;
 
 	/**
-	 * Collision groups allow a certain group of objects to never collide (negative) or always collide (positive). Zero
-	 * means no collision group. Non-zero group filtering always wins against the mask bits.
+	 * Collision groups allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no
+	 * collision group. Non-zero group filtering always wins against the mask bits.
 	 */
 	public int groupIndex;
 

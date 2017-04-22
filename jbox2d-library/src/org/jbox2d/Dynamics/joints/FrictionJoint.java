@@ -26,6 +26,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
@@ -37,7 +38,9 @@ import org.jbox2d.pooling.IWorldPool;
 /**
  * @author Daniel Murphy
  */
-public class FrictionJoint extends Joint {
+public class FrictionJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	private final Vec2 m_localAnchorA;
 	private final Vec2 m_localAnchorB;

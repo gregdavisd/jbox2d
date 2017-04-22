@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.collision.Distance.SimplexCache;
 import org.jbox2d.collision.Manifold.ManifoldType;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -37,13 +38,14 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
- * Functions used for computing contact points, distance queries, and TOI queries. Collision methods are non-static for
- * pooling speed, retrieve a collision object from the {@link SingletonPool}. Should not be finalructed.
+ * Functions used for computing contact points, distance queries, and TOI queries. Collision methods are non-static for pooling
+ * speed, retrieve a collision object from the {@link SingletonPool}. Should not be finalructed.
  *
  * @author Daniel Murphy
  */
-public class Collision {
+public class Collision implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public static final int NULL_FEATURE = Integer.MAX_VALUE;
 
 	private final IWorldPool pool;
@@ -87,8 +89,8 @@ public class Collision {
 	}
 
 	/**
-	 * Compute the point states given two manifolds. The states pertain to the transition from manifold1 to manifold2. So
-	 * state1 is either persist or remove while state2 is either add or persist.
+	 * Compute the point states given two manifolds. The states pertain to the transition from manifold1 to manifold2. So state1 is
+	 * either persist or remove while state2 is either add or persist.
 	 *
 	 * @param state1
 	 * @param state2
@@ -846,8 +848,9 @@ public class Collision {
 	/**
 	 * Java-specific class for returning edge results
 	 */
-	private static class EdgeResults {
+	private static class EdgeResults implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public float separation;
 		public int edgeIndex;
 	}
@@ -855,8 +858,9 @@ public class Collision {
 	/**
 	 * Used for computing contact manifolds.
 	 */
-	public static class ClipVertex {
+	public static class ClipVertex implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public final Vec2 v;
 		public final ContactID id;
 
@@ -882,8 +886,9 @@ public class Collision {
 	 *
 	 * @author Daniel Murphy
 	 */
-	public static class PointState {
+	public static class PointState implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		/**
 		 * point does not exist
 		 */
@@ -905,10 +910,13 @@ public class Collision {
 	/**
 	 * This structure is used to keep track of the best separating axis.
 	 */
-	static class EPAxis {
+	static class EPAxis implements Serializable {
 
-		static class Type {
+		static final long serialVersionUID = 1L;
 
+		static class Type implements Serializable {
+
+			static final long serialVersionUID = 1L;
 			public static final byte UNKNOWN = 0;
 			public static final byte EDGE_A = 1;
 			public static final byte EDGE_B = 2;
@@ -922,8 +930,9 @@ public class Collision {
 	/**
 	 * This holds polygon B expressed in frame A.
 	 */
-	static class TempPolygon {
+	static class TempPolygon implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		final Vec2[] vertices = new Vec2[Settings.maxPolygonVertices];
 		final Vec2[] normals = new Vec2[Settings.maxPolygonVertices];
 		int count;
@@ -939,8 +948,9 @@ public class Collision {
 	/**
 	 * Reference face used for clipping
 	 */
-	static class ReferenceFace {
+	static class ReferenceFace implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		int i1, i2;
 		final Vec2 v1 = new Vec2();
 		final Vec2 v2 = new Vec2();
@@ -956,10 +966,13 @@ public class Collision {
 	/**
 	 * This class collides and edge and a polygon, taking into account edge adjacency.
 	 */
-	static class EPCollider {
+	static class EPCollider implements Serializable {
 
-		static class VertexType {
+		static final long serialVersionUID = 1L;
 
+		static class VertexType implements Serializable {
+
+			static final long serialVersionUID = 1L;
 			public static final byte ISOLATED = 0;
 			public static final byte CONCAVE = 1;
 			public static final byte CONVEX = 2;

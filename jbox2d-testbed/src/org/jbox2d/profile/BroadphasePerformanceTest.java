@@ -1,7 +1,7 @@
 package org.jbox2d.profile;
 
+import org.jbox2d.collision.broadphase.DynamicTree;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.collision.broadphase.DynamicTreeFlatNodes;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.normal.DefaultWorldPool;
@@ -30,7 +30,7 @@ public class BroadphasePerformanceTest extends BasicPerformanceTest {
 		if (testNum == 0) {
 			w = new World(new Vec2(0.0f, -10.0f), pool);
 		} else {
-			w = new World(new Vec2(0, -10), pool, new DynamicTreeFlatNodes());
+			w = new World(new Vec2(0, -10), pool, new DynamicTree());
 		}
 		world.setupWorld(w);
 	}

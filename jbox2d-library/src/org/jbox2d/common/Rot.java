@@ -30,7 +30,7 @@ import java.io.Serializable;
  *
  * @author Daniel
  */
-public class Rot implements Serializable {
+public final class Rot implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -84,7 +84,7 @@ public class Rot implements Serializable {
 	}
 
 	public final Vec2 getXAxis() {
-		return new Vec2(c,s);
+		return new Vec2(c, s);
 	}
 
 	public final void getYAxis(Vec2 yAxis) {
@@ -92,9 +92,8 @@ public class Rot implements Serializable {
 	}
 
 	public final Vec2 getYAxis() {
-		return new Vec2(-s,c);
+		return new Vec2(-s, c);
 	}
-
 
 	@Override
 	public final Rot clone() {
@@ -117,17 +116,16 @@ public class Rot implements Serializable {
 		s = new_s;
 		return this;
 	}
-	
+
 	/**
-	 * Scale this rotation 
-		* 
+	 * Scale this rotation
+	 *
 	 * @param s scale factor
 	 * @return this for chaining
 	 */
-	public final Rot scale(float s)
-	{
-		c*=s;
-		s*=s;
+	public final Rot scale(float s) {
+		c *= s;
+		s *= s;
 		return this;
 	}
 

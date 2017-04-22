@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.collision.Distance.DistanceProxy;
 import org.jbox2d.common.Transform;
 
@@ -30,8 +31,9 @@ import org.jbox2d.common.Transform;
  * Input for Distance. You have to option to use the shape radii in the computation.
  *
  */
-public class DistanceInput {
+public class DistanceInput implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public DistanceProxy proxyA = new DistanceProxy();
 	public DistanceProxy proxyB = new DistanceProxy();
 	public Transform transformA = new Transform();

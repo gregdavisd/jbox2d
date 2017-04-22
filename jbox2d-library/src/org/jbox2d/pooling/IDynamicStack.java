@@ -23,6 +23,8 @@
  ***************************************************************************** */
 package org.jbox2d.pooling;
 
+import java.io.Serializable;
+
 /**
  * Same functionality of a regular java.util stack. Object return order does not matter.
  *
@@ -30,7 +32,9 @@ package org.jbox2d.pooling;
  *
  * @param <E>
  */
-public interface IDynamicStack<E> {
+public interface IDynamicStack<E> extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Pops an item off the stack

@@ -45,20 +45,23 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
 /**
- * Revolute joint definition. This requires defining an anchor point where the bodies are joined. The definition uses
- * local anchor points so that the initial configuration can violate the constraint slightly. You also need to specify
- * the initial relative angle for joint limits. This helps when saving and loading a game. The local anchor points are
- * measured from the body's origin rather than the center of mass because:<br/>
+ * Revolute joint definition. This requires defining an anchor point where the bodies are joined. The definition uses local anchor
+ * points so that the initial configuration can violate the constraint slightly. You also need to specify the initial relative
+ * angle for joint limits. This helps when saving and loading a game. The local anchor points are measured from the body's origin
+ * rather than the center of mass because:<br/>
  * <ul>
  * <li>you might not know where the center of mass will be.</li>
  * <li>if you add/remove shapes from a body and recompute the mass, the joints will be broken.</li>
  * </ul>
  */
-public class RevoluteJointDef extends JointDef {
+public class RevoluteJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The local anchor point relative to body1's origin.

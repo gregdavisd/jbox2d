@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Mat33;
 import org.jbox2d.common.MathUtils;
@@ -47,14 +48,16 @@ import org.jbox2d.pooling.IWorldPool;
 //J = [0 0 -1 0 0 1]
 //K = invI1 + invI2
 /**
- * A revolute joint constrains two bodies to share a common point while they are free to rotate about the point. The
- * relative rotation about the shared point is the joint angle. You can limit the relative rotation with a joint limit
- * that specifies a lower and upper angle. You can use a motor to drive the relative rotation about the shared point. A
- * maximum motor torque is provided so that infinite forces are not generated.
+ * A revolute joint constrains two bodies to share a common point while they are free to rotate about the point. The relative
+ * rotation about the shared point is the joint angle. You can limit the relative rotation with a joint limit that specifies a
+ * lower and upper angle. You can use a motor to drive the relative rotation about the shared point. A maximum motor torque is
+ * provided so that infinite forces are not generated.
  *
  * @author Daniel Murphy
  */
-public class RevoluteJoint extends Joint {
+public class RevoluteJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	// Solver shared
 	protected final Vec2 m_localAnchorA = new Vec2();
@@ -357,8 +360,8 @@ public class RevoluteJoint extends Joint {
 
 			if (m_limitState == LimitState.EQUAL) {
 				// Prevent large angular corrections
-				float C =
-					MathUtils.clamp(angle - m_lowerAngle, -Settings.maxAngularCorrection,
+				float C
+					= MathUtils.clamp(angle - m_lowerAngle, -Settings.maxAngularCorrection,
 						Settings.maxAngularCorrection);
 				limitImpulse = -m_motorMass * C;
 				angularError = Math.abs(C);

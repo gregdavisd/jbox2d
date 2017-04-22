@@ -23,7 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.callbacks;
 
-import org.jbox2d.collision.broadphase.DynamicTree;
+import java.io.Serializable;
 
 // update to rev 100
 /**
@@ -32,7 +32,9 @@ import org.jbox2d.collision.broadphase.DynamicTree;
  * @author Daniel Murphy
  *
  */
-public interface TreeCallback {
+public interface TreeCallback extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Callback from a query request.

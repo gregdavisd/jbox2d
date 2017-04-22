@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics;
 
+import java.io.Serializable;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
@@ -36,16 +37,17 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 
 /**
- * A fixture is used to attach a shape to a body for collision detection. A fixture inherits its transform from its
- * parent. Fixtures hold additional non-geometric data such as friction, collision filters, etc. Fixtures are created
- * via Body::CreateFixture.
+ * A fixture is used to attach a shape to a body for collision detection. A fixture inherits its transform from its parent.
+ * Fixtures hold additional non-geometric data such as friction, collision filters, etc. Fixtures are created via
+ * Body::CreateFixture.
  *
  * @warning you cannot reuse fixtures.
  *
  * @author daniel
  */
-public class Fixture {
+public class Fixture implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public float m_density;
 
 	public Body m_body;
@@ -78,8 +80,8 @@ public class Fixture {
 	}
 
 	/**
-	 * Get the child shape. You can modify the child shape, however you should not change the number of vertices because
-	 * this will crash some collision caching mechanisms.
+	 * Get the child shape. You can modify the child shape, however you should not change the number of vertices because this will
+	 * crash some collision caching mechanisms.
 	 *
 	 * @return
 	 */
@@ -110,8 +112,8 @@ public class Fixture {
 	}
 
 	/**
-	 * Set the contact filtering data. This is an expensive operation and should not be called frequently. This will not
-	 * update contacts until the next time step when either parent body is awake. This automatically calls refilter.
+	 * Set the contact filtering data. This is an expensive operation and should not be called frequently. This will not update
+	 * contacts until the next time step when either parent body is awake. This automatically calls refilter.
 	 *
 	 * @param filter
 	 */
@@ -222,8 +224,8 @@ public class Fixture {
 	}
 
 	/**
-	 * Get the mass data for this fixture. The mass data is based on the density and the shape. The rotational inertia is
-	 * about the shape's origin.
+	 * Get the mass data for this fixture. The mass data is based on the density and the shape. The rotational inertia is about the
+	 * shape's origin.
 	 *
 	 * @return
 	 */
@@ -268,8 +270,8 @@ public class Fixture {
 	}
 
 	/**
-	 * Get the fixture's AABB. This AABB may be enlarge and/or stale. If you need a more accurate AABB, compute it using
-	 * the shape and the body transform.
+	 * Get the fixture's AABB. This AABB may be enlarge and/or stale. If you need a more accurate AABB, compute it using the shape
+	 * and the body transform.
 	 *
 	 * @return
 	 */
@@ -390,14 +392,14 @@ public class Fixture {
 			m_shape.computeAABB(aabb1, transform1, proxy.childIndex);
 			m_shape.computeAABB(aab, transform2, proxy.childIndex);
 
-			proxy.aabb.lowerBound.x =
-				aabb1.lowerBound.x < aab.lowerBound.x ? aabb1.lowerBound.x : aab.lowerBound.x;
-			proxy.aabb.lowerBound.y =
-				aabb1.lowerBound.y < aab.lowerBound.y ? aabb1.lowerBound.y : aab.lowerBound.y;
-			proxy.aabb.upperBound.x =
-				aabb1.upperBound.x > aab.upperBound.x ? aabb1.upperBound.x : aab.upperBound.x;
-			proxy.aabb.upperBound.y =
-				aabb1.upperBound.y > aab.upperBound.y ? aabb1.upperBound.y : aab.upperBound.y;
+			proxy.aabb.lowerBound.x
+				= aabb1.lowerBound.x < aab.lowerBound.x ? aabb1.lowerBound.x : aab.lowerBound.x;
+			proxy.aabb.lowerBound.y
+				= aabb1.lowerBound.y < aab.lowerBound.y ? aabb1.lowerBound.y : aab.lowerBound.y;
+			proxy.aabb.upperBound.x
+				= aabb1.upperBound.x > aab.upperBound.x ? aabb1.upperBound.x : aab.upperBound.x;
+			proxy.aabb.upperBound.y
+				= aabb1.upperBound.y > aab.upperBound.y ? aabb1.upperBound.y : aab.upperBound.y;
 			displacement.x = transform2.p.x - transform1.p.x;
 			displacement.y = transform2.p.y - transform1.p.y;
 

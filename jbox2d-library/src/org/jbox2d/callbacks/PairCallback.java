@@ -24,7 +24,11 @@
 package org.jbox2d.callbacks;
 
 // updated to rev 100
-public interface PairCallback {
+import java.io.Serializable;
+
+public interface PairCallback extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public void addPair(Object userDataA, Object userDataB);
 }

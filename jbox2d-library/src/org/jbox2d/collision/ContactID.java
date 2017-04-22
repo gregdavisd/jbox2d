@@ -45,10 +45,14 @@
  */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
+
 /**
  * Contact ids to facilitate warm starting. Note: the ContactFeatures class is just embedded in here
  */
-public class ContactID implements Comparable<ContactID> {
+public class ContactID implements Comparable<ContactID>, Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static class Type {
 

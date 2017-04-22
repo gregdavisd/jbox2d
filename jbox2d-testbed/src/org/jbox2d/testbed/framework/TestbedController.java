@@ -18,18 +18,13 @@
  ***************************************************************************** */
 package org.jbox2d.testbed.framework;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * This class contains most control logic for the testbed and the update loop. It also watches the model to switch tests
- * and populates the model with some loop statistics.
+ * This class contains most control logic for the testbed and the update loop. It also watches the model to switch tests and
+ * populates the model with some loop statistics.
  *
  * @author Daniel Murphy
  */
 public class TestbedController extends AbstractTestbedController implements Runnable {
-
-	private static final Logger log = LoggerFactory.getLogger(TestbedController.class);
 
 	private Thread animator;
 

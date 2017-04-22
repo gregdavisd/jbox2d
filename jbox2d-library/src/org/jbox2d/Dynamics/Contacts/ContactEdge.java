@@ -23,16 +23,19 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.dynamics.Body;
 
 /**
- * A contact edge is used to connect bodies and contacts together in a contact graph where each body is a node and each
- * contact is an edge. A contact edge belongs to a doubly linked list maintained in each attached body. Each contact has
- * two contact nodes, one for each attached body.
+ * A contact edge is used to connect bodies and contacts together in a contact graph where each body is a node and each contact is
+ * an edge. A contact edge belongs to a doubly linked list maintained in each attached body. Each contact has two contact nodes,
+ * one for each attached body.
  *
  * @author daniel
  */
-public class ContactEdge {
+public class ContactEdge implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * provides quick access to the other body attached.

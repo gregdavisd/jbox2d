@@ -45,21 +45,23 @@
  */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
 // updated to rev 100
 /**
- * A manifold point is a contact point belonging to a contact manifold. It holds details related to the geometry and
- * dynamics of the contact points. The local point usage depends on the manifold type:
+ * A manifold point is a contact point belonging to a contact manifold. It holds details related to the geometry and dynamics of
+ * the contact points. The local point usage depends on the manifold type:
  * <ul><li>e_circles: the local center of circleB</li>
  * <li>e_faceA: the local center of cirlceB or the clip point of polygonB</li>
  * <li>e_faceB: the clip point of polygonA</li></ul>
  * This structure is stored across time steps, so we keep it small.<br/>
- * Note: the impulses are used for internal caching and may not provide reliable contact forces, especially for high
- * speed collisions.
+ * Note: the impulses are used for internal caching and may not provide reliable contact forces, especially for high speed
+ * collisions.
  */
-public class ManifoldPoint {
+public class ManifoldPoint implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	/**
 	 * usage depends on manifold type
 	 */

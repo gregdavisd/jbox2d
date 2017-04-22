@@ -1,11 +1,15 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
+
 /**
  * The particle type. Can be combined with | operator. Zero means liquid.
  *
  * @author dmurph
  */
-public class ParticleType {
+public class ParticleType implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static final int b2_waterParticle = 0;
 	/**

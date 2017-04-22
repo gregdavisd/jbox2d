@@ -17,8 +17,8 @@ public class DamBreak extends TestbedTest {
 			Body ground = m_world.createBody(bd);
 
 			ChainShape shape = new ChainShape();
-			Vec2[] vertices =
-				new Vec2[]{new Vec2(-20, 0), new Vec2(20, 0), new Vec2(20, 40), new Vec2(-20, 40)};
+			Vec2[] vertices
+				= new Vec2[]{new Vec2(-20, 0), new Vec2(20, 0), new Vec2(20, 40), new Vec2(-20, 40)};
 			shape.createLoop(vertices, 4);
 			ground.createFixture(shape, 0.0f);
 

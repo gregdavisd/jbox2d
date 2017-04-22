@@ -1,6 +1,10 @@
 package org.jbox2d.particle;
 
-public class StackQueue<T> {
+import java.io.Serializable;
+
+public class StackQueue<T> implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	private T[] m_buffer;
 	private int m_front;

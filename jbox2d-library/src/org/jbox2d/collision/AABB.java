@@ -23,16 +23,16 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.IWorldPool;
-import org.jbox2d.pooling.normal.DefaultWorldPool;
 
 /**
  * An axis-aligned bounding box.
  */
-public class AABB {
+public class AABB implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	/**
 	 * Bottom left vertex of bounding box.
 	 */
@@ -190,8 +190,8 @@ public class AABB {
 		 */
 		// djm: faster putting all of them together, as if one is false we leave the logic
 		// early
-		return lowerBound.x <= aabb.lowerBound.x && lowerBound.y <= aabb.lowerBound.y &&
-			aabb.upperBound.x <= upperBound.x && aabb.upperBound.y <= upperBound.y;
+		return lowerBound.x <= aabb.lowerBound.x && lowerBound.y <= aabb.lowerBound.y
+			&& aabb.upperBound.x <= upperBound.x && aabb.upperBound.y <= upperBound.y;
 	}
 
 	/**

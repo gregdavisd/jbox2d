@@ -1,6 +1,6 @@
 package org.jbox2d.callbacks;
 
-import org.jbox2d.dynamics.World;
+import java.io.Serializable;
 
 /**
  * Callback class for AABB queries. See {@link World#queryAABB(QueryCallback, org.jbox2d.collision.AABB)}.
@@ -8,7 +8,9 @@ import org.jbox2d.dynamics.World;
  * @author dmurph
  *
  */
-public interface ParticleQueryCallback {
+public interface ParticleQueryCallback extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Called for each particle found in the query AABB.

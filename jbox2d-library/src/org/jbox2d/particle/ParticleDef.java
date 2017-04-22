@@ -1,12 +1,15 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
-public class ParticleDef {
+public class ParticleDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
-	 * Specifies the type of particle. A particle may be more than one type. Multiple types are chained by logical sums,
-	 * for example: pd.flags = ParticleType.b2_elasticParticle | ParticleType.b2_viscousParticle.
+	 * Specifies the type of particle. A particle may be more than one type. Multiple types are chained by logical sums, for example:
+	 * pd.flags = ParticleType.b2_elasticParticle | ParticleType.b2_viscousParticle.
 	 */
 	int flags;
 

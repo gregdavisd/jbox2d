@@ -142,8 +142,8 @@ public class ContinuousTest extends TestbedTest {
 			addTextLine(String.format("toi calls = %d, ave toi iters = %3.1f, max toi iters = %d",
 				toiCalls, toiIters * 1. / toiCalls, toiMaxIters));
 
-			addTextLine(String.format("ave toi root iters = %3.1f, max toi root iters = %d", toiRootIters *
-				1. / toiCalls, toiMaxRootIters));
+			addTextLine(String.format("ave toi root iters = %3.1f, max toi root iters = %d", toiRootIters
+				* 1. / toiCalls, toiMaxRootIters));
 		}
 
 		addTextLine("Press 'c' to change launch shape");

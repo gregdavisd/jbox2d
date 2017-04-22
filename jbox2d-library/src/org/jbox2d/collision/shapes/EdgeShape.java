@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision.shapes;
 
+import java.io.Serializable;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
@@ -32,12 +33,14 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
 /**
- * A line segment (edge) shape. These can be connected in chains or loops to other edge shapes. The connectivity
- * information is used to ensure correct contact normals.
+ * A line segment (edge) shape. These can be connected in chains or loops to other edge shapes. The connectivity information is
+ * used to ensure correct contact normals.
  *
  * @author Daniel
  */
-public class EdgeShape extends Shape {
+public class EdgeShape extends Shape implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * edge vertex 1

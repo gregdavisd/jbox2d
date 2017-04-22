@@ -23,11 +23,10 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics;
 
+import java.io.Serializable;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.common.Settings;
-import org.jbox2d.common.Sweep;
-import org.jbox2d.common.Jbox2dTimer;
 import org.jbox2d.common.Vec2;
 
 import org.jbox2d.dynamics.contacts.Contact;
@@ -133,8 +132,9 @@ import org.jbox2d.dynamics.joints.Joint;
  *
  * @author Daniel Murphy
  */
-public class Island {
+public class Island implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public ContactListener m_listener;
 
 	public Body[] m_bodies;
@@ -206,11 +206,10 @@ public class Island {
 	}
 
 	private final ContactSolver contactSolver = new ContactSolver();
-	private final Jbox2dTimer timer = new Jbox2dTimer();
 	private final SolverData solverData = new SolverData();
 	private final ContactSolverDef solverDef = new ContactSolverDef();
 
-	public void solve(Profile profile, TimeStep step, Vec2 gravity, boolean allowSleep) {
+	public void solve(TimeStep step, Vec2 gravity, boolean allowSleep) {
 
 		// System.out.println("Solving Island");
 		float h = step.dt;
@@ -255,8 +254,6 @@ public class Island {
 			m_velocities[i].w = w;
 		}
 
-		timer.reset();
-
 		// Solver data
 		solverData.step = step;
 		solverData.positions = m_positions;
@@ -282,10 +279,7 @@ public class Island {
 			m_joints[i].initVelocityConstraints(solverData);
 		}
 
-		profile.solveInit.accum(timer.getMilliseconds());
-
 		// Solve velocity constraints
-		timer.reset();
 		// System.out.println("island solving velocities");
 		for (int i = 0; i < step.velocityIterations; ++i) {
 			for (int j = 0; j < m_jointCount; ++j) {
@@ -297,7 +291,6 @@ public class Island {
 
 		// Store impulses for warm starting
 		contactSolver.storeImpulses();
-		profile.solveVelocity.accum(timer.getMilliseconds());
 
 		// Integrate positions
 		for (int i = 0; i < m_bodyCount; ++i) {
@@ -311,8 +304,8 @@ public class Island {
 			float translationy = v.y * h;
 
 			if (translationx * translationx + translationy * translationy > Settings.maxTranslationSquared) {
-				float ratio = Settings.maxTranslation /
-					(float) Math.sqrt(translationx * translationx + translationy * translationy);
+				float ratio = Settings.maxTranslation
+					/ (float) Math.sqrt(translationx * translationx + translationy * translationy);
 				v.x *= ratio;
 				v.y *= ratio;
 			}
@@ -333,7 +326,6 @@ public class Island {
 		}
 
 		// Solve position constraints
-		timer.reset();
 		boolean positionSolved = false;
 		for (int i = 0; i < step.positionIterations; ++i) {
 			boolean contactsOkay = contactSolver.solvePositionConstraints();
@@ -363,8 +355,6 @@ public class Island {
 			body.synchronizeTransform();
 		}
 
-		profile.solvePosition.accum(timer.getMilliseconds());
-
 		report(contactSolver.m_velocityConstraints);
 
 		if (allowSleep) {
@@ -379,9 +369,9 @@ public class Island {
 					continue;
 				}
 
-				if (!b.isSleepingAllowed() ||
-					b.m_angularVelocity * b.m_angularVelocity > angTolSqr ||
-					b.m_linearVelocity.dot(b.m_linearVelocity) > linTolSqr) {
+				if (!b.isSleepingAllowed()
+					|| b.m_angularVelocity * b.m_angularVelocity > angTolSqr
+					|| b.m_linearVelocity.dot(b.m_linearVelocity) > linTolSqr) {
 					b.m_sleepTime = 0.0f;
 					minSleepTime = 0.0f;
 				} else {
@@ -494,9 +484,9 @@ public class Island {
 			float translationx = v.x * h;
 			float translationy = v.y * h;
 			if (translationx * translationx + translationy * translationy > Settings.maxTranslationSquared) {
-				float ratio =
-					Settings.maxTranslation /
-					(float) Math.sqrt(translationx * translationx + translationy * translationy);
+				float ratio
+					= Settings.maxTranslation
+					/ (float) Math.sqrt(translationx * translationx + translationy * translationy);
 				v.scale(ratio);
 			}
 

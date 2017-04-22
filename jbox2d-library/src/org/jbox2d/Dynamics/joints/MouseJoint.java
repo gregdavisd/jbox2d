@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
@@ -33,14 +34,15 @@ import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
- * A mouse joint is used to make a point on a body track a specified world point. This a soft constraint with a maximum
- * force. This allows the constraint to stretch and without applying huge forces. NOTE: this joint is not documented in
- * the manual because it was developed to be used in the testbed. If you want to learn how to use the mouse joint, look
- * at the testbed.
+ * A mouse joint is used to make a point on a body track a specified world point. This a soft constraint with a maximum force.
+ * This allows the constraint to stretch and without applying huge forces. NOTE: this joint is not documented in the manual
+ * because it was developed to be used in the testbed. If you want to learn how to use the mouse joint, look at the testbed.
  *
  * @author Daniel
  */
-public class MouseJoint extends Joint {
+public class MouseJoint extends Joint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	private final Vec2 m_localAnchorB = new Vec2();
 	private final Vec2 m_targetA = new Vec2();

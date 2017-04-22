@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.pooling;
 
+import java.io.Serializable;
 import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.TimeOfImpact;
@@ -34,7 +35,9 @@ import org.jbox2d.dynamics.contacts.Contact;
  * @author Daniel
  *
  */
-public interface IWorldPool {
+public interface IWorldPool extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public IDynamicStack<Contact> getPolyContactStack();
 

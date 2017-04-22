@@ -1,9 +1,11 @@
 package org.jbox2d.callbacks;
 
-import org.jbox2d.dynamics.World;
+import java.io.Serializable;
 import org.jbox2d.particle.ParticleGroup;
 
-public interface ParticleDestructionListener {
+public interface ParticleDestructionListener extends Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Called when any particle group is about to be destroyed.

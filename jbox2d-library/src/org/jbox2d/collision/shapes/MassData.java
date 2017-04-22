@@ -45,13 +45,16 @@
  */
 package org.jbox2d.collision.shapes;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
 // Updated to rev 100
 /**
  * This holds the mass data computed for a shape.
  */
-public class MassData {
+public class MassData implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The mass of the shape, usually in kilograms.

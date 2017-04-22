@@ -31,7 +31,9 @@ import javax.vecmath.Matrix3f;
  *
  * @author Daniel Murphy
  */
-public class Mat33 extends Matrix3f implements Serializable {
+public final class Mat33 extends Matrix3f implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	//public final Vec3 ex, ey, ez;
 	public Mat33() {

@@ -11,13 +11,16 @@
  ***************************************************************************** */
 package org.jbox2d.common;
 
+import java.io.Serializable;
 import javax.vecmath.Tuple3f;
 
 /**
  *
  * @author Gregery Barton
  */
-public class Vec3 extends Tuple3f {
+public final class Vec3 extends Tuple3f implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public Vec3(float x, float y, float z) {
 		super(x, y, z);

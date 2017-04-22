@@ -23,6 +23,9 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.jbox2d.callbacks.ContactFilter;
@@ -55,7 +58,6 @@ import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.PrimeColor3f;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
-import org.jbox2d.common.Jbox2dTimer;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
@@ -79,19 +81,23 @@ import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.normal.DefaultWorldPool;
 
 /**
- * The world class manages all physics entities, dynamic simulation, and asynchronous queries. The world also contains
- * efficient memory management facilities.
+ * The world class manages all physics entities, dynamic simulation, and asynchronous queries. The world also contains efficient
+ * memory management facilities.
  *
  * @author Daniel Murphy
  */
-public class World {
+public class World implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	public static final int WORLD_POOL_SIZE = 100;
 	public static final int WORLD_POOL_CONTAINER_SIZE = 10;
 
 	public static final int NEW_FIXTURE = 0x0001;
 	public static final int LOCKED = 0x0002;
 	public static final int CLEAR_FORCES = 0x0004;
+	// NOTE this corresponds to the liquid test, so the debugdraw can draw
+	// the liquid particles correctly. They should be the same.
+	private static Integer LIQUID_INT = new Integer(1234598372);
 
 	// statistics gathering
 	public int activeContacts = 0;
@@ -126,13 +132,44 @@ public class World {
 
 	private boolean m_stepComplete;
 
-	private Profile m_profile;
-
 	private ParticleSystem m_particleSystem;
 
-	private ContactRegister[][] contactStacks =
-		new ContactRegister[ShapeType.NUM_TYPES][ShapeType.NUM_TYPES];
+	private ContactRegister[][] contactStacks
+		= new ContactRegister[ShapeType.NUM_TYPES][ShapeType.NUM_TYPES];
+	// djm pooling
+	private final TimeStep step = new TimeStep();
+	private final PrimeColor3f color = new PrimeColor3f();
+	private final Transform xf = new Transform();
+	private final Vec2 cA = new Vec2();
+	private final Vec2 cB = new Vec2();
 
+	private final WorldQueryWrapper wqwrapper = new WorldQueryWrapper();
+	private final WorldRayCastWrapper wrcwrapper = new WorldRayCastWrapper();
+	private final RayCastInput input = new RayCastInput();
+	private final Island island = new Island();
+	private final Island toiIsland = new Island();
+
+	private final TOIInput toiInput = new TOIInput();
+	private final TOIOutput toiOutput = new TOIOutput();
+	private final TimeStep subStep = new TimeStep();
+	private final Body[] tempBodies = new Body[2];
+	private final Sweep backup1 = new Sweep();
+	private final Sweep backup2 = new Sweep();
+
+	private float liquidLength = .12f;
+	private float averageLinearVel = -1;
+	private final Vec2 liquidOffset = new Vec2();
+	private final Vec2 circCenterMoved = new Vec2();
+	private final PrimeColor3f liquidColor = new PrimeColor3f(.4f, .4f, 1f);
+	private final Vec2 center = new Vec2();
+	private final Vec2 axis = new Vec2();
+	private final Vec2 v1 = new Vec2();
+	private final Vec2 v2 = new Vec2();
+
+//	private void writeObject(ObjectOutputStream o)
+//    throws IOException {  
+//    
+//  }
 	/**
 	 * Construct a world object.
 	 *
@@ -171,7 +208,6 @@ public class World {
 		m_inv_dt0 = 0f;
 
 		m_contactManager = new ContactManager(this, broadPhase);
-		m_profile = new Profile();
 
 		m_particleSystem = new ParticleSystem(this);
 
@@ -185,8 +221,14 @@ public class World {
 
 		m_allowSleep = flag;
 		if (m_allowSleep == false) {
-			m_bodyList.forEach(b -> b.setAwake(true));
+			for (Body body : m_bodyList) {
+				body.setAwake(true);
+			}
 		}
+	}
+
+	public boolean isAllowSleep() {
+		return m_allowSleep;
 	}
 
 	public void setSubStepping(boolean subStepping) {
@@ -195,10 +237,6 @@ public class World {
 
 	public boolean isSubStepping() {
 		return m_subStepping;
-	}
-
-	public boolean isAllowSleep() {
-		return m_allowSleep;
 	}
 
 	private void addType(IDynamicStack<Contact> creator, byte type1, byte type2) {
@@ -227,6 +265,15 @@ public class World {
 
 	public DestructionListener getDestructionListener() {
 		return m_destructionListener;
+	}
+
+	/**
+	 * Register a destruction listener. The listener is owned by you and must remain in scope.
+	 *
+	 * @param listener
+	 */
+	public void setDestructionListener(DestructionListener listener) {
+		m_destructionListener = listener;
 	}
 
 	public ParticleDestructionListener getParticleDestructionListener() {
@@ -262,17 +309,8 @@ public class World {
 	}
 
 	/**
-	 * Register a destruction listener. The listener is owned by you and must remain in scope.
-	 *
-	 * @param listener
-	 */
-	public void setDestructionListener(DestructionListener listener) {
-		m_destructionListener = listener;
-	}
-
-	/**
-	 * Register a contact filter to provide specific control over collision. Otherwise the default filter is used
-	 * (_defaultFilter). The listener is owned by you and must remain in scope.
+	 * Register a contact filter to provide specific control over collision. Otherwise the default filter is used (_defaultFilter).
+	 * The listener is owned by you and must remain in scope.
 	 *
 	 * @param filter
 	 */
@@ -299,8 +337,8 @@ public class World {
 	}
 
 	/**
-	 * Register a routine for debug drawing. The debug draw functions are called inside with World.DrawDebugData method.
-	 * The debug draw object is owned by you and must remain in scope.
+	 * Register a routine for debug drawing. The debug draw functions are called inside with World.DrawDebugData method. The debug
+	 * draw object is owned by you and must remain in scope.
 	 *
 	 * @param debugDraw
 	 */
@@ -325,10 +363,8 @@ public class World {
 		return b;
 	}
 
-
 	/**
-	 * destroy a rigid body given a definition. No reference to the definition is retained. This function is locked during
-	 * callbacks.
+	 * destroy a rigid body given a definition. No reference to the definition is retained. This function is locked during callbacks.
 	 *
 	 * @warning This automatically deletes all associated shapes and joints.
 	 * @warning This function is locked during callbacks.
@@ -377,8 +413,8 @@ public class World {
 	}
 
 	/**
-	 * create a joint to constrain bodies together. No reference to the definition is retained. This may cause the
-	 * connected bodies to cease colliding.
+	 * create a joint to constrain bodies together. No reference to the definition is retained. This may cause the connected bodies
+	 * to cease colliding.
 	 *
 	 * @warning This function is locked during callbacks.
 	 * @param def
@@ -471,11 +507,6 @@ public class World {
 		}
 	}
 
-	// djm pooling
-	private final TimeStep step = new TimeStep();
-	private final Jbox2dTimer stepTimer = new Jbox2dTimer();
-	private final Jbox2dTimer tempTimer = new Jbox2dTimer();
-
 	/**
 	 * Take a time step. This performs collision detection, integration, and constraint solution.
 	 *
@@ -484,8 +515,7 @@ public class World {
 	 * @param positionIterations for the position constraint solver.
 	 */
 	public void step(float dt, int velocityIterations, int positionIterations) {
-		stepTimer.reset();
-		tempTimer.reset();
+
 		// log.debug("Starting step");
 		// If new fixtures were added, we need to find the new contacts.
 		if ((m_flags & NEW_FIXTURE) == NEW_FIXTURE) {
@@ -508,28 +538,24 @@ public class World {
 		step.dtRatio = m_inv_dt0 * dt;
 
 		step.warmStarting = m_warmStarting;
-		m_profile.stepInit.record(tempTimer.getMilliseconds());
 
 		// Update contacts. This is where some contacts are destroyed.
-		tempTimer.reset();
 		m_contactManager.collide();
-		m_profile.collide.record(tempTimer.getMilliseconds());
 
 		// Integrate velocities, solve velocity constraints, and integrate positions.
 		if (m_stepComplete && step.dt > 0.0f) {
-			tempTimer.reset();
+
 			m_particleSystem.solve(step); // Particle Simulation
-			m_profile.solveParticleSystem.record(tempTimer.getMilliseconds());
-			tempTimer.reset();
+
 			solve(step);
-			m_profile.solve.record(tempTimer.getMilliseconds());
+
 		}
 
 		// Handle TOI events.
 		if (m_continuousPhysics && step.dt > 0.0f) {
-			tempTimer.reset();
+
 			solveTOI(step);
-			m_profile.solveTOI.record(tempTimer.getMilliseconds());
+
 		}
 
 		if (step.dt > 0.0f) {
@@ -543,13 +569,11 @@ public class World {
 		m_flags &= ~LOCKED;
 		// log.debug("ending step");
 
-		m_profile.step.record(stepTimer.getMilliseconds());
 	}
 
 	/**
-	 * Call this after you are done with time steps to clear the forces. You normally call this after each call to Step,
-	 * unless you are performing sub-steps. By default, forces will be automatically cleared, so you don't need to call
-	 * this function.
+	 * Call this after you are done with time steps to clear the forces. You normally call this after each call to Step, unless you
+	 * are performing sub-steps. By default, forces will be automatically cleared, so you don't need to call this function.
 	 *
 	 * @see setAutoClearForces
 	 */
@@ -560,11 +584,6 @@ public class World {
 			body.m_torque = 0.0f;
 		}
 	}
-
-	private final PrimeColor3f color = new PrimeColor3f();
-	private final Transform xf = new Transform();
-	private final Vec2 cA = new Vec2();
-	private final Vec2 cB = new Vec2();
 
 	/**
 	 * Call this to draw shapes and other debug draw data.
@@ -604,7 +623,9 @@ public class World {
 		}
 
 		if ((flags & DebugDraw.e_jointBit) != 0) {
-			m_jointList.forEach(j -> drawJoint(j));
+			for (Joint joint : m_jointList) {
+				drawJoint(joint);
+			}
 		}
 
 		if ((flags & DebugDraw.e_pairBit) != 0) {
@@ -659,8 +680,6 @@ public class World {
 		m_debugDraw.flush();
 	}
 
-	private final WorldQueryWrapper wqwrapper = new WorldQueryWrapper();
-
 	/**
 	 * Query the world for all fixtures that potentially overlap the provided AABB.
 	 *
@@ -697,12 +716,9 @@ public class World {
 		m_particleSystem.queryAABB(particleCallback, aabb);
 	}
 
-	private final WorldRayCastWrapper wrcwrapper = new WorldRayCastWrapper();
-	private final RayCastInput input = new RayCastInput();
-
 	/**
-	 * Ray-cast the world for all fixtures in the path of the ray. Your callback controls whether you get the closest
-	 * point, any point, or n-points. The ray-cast ignores shapes that contain the starting point.
+	 * Ray-cast the world for all fixtures in the path of the ray. Your callback controls whether you get the closest point, any
+	 * point, or n-points. The ray-cast ignores shapes that contain the starting point.
 	 *
 	 * @param callback a user implemented callback class.
 	 * @param point1 the ray starting point
@@ -718,8 +734,8 @@ public class World {
 	}
 
 	/**
-	 * Ray-cast the world for all fixtures and particles in the path of the ray. Your callback controls whether you get the
-	 * closest point, any point, or n-points. The ray-cast ignores shapes that contain the starting point.
+	 * Ray-cast the world for all fixtures and particles in the path of the ray. Your callback controls whether you get the closest
+	 * point, any point, or n-points. The ray-cast ignores shapes that contain the starting point.
 	 *
 	 * @param callback a user implemented callback class.
 	 * @param particleCallback the particle callback class.
@@ -738,8 +754,8 @@ public class World {
 	}
 
 	/**
-	 * Ray-cast the world for all particles in the path of the ray. Your callback controls whether you get the closest
-	 * point, any point, or n-points.
+	 * Ray-cast the world for all particles in the path of the ray. Your callback controls whether you get the closest point, any
+	 * point, or n-points.
 	 *
 	 * @param particleCallback the particle callback class.
 	 * @param point1 the ray starting point
@@ -750,8 +766,8 @@ public class World {
 	}
 
 	/**
-	 * Get the world body list. With the returned body, use Body.getNext to get the next body in the world list. A null
-	 * body indicates the end of the list.
+	 * Get the world body list. With the returned body, use Body.getNext to get the next body in the world list. A null body
+	 * indicates the end of the list.
 	 *
 	 * @return the head of the world body list.
 	 */
@@ -760,8 +776,8 @@ public class World {
 	}
 
 	/**
-	 * Get the world joint list. With the returned joint, use Joint.getNext to get the next joint in the world list. A null
-	 * joint indicates the end of the list.
+	 * Get the world joint list. With the returned joint, use Joint.getNext to get the next joint in the world list. A null joint
+	 * indicates the end of the list.
 	 *
 	 * @return the head of the world joint list.
 	 */
@@ -770,12 +786,11 @@ public class World {
 	}
 
 	/**
-	 * Get the world contact list. With the returned contact, use Contact.getNext to get the next contact in the world
-	 * list. A null contact indicates the end of the list.
+	 * Get the world contact list. With the returned contact, use Contact.getNext to get the next contact in the world list. A null
+	 * contact indicates the end of the list.
 	 *
 	 * @return the head of the world contact list.
-	 * @warning contacts are created and destroyed in the middle of a time step. Use ContactListener to avoid missing
-	 * contacts.
+	 * @warning contacts are created and destroyed in the middle of a time step. Use ContactListener to avoid missing contacts.
 	 */
 	public final List<Contact> getContactList() {
 		return m_contactManager.getContactList();
@@ -936,18 +951,7 @@ public class World {
 		return m_contactManager;
 	}
 
-	public Profile getProfile() {
-		return m_profile;
-	}
-
-	private final Island island = new Island();
-	private Body[] stack = new Body[10]; // TODO djm find a good initial stack number;
-	private final Jbox2dTimer broadphaseTimer = new Jbox2dTimer();
-
 	private void solve(TimeStep step) {
-		m_profile.solveInit.startAccum();
-		m_profile.solveVelocity.startAccum();
-		m_profile.solvePosition.startAccum();
 
 		// update previous transforms
 		for (int i = 0; i < m_bodyList.size(); ++i) {
@@ -973,9 +977,9 @@ public class World {
 
 		// Build and simulate all awake islands.
 		int stackSize = getBodyCount();
-		if (stack.length < stackSize) {
-			stack = new Body[stackSize];
-		}
+
+		Body[] stack = new Body[stackSize];
+
 		for (int i_body = 0; i_body < m_bodyList.size(); ++i_body) {
 			Body seed = m_bodyList.get(i_body);
 			if (seed.is_island) {
@@ -1076,7 +1080,7 @@ public class World {
 					other.is_island = true;
 				}
 			}
-			island.solve(m_profile, step, m_gravity, m_allowSleep);
+			island.solve(step, m_gravity, m_allowSleep);
 
 			// Post solve cleanup.
 			for (int i = 0; i < island.m_bodyCount; ++i) {
@@ -1087,11 +1091,7 @@ public class World {
 				}
 			}
 		}
-		m_profile.solveInit.endAccum();
-		m_profile.solveVelocity.endAccum();
-		m_profile.solvePosition.endAccum();
 
-		broadphaseTimer.reset();
 		// Synchronize fixtures, check for out of range bodies.
 		for (int i_body = 0; i_body < m_bodyList.size(); ++i_body) {
 			Body b = m_bodyList.get(i_body);
@@ -1110,16 +1110,7 @@ public class World {
 
 		// Look for new contacts.
 		m_contactManager.findNewContacts();
-		m_profile.broadphase.record(broadphaseTimer.getMilliseconds());
 	}
-
-	private final Island toiIsland = new Island();
-	private final TOIInput toiInput = new TOIInput();
-	private final TOIOutput toiOutput = new TOIOutput();
-	private final TimeStep subStep = new TimeStep();
-	private final Body[] tempBodies = new Body[2];
-	private final Sweep backup1 = new Sweep();
-	private final Sweep backup2 = new Sweep();
 
 	private void solveTOI(final TimeStep step) {
 
@@ -1315,8 +1306,8 @@ public class World {
 
 						// Only add static, kinematic, or bullet bodies.
 						Body other = ce.other;
-						if (other.m_type == BodyType.DYNAMIC && !body.isBullet() &&
-							!other.isBullet()) {
+						if (other.m_type == BodyType.DYNAMIC && !body.isBullet()
+							&& !other.isBullet()) {
 							continue;
 						}
 
@@ -1447,20 +1438,6 @@ public class World {
 		}
 	}
 
-	// NOTE this corresponds to the liquid test, so the debugdraw can draw
-	// the liquid particles correctly. They should be the same.
-	private static Integer LIQUID_INT = new Integer(1234598372);
-	private float liquidLength = .12f;
-	private float averageLinearVel = -1;
-	private final Vec2 liquidOffset = new Vec2();
-	private final Vec2 circCenterMoved = new Vec2();
-	private final PrimeColor3f liquidColor = new PrimeColor3f(.4f, .4f, 1f);
-
-	private final Vec2 center = new Vec2();
-	private final Vec2 axis = new Vec2();
-	private final Vec2 v1 = new Vec2();
-	private final Vec2 v2 = new Vec2();
-
 	private void drawShape(Fixture fixture, Transform xf, PrimeColor3f color, boolean wireframe) {
 		switch (fixture.getType()) {
 			case ShapeType.CIRCLE: {
@@ -1558,9 +1535,9 @@ public class World {
 	}
 
 	/**
-	 * Create a particle whose properties have been defined. No reference to the definition is retained. A simulation step
-	 * must occur before it's possible to interact with a newly created particle. For example, DestroyParticleInShape()
-	 * will not destroy a particle until Step() has been called.
+	 * Create a particle whose properties have been defined. No reference to the definition is retained. A simulation step must occur
+	 * before it's possible to interact with a newly created particle. For example, DestroyParticleInShape() will not destroy a
+	 * particle until Step() has been called.
 	 *
 	 * @warning This function is locked during callbacks.
 	 * @return the index of the particle.
@@ -1594,8 +1571,8 @@ public class World {
 	}
 
 	/**
-	 * Destroy particles inside a shape without enabling the destruction callback for destroyed particles. This function is
-	 * locked during callbacks. For more information see DestroyParticleInShape(Shape&, Transform&,bool).
+	 * Destroy particles inside a shape without enabling the destruction callback for destroyed particles. This function is locked
+	 * during callbacks. For more information see DestroyParticleInShape(Shape&, Transform&,bool).
 	 *
 	 * @param Shape which encloses particles that should be destroyed.
 	 * @param Transform applied to the shape.
@@ -1607,9 +1584,8 @@ public class World {
 	}
 
 	/**
-	 * Destroy particles inside a shape. This function is locked during callbacks. In addition, this function immediately
-	 * destroys particles in the shape in contrast to DestroyParticle() which defers the destruction until the next
-	 * simulation step.
+	 * Destroy particles inside a shape. This function is locked during callbacks. In addition, this function immediately destroys
+	 * particles in the shape in contrast to DestroyParticle() which defers the destruction until the next simulation step.
 	 *
 	 * @param Shape which encloses particles that should be destroyed.
 	 * @param Transform applied to the shape.
@@ -1670,8 +1646,8 @@ public class World {
 	}
 
 	/**
-	 * Destroy particles in a group without enabling the destruction callback for destroyed particles. This function is
-	 * locked during callbacks.
+	 * Destroy particles in a group without enabling the destruction callback for destroyed particles. This function is locked during
+	 * callbacks.
 	 *
 	 * @param The particle group to destroy.
 	 * @warning This function is locked during callbacks.
@@ -1681,8 +1657,8 @@ public class World {
 	}
 
 	/**
-	 * Get the world particle group list. With the returned group, use ParticleGroup::GetNext to get the next group in the
-	 * world list. A NULL group indicates the end of the list.
+	 * Get the world particle group list. With the returned group, use ParticleGroup::GetNext to get the next group in the world
+	 * list. A NULL group indicates the end of the list.
 	 *
 	 * @return the head of the world particle group list.
 	 */
@@ -1745,8 +1721,7 @@ public class World {
 	}
 
 	/**
-	 * Change the particle gravity scale. Adjusts the effect of the global gravity vector on particles. Default value is
-	 * 1.0f.
+	 * Change the particle gravity scale. Adjusts the effect of the global gravity vector on particles. Default value is 1.0f.
 	 *
 	 * @param gravityScale
 	 */
@@ -1765,8 +1740,8 @@ public class World {
 	}
 
 	/**
-	 * Damping is used to reduce the velocity of particles. The damping parameter can be larger than 1.0f but the damping
-	 * effect becomes sensitive to the time step when the damping parameter is large.
+	 * Damping is used to reduce the velocity of particles. The damping parameter can be larger than 1.0f but the damping effect
+	 * becomes sensitive to the time step when the damping parameter is large.
 	 *
 	 * @param damping
 	 */
@@ -1784,8 +1759,8 @@ public class World {
 	}
 
 	/**
-	 * Change the particle radius. You should set this only once, on world start. If you change the radius during
-	 * execution, existing particles may explode, shrink, or behave unexpectedly.
+	 * Change the particle radius. You should set this only once, on world start. If you change the radius during execution, existing
+	 * particles may explode, shrink, or behave unexpectedly.
 	 *
 	 * @param radius
 	 */
@@ -1907,7 +1882,7 @@ public class World {
 	}
 }
 
-class WorldQueryWrapper implements TreeCallback {
+class WorldQueryWrapper implements TreeCallback, Serializable {
 
 	public boolean treeCallback(int nodeId) {
 		FixtureProxy proxy = (FixtureProxy) broadPhase.getUserData(nodeId);
@@ -1918,7 +1893,7 @@ class WorldQueryWrapper implements TreeCallback {
 	QueryCallback callback;
 };
 
-class WorldRayCastWrapper implements TreeRayCastCallback {
+class WorldRayCastWrapper implements TreeRayCastCallback, Serializable {
 
 	// djm pooling
 	private final RayCastOutput output = new RayCastOutput();

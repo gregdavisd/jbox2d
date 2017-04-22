@@ -23,11 +23,14 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
-public class ContactVelocityConstraint {
+public class ContactVelocityConstraint implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public VelocityConstraintPoint[] points = new VelocityConstraintPoint[Settings.maxManifoldPoints];
 	public final Vec2 normal = new Vec2();
@@ -49,8 +52,9 @@ public class ContactVelocityConstraint {
 		}
 	}
 
-	public static class VelocityConstraintPoint {
+	public static class VelocityConstraintPoint implements Serializable {
 
+		static final long serialVersionUID = 1L;
 		public final Vec2 rA = new Vec2();
 		public final Vec2 rB = new Vec2();
 		public float normalImpulse;

@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.dynamics.Body;
 
 /**
@@ -30,7 +31,9 @@ import org.jbox2d.dynamics.Body;
  *
  * @author Daniel Murphy
  */
-public class JointDef {
+public class JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public JointDef(byte type) {
 		this.type = type;

@@ -23,16 +23,19 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.dynamics.Body;
 
 /**
- * A joint edge is used to connect bodies and joints together in a joint graph where each body is a node and each joint
- * is an edge. A joint edge belongs to a doubly linked list maintained in each attached body. Each joint has two joint
- * nodes, one for each attached body.
+ * A joint edge is used to connect bodies and joints together in a joint graph where each body is a node and each joint is an
+ * edge. A joint edge belongs to a doubly linked list maintained in each attached body. Each joint has two joint nodes, one for
+ * each attached body.
  *
  * @author Daniel
  */
-public class JointEdge {
+public class JointEdge implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Provides quick access to the other body attached

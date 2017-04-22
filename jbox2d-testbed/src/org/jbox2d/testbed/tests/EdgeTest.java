@@ -17,8 +17,8 @@ public class EdgeTest extends TestbedTest {
 			Body ground = getGroundBody();
 
 			Vec2 v1 = new Vec2(-10.0f, 0.0f), v2 = new Vec2(-7.0f, -2.0f), v3 = new Vec2(-4.0f, 0.0f);
-			Vec2 v4 = new Vec2(0.0f, 0.0f), v5 = new Vec2(4.0f, 0.0f), v6 = new Vec2(7.0f, 2.0f), v7 =
-				new Vec2(10.0f, 0.0f);
+			Vec2 v4 = new Vec2(0.0f, 0.0f), v5 = new Vec2(4.0f, 0.0f), v6 = new Vec2(7.0f, 2.0f), v7
+				= new Vec2(10.0f, 0.0f);
 
 			EdgeShape shape = new EdgeShape();
 

@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics;
 
+import java.io.Serializable;
 import org.jbox2d.collision.AABB;
 
 /**
@@ -30,8 +31,9 @@ import org.jbox2d.collision.AABB;
  *
  * @author Daniel
  */
-public class FixtureProxy {
+public class FixtureProxy implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	final AABB aabb = new AABB();
 	Fixture fixture;
 	int childIndex;

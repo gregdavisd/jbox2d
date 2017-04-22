@@ -23,12 +23,16 @@
  ***************************************************************************** */
 package org.jbox2d.collision.shapes;
 
+import java.io.Serializable;
+
 /**
  * Types of shapes
  *
  * @author Daniel
  */
-public class ShapeType {
+public class ShapeType implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public static final byte NUM_TYPES = 4;
 

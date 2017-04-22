@@ -1,8 +1,11 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
-public class ParticleContact {
+public class ParticleContact implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * Indices of the respective particles making contact.

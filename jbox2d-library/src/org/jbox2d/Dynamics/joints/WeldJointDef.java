@@ -23,10 +23,9 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.joints.JointDef;
-import org.jbox2d.dynamics.joints.JointType;
 
 /**
  * Created at 3:38:52 AM Jan 15, 2011
@@ -34,7 +33,9 @@ import org.jbox2d.dynamics.joints.JointType;
 /**
  * @author Daniel Murphy
  */
-public class WeldJointDef extends JointDef {
+public class WeldJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The local anchor point relative to body1's origin.

@@ -26,6 +26,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
@@ -34,7 +35,9 @@ import org.jbox2d.dynamics.Body;
  *
  * @author Daniel Murphy
  */
-public class FrictionJointDef extends JointDef {
+public class FrictionJointDef extends JointDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The local anchor point relative to bodyA's origin.

@@ -22,8 +22,8 @@ public class Particles extends TestbedTest {
 		{
 			{
 				PolygonShape shape = new PolygonShape();
-				Vec2[] vertices =
-					new Vec2[]{new Vec2(-40, -10), new Vec2(40, -10), new Vec2(40, 0), new Vec2(-40, 0)};
+				Vec2[] vertices
+					= new Vec2[]{new Vec2(-40, -10), new Vec2(40, -10), new Vec2(40, 0), new Vec2(-40, 0)};
 				shape.set(vertices, 4);
 				getGroundBody().createFixture(shape, 0.0f);
 			}

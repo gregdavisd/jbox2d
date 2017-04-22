@@ -25,16 +25,16 @@ public class DrawingParticles extends TestbedTest {
 		{
 			{
 				PolygonShape shape = new PolygonShape();
-				Vec2[] vertices =
-					new Vec2[]{new Vec2(-40, -20), new Vec2(40, -20), new Vec2(40, 0), new Vec2(-40, 0)};
+				Vec2[] vertices
+					= new Vec2[]{new Vec2(-40, -20), new Vec2(40, -20), new Vec2(40, 0), new Vec2(-40, 0)};
 				shape.set(vertices, 4);
 				getGroundBody().createFixture(shape, 0.0f);
 			}
 
 			{
 				PolygonShape shape = new PolygonShape();
-				Vec2[] vertices =
-					new Vec2[]{new Vec2(-40, -20), new Vec2(-20, -20), new Vec2(-20, 60),
+				Vec2[] vertices
+					= new Vec2[]{new Vec2(-40, -20), new Vec2(-20, -20), new Vec2(-20, 60),
 						new Vec2(-40, 60)};
 				shape.set(vertices, 4);
 				getGroundBody().createFixture(shape, 0.0f);
@@ -43,16 +43,16 @@ public class DrawingParticles extends TestbedTest {
 			{
 				PolygonShape shape = new PolygonShape();
 
-				Vec2[] vertices =
-					new Vec2[]{new Vec2(20, -20), new Vec2(40, -20), new Vec2(40, 60), new Vec2(20, 60)};
+				Vec2[] vertices
+					= new Vec2[]{new Vec2(20, -20), new Vec2(40, -20), new Vec2(40, 60), new Vec2(20, 60)};
 				shape.set(vertices, 4);
 				getGroundBody().createFixture(shape, 0.0f);
 			}
 
 			{
 				PolygonShape shape = new PolygonShape();
-				Vec2[] vertices =
-					new Vec2[]{new Vec2(-40, 40), new Vec2(40, 40), new Vec2(40, 60), new Vec2(-40, 60)};
+				Vec2[] vertices
+					= new Vec2[]{new Vec2(-40, 40), new Vec2(40, 40), new Vec2(40, 60), new Vec2(-40, 60)};
 				shape.set(vertices, 4);
 				getGroundBody().createFixture(shape, 0.0f);
 			}
@@ -87,8 +87,8 @@ public class DrawingParticles extends TestbedTest {
 				m_particleFlags = ParticleType.b2_powderParticle;
 				break;
 			case 'f':
-				m_groupFlags =
-					ParticleGroupType.b2_rigidParticleGroup | ParticleGroupType.b2_solidParticleGroup;
+				m_groupFlags
+					= ParticleGroupType.b2_rigidParticleGroup | ParticleGroupType.b2_solidParticleGroup;
 				break;
 			case 's':
 				m_particleFlags = ParticleType.b2_springParticle;

@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.ShapeType;
@@ -30,7 +31,9 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
 
-public class PolygonContact extends Contact {
+public class PolygonContact extends Contact implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public PolygonContact(IWorldPool argPool) {
 		super(argPool);

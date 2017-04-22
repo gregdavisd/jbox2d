@@ -1,13 +1,15 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 
 /**
- * A particle group definition holds all the data needed to construct a particle group. You can safely re-use these
- * definitions.
+ * A particle group definition holds all the data needed to construct a particle group. You can safely re-use these definitions.
  */
-public class ParticleGroupDef {
+public class ParticleGroupDef implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * The particle-behavior flags.

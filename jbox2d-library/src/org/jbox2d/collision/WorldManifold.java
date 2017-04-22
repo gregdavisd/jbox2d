@@ -23,7 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
-import org.jbox2d.common.MathUtils;
+import java.io.Serializable;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
@@ -34,8 +34,9 @@ import org.jbox2d.common.Vec2;
  *
  * @author daniel
  */
-public class WorldManifold {
+public class WorldManifold implements Serializable {
 
+	static final long serialVersionUID = 1L;
 	/**
 	 * World vector pointing from A to B
 	 */
@@ -124,10 +125,10 @@ public class WorldManifold {
 					// cB.set(normal).scale(radiusB).sub(clipPoint).negate();
 					// points[i].set(cA).add(cB).scale(0.5f);
 
-					final float scalar =
-						radiusA -
-						((clipPoint.x - planePoint.x) * normal.x + (clipPoint.y - planePoint.y) *
-						normal.y);
+					final float scalar
+						= radiusA
+						- ((clipPoint.x - planePoint.x) * normal.x + (clipPoint.y - planePoint.y)
+						* normal.y);
 
 					final float cAx = normal.x * scalar + clipPoint.x;
 					final float cAy = normal.y * scalar + clipPoint.y;
@@ -174,10 +175,10 @@ public class WorldManifold {
 					// manifold.points[i].localPoint.y;
 					// clipPoint.y = xfA.p.y + xfA.q.m10 * manifold.points[i].localPoint.x + xfA.q.m11 *
 					// manifold.points[i].localPoint.y;
-					final float scalar =
-						radiusB -
-						((clipPoint.x - planePoint.x) * normal.x + (clipPoint.y - planePoint.y) *
-						normal.y);
+					final float scalar
+						= radiusB
+						- ((clipPoint.x - planePoint.x) * normal.x + (clipPoint.y - planePoint.y)
+						* normal.y);
 
 					final float cBx = normal.x * scalar + clipPoint.x;
 					final float cBy = normal.y * scalar + clipPoint.y;

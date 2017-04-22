@@ -23,12 +23,9 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics;
 
-import defactory.streambuilder.StreamBuilder;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Stream;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
@@ -41,15 +38,14 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
 
-import org.jbox2d.dynamics.CircularWorld;
-
 /**
  * A rigid body. These are created via World.createBody.
  *
  * @author Daniel Murphy
  */
-public class Body extends CircularWorld {
+public class Body extends CircularWorld implements Serializable {
 
+	static final long serialVersionUID = 1L;
 //	public static final int E_ISLAND_FLAG = 0x0001;
 //	public static final int E_AWAKE_FLAG = 0x0002;
 //	public static final int E_AUTO_SLEEP_FLAG = 0x0004;
@@ -65,6 +61,7 @@ public class Body extends CircularWorld {
 	private boolean is_auto_sleep;
 	private boolean is_bullet;
 	private boolean is_fixed_rotation;
+	private boolean broadphase;
 	private boolean is_active;
 
 	//public int m_flags;
@@ -135,6 +132,7 @@ public class Body extends CircularWorld {
 		if (bd.active) {
 			is_active = true;
 		}
+		broadphase = bd.broadphase;
 
 		m_xf.p.set(bd.position);
 		m_xf.q.set(bd.angle);
@@ -179,9 +177,9 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Creates a fixture and attach it to this body. Use this function if you need to set some fixture parameters, like
-	 * friction. Otherwise you can create the fixture directly from a shape. If the density is non-zero, this function
-	 * automatically updates the mass of the body. Contacts are not created until the next time step.
+	 * Creates a fixture and attach it to this body. Use this function if you need to set some fixture parameters, like friction.
+	 * Otherwise you can create the fixture directly from a shape. If the density is non-zero, this function automatically updates
+	 * the mass of the body. Contacts are not created until the next time step.
 	 *
 	 * @param def the fixture definition.
 	 * @warning This function is locked during callbacks.
@@ -196,7 +194,7 @@ public class Body extends CircularWorld {
 		Fixture fixture = new Fixture();
 		fixture.create(this, def);
 
-		if (is_active) {
+		if (is_active && broadphase) {
 			BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
 			fixture.createProxies(broadPhase, m_xf);
 		}
@@ -220,9 +218,9 @@ public class Body extends CircularWorld {
 	private final FixtureDef fixDef = new FixtureDef();
 
 	/**
-	 * Creates a fixture from a shape and attach it to this body. This is a convenience function. Use FixtureDef if you
-	 * need to set parameters like friction, restitution, user data, or filtering. If the density is non-zero, this
-	 * function automatically updates the mass of the body.
+	 * Creates a fixture from a shape and attach it to this body. This is a convenience function. Use FixtureDef if you need to set
+	 * parameters like friction, restitution, user data, or filtering. If the density is non-zero, this function automatically
+	 * updates the mass of the body.
 	 *
 	 * @param shape the shape to be cloned.
 	 * @param density the shape density (set to zero for static bodies).
@@ -236,9 +234,9 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Destroy a fixture. This removes the fixture from the broad-phase and destroys all contacts associated with this
-	 * fixture. This will automatically adjust the mass of the body if the body is dynamic and the fixture has positive
-	 * density. All fixtures attached to a body are implicitly destroyed when the body is destroyed.
+	 * Destroy a fixture. This removes the fixture from the broad-phase and destroys all contacts associated with this fixture. This
+	 * will automatically adjust the mass of the body if the body is dynamic and the fixture has positive density. All fixtures
+	 * attached to a body are implicitly destroyed when the body is destroyed.
 	 *
 	 * @param fixture the fixture to be removed.
 	 * @warning This function is locked during callbacks.
@@ -289,9 +287,8 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Set the position of the body's origin and rotation. This breaks any contacts and wakes the other bodies.
-	 * Manipulating a body's transform may cause non-physical behavior. Note: contacts are updated on the next call to
-	 * World.step().
+	 * Set the position of the body's origin and rotation. This breaks any contacts and wakes the other bodies. Manipulating a body's
+	 * transform may cause non-physical behavior. Note: contacts are updated on the next call to World.step().
 	 *
 	 * @param position the world position of the body's local origin.
 	 * @param angle the world rotation in radians.
@@ -313,7 +310,9 @@ public class Body extends CircularWorld {
 		m_sweep.a0 = m_sweep.a;
 
 		BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
-		m_fixtureList.forEach(f -> f.synchronize(broadPhase, m_xf, m_xf));
+		for (Fixture fixture : m_fixtureList) {
+			fixture.synchronize(broadPhase, m_xf, m_xf);
+		}
 	}
 
 	/**
@@ -464,8 +463,8 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Apply a force at a world point. If the force is not applied at the center of mass, it will generate a torque and
-	 * affect the angular velocity. This wakes up the body.
+	 * Apply a force at a world point. If the force is not applied at the center of mass, it will generate a torque and affect the
+	 * angular velocity. This wakes up the body.
 	 *
 	 * @param force the world force vector, usually in Newtons (N).
 	 * @param point the world position of the point of application.
@@ -508,8 +507,8 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Apply a torque. This affects the angular velocity without affecting the linear velocity of the center of mass. This
-	 * wakes up the body.
+	 * Apply a torque. This affects the angular velocity without affecting the linear velocity of the center of mass. This wakes up
+	 * the body.
 	 *
 	 * @param torque about the z-axis (out of the screen), usually in N-m.
 	 */
@@ -526,9 +525,9 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Apply an impulse at a point. This immediately modifies the velocity. It also modifies the angular velocity if the
-	 * point of application is not at the center of mass. This wakes up the body if 'wake' is set to true. If the body is
-	 * sleeping and 'wake' is false, then there is no effect.
+	 * Apply an impulse at a point. This immediately modifies the velocity. It also modifies the angular velocity if the point of
+	 * application is not at the center of mass. This wakes up the body if 'wake' is set to true. If the body is sleeping and 'wake'
+	 * is false, then there is no effect.
 	 *
 	 * @param impulse the world impulse vector, usually in N-seconds or kg-m/s.
 	 * @param point the world position of the point of application.
@@ -550,8 +549,8 @@ public class Body extends CircularWorld {
 		m_linearVelocity.x += impulse.x * m_invMass;
 		m_linearVelocity.y += impulse.y * m_invMass;
 
-		m_angularVelocity +=
-			m_invI * ((point.x - m_sweep.c.x) * impulse.y - (point.y - m_sweep.c.y) * impulse.x);
+		m_angularVelocity
+			+= m_invI * ((point.x - m_sweep.c.x) * impulse.y - (point.y - m_sweep.c.y) * impulse.x);
 	}
 
 	/**
@@ -585,10 +584,10 @@ public class Body extends CircularWorld {
 	 * @return the rotational inertia, usually in kg-m^2.
 	 */
 	public final float getInertia() {
-		return m_I +
-			m_mass *
-			(m_sweep.localCenter.x * m_sweep.localCenter.x + m_sweep.localCenter.y *
-			m_sweep.localCenter.y);
+		return m_I
+			+ m_mass
+			* (m_sweep.localCenter.x * m_sweep.localCenter.x + m_sweep.localCenter.y
+			* m_sweep.localCenter.y);
 	}
 
 	/**
@@ -602,19 +601,18 @@ public class Body extends CircularWorld {
 		// data.center.set(m_sweep.localCenter);
 
 		data.mass = m_mass;
-		data.I =
-			m_I +
-			m_mass *
-			(m_sweep.localCenter.x * m_sweep.localCenter.x + m_sweep.localCenter.y *
-			m_sweep.localCenter.y);
+		data.I
+			= m_I
+			+ m_mass
+			* (m_sweep.localCenter.x * m_sweep.localCenter.x + m_sweep.localCenter.y
+			* m_sweep.localCenter.y);
 		data.center.x = m_sweep.localCenter.x;
 		data.center.y = m_sweep.localCenter.y;
 	}
 
 	/**
-	 * Set the mass properties to override the mass properties of the fixtures. Note that this changes the center of mass
-	 * position. Note that creating or destroying fixtures can also alter the mass. This function has no effect if the body
-	 * isn't dynamic.
+	 * Set the mass properties to override the mass properties of the fixtures. Note that this changes the center of mass position.
+	 * Note that creating or destroying fixtures can also alter the mass. This function has no effect if the body isn't dynamic.
 	 *
 	 * @param massData the mass properties.
 	 */
@@ -664,8 +662,8 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * This resets the mass properties to the sum of the mass properties of the fixtures. This normally does not need to be
-	 * called unless you called setMassData to override the mass and you later want to reset the mass.
+	 * This resets the mass properties to the sum of the mass properties of the fixtures. This normally does not need to be called
+	 * unless you called setMassData to override the mass and you later want to reset the mass.
 	 */
 	public final void resetMassData() {
 		// Compute mass data from shapes. Each shape has its own density.
@@ -969,7 +967,6 @@ public class Body extends CircularWorld {
 	 * Set the sleep state of the body. A sleeping body has very low CPU cost.
 	 *
 	 * @param flag set to true to put body to sleep, false to wake it.
-	 * @param flag
 	 */
 	public final void setAwake(boolean flag) {
 		if (flag) {
@@ -997,12 +994,12 @@ public class Body extends CircularWorld {
 	}
 
 	/**
-	 * Set the active state of the body. An inactive body is not simulated and cannot be collided with or woken up. If you
-	 * pass a flag of true, all fixtures will be added to the broad-phase. If you pass a flag of false, all fixtures will
-	 * be removed from the broad-phase and all contacts will be destroyed. Fixtures and joints are otherwise unaffected.
-	 * You may continue to create/destroy fixtures and joints on inactive bodies. Fixtures on an inactive body are
-	 * implicitly inactive and will not participate in collisions, ray-casts, or queries. Joints connected to an inactive
-	 * body are implicitly inactive. An inactive body is still owned by a World object and remains in the body list.
+	 * Set the active state of the body. An inactive body is not simulated and cannot be collided with or woken up. If you pass a
+	 * flag of true, all fixtures will be added to the broad-phase. If you pass a flag of false, all fixtures will be removed from
+	 * the broad-phase and all contacts will be destroyed. Fixtures and joints are otherwise unaffected. You may continue to
+	 * create/destroy fixtures and joints on inactive bodies. Fixtures on an inactive body are implicitly inactive and will not
+	 * participate in collisions, ray-casts, or queries. Joints connected to an inactive body are implicitly inactive. An inactive
+	 * body is still owned by a World object and remains in the body list.
 	 *
 	 * @param flag
 	 */
@@ -1016,17 +1013,22 @@ public class Body extends CircularWorld {
 		if (flag) {
 			is_active = true;
 
-			// Create all proxies.
-			BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
-			m_fixtureList.forEach(f -> f.createProxies(broadPhase, m_xf));
-
+			if (broadphase) {
+				// Create all proxies.
+				BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
+				for (Fixture fixture : m_fixtureList) {
+					fixture.createProxies(broadPhase, m_xf);
+				}
+			}
 			// Contacts are created the next time step.
 		} else {
 			is_active = false;
 
 			// Destroy all proxies.
 			BroadPhase broadPhase = getWorld().m_contactManager.m_broadPhase;
-			m_fixtureList.forEach(f -> f.destroyProxies(broadPhase));
+			for (Fixture fixture : m_fixtureList) {
+				fixture.destroyProxies(broadPhase);
+			}
 
 			// Destroy the attached contacts.
 			delete_attached_contacts();
@@ -1120,7 +1122,9 @@ public class Body extends CircularWorld {
 		xf1.p.y = m_sweep.c0.y - xf1.q.s * m_sweep.localCenter.x - xf1.q.c * m_sweep.localCenter.y;
 		// end inline
 
-		m_fixtureList.forEach(f -> f.synchronize(getWorld().m_contactManager.m_broadPhase, xf1, m_xf));
+		for (Fixture fixture : m_fixtureList) {
+			fixture.synchronize(getWorld().m_contactManager.m_broadPhase, xf1, m_xf);
+		}
 
 	}
 
@@ -1187,28 +1191,27 @@ public class Body extends CircularWorld {
 		}
 	}
 
-	public Stream<Body> streamBody() {
-		StreamBuilder<Body> builder = new StreamBuilder<>();
-		Set<Body> added = new TreeSet<>();
-		streamBody(added, builder);
-		return builder.build();
-	}
-
-	private void streamBody(Set<Body> added, StreamBuilder<Body> builder) {
-		builder.add(this);
-		added.add(this);
-
-		for (JointEdge jointEdge : m_jointList) {
-			Body other = jointEdge.other;
-			if ((other != null) && !added.contains(other)) {
-				other.streamBody(added, builder);
-			}
-		}
-
-	}
-
-	public Stream<Fixture> streamFixture() {
-		return m_fixtureList.stream();
-	}
-
+//	public Stream<Body> streamBody() {
+//		StreamBuilder<Body> builder = new StreamBuilder<>();
+//		Set<Body> added = new TreeSet<>();
+//		streamBody(added, builder);
+//		return builder.build();
+//	}
+//
+//	private void streamBody(Set<Body> added, StreamBuilder<Body> builder) {
+//		builder.add(this);
+//		added.add(this);
+//
+//		for (JointEdge jointEdge : m_jointList) {
+//			Body other = jointEdge.other;
+//			if ((other != null) && !added.contains(other)) {
+//				other.streamBody(added, builder);
+//			}
+//		}
+//
+//	}
+//
+//	public Stream<Fixture> streamFixture() {
+//		return m_fixtureList.stream();
+//	}
 }

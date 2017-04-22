@@ -1,9 +1,12 @@
 package org.jbox2d.particle;
 
+import java.io.Serializable;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
-public class ParticleGroup {
+public class ParticleGroup implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	ParticleSystem m_system;
 	int m_firstIndex;

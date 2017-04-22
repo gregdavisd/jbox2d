@@ -23,9 +23,12 @@
  ***************************************************************************** */
 package org.jbox2d.dynamics.contacts;
 
+import java.io.Serializable;
 import org.jbox2d.common.Vec2;
 
-public class Velocity {
+public class Velocity implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	public final Vec2 v = new Vec2();
 	public float w;

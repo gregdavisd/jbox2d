@@ -23,6 +23,7 @@
  ***************************************************************************** */
 package org.jbox2d.collision;
 
+import java.io.Serializable;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
@@ -44,14 +45,16 @@ import org.jbox2d.common.Vec2;
  * <li>e_faceA: the normal on polygonA</li>
  * <li>e_faceB: the normal on polygonB</li>
  * </ul>
- * We store contacts in this way so that position correction can account for movement, which is critical for continuous
- * physics. All contact scenarios must be expressed in one of these types. This structure is stored across time steps,
- * so we keep it small.
+ * We store contacts in this way so that position correction can account for movement, which is critical for continuous physics.
+ * All contact scenarios must be expressed in one of these types. This structure is stored across time steps, so we keep it small.
  */
-public class Manifold {
+public class Manifold implements Serializable {
 
-	public static class ManifoldType {
+	static final long serialVersionUID = 1L;
 
+	public static class ManifoldType implements Serializable {
+
+		static final long serialVersionUID = 1L;
 		public static final byte CIRCLES = 0;
 		public static final byte FACE_A = 1;
 		public static final byte FACE_B = 2;

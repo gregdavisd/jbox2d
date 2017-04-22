@@ -1,6 +1,10 @@
 package org.jbox2d.particle;
 
-public class ParticleGroupType {
+import java.io.Serializable;
+
+public class ParticleGroupType implements Serializable {
+
+	static final long serialVersionUID = 1L;
 
 	/**
 	 * resists penetration

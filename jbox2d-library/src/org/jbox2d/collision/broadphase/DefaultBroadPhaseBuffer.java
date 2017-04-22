@@ -23,8 +23,8 @@
  ***************************************************************************** */
 package org.jbox2d.collision.broadphase;
 
+import java.io.Serializable;
 import java.util.Arrays;
-
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.PairCallback;
 import org.jbox2d.callbacks.TreeCallback;
@@ -34,14 +34,15 @@ import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.common.Vec2;
 
 /**
- * The broad-phase is used for computing pairs and performing volume queries and ray casts. This broad-phase does not
- * persist pairs. Instead, this reports potentially new pairs. It is up to the client to consume the new pairs and to
- * track subsequent overlap.
+ * The broad-phase is used for computing pairs and performing volume queries and ray casts. This broad-phase does not persist
+ * pairs. Instead, this reports potentially new pairs. It is up to the client to consume the new pairs and to track subsequent
+ * overlap.
  *
  * @author Daniel Murphy
  */
-public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
+public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase, Serializable {
 
+	static final long serialVersionUID = 1L;
 	private final BroadPhaseStrategy m_tree;
 
 	private int m_proxyCount;
