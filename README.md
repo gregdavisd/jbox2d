@@ -9,6 +9,5 @@ This fork of JBox2d is mostly to improve memory handling. This version can run t
 - Removed some static builder methods and replaced with constructors, there is still a lot more work needed on this.
 - Removed unused classes.
 - Removed some static utility methods, still more needed to be removed.
-- Removed GWT compatibility.
 - Replaced Ad hoc linked lists with ArrayList.
 
