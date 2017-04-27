@@ -559,9 +559,9 @@ public class ContactSolver implements Serializable {
 						 */
 						if (DEBUG_SOLVER) {
 							// Postconditions
-							Vec2 dv1 = (Vec2) new Vec2(vB).add(new Vec2(cp1rB).setLeftPerpendicular(wB)).sub(vA).sub(new Vec2(cp1rA).
+							Vec2 dv1 =  new Vec2(vB).add(new Vec2(cp1rB).setLeftPerpendicular(wB)).sub(vA).sub(new Vec2(cp1rA).
 								setLeftPerpendicular(wA));
-							Vec2 dv2 = (Vec2) new Vec2(vB).add(new Vec2(cp2rB).setLeftPerpendicular(wB)).sub(vA).sub(new Vec2(cp2rA).
+							Vec2 dv2 =  new Vec2(vB).add(new Vec2(cp2rB).setLeftPerpendicular(wB)).sub(vA).sub(new Vec2(cp2rA).
 								setLeftPerpendicular(wA));
 							// Compute normal velocity
 							vn1 = dv1.dot(normal);
@@ -624,7 +624,7 @@ public class ContactSolver implements Serializable {
 						 */
 						if (DEBUG_SOLVER) {
 							// Postconditions
-							Vec2 dv1 = (Vec2) new Vec2(vB).add(new Vec2(cp1rB).setLeftPerpendicular(wB)).sub(vA).sub(new Vec2(cp1rA).
+							Vec2 dv1 =  new Vec2(vB).add(new Vec2(cp1rB).setLeftPerpendicular(wB)).sub(vA).sub(new Vec2(cp1rA).
 								setLeftPerpendicular(wA));
 							// Compute normal velocity
 							vn1 = dv1.dot(normal);
@@ -683,7 +683,7 @@ public class ContactSolver implements Serializable {
 						 */
 						if (DEBUG_SOLVER) {
 							// Postconditions
-							Vec2 dv2 = (Vec2) new Vec2(vB).add(new Vec2(cp2rB).setLeftPerpendicular(wB)).sub(vA).sub(new Vec2(cp2rA).
+							Vec2 dv2 =  new Vec2(vB).add(new Vec2(cp2rB).setLeftPerpendicular(wB)).sub(vA).sub(new Vec2(cp2rA).
 								setLeftPerpendicular(wA));
 
 							// Compute normal velocity

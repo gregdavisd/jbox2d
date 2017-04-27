@@ -203,8 +203,8 @@ public class PulleyJoint extends Joint implements Serializable {
 		qB.set(aB);
 
 		// Compute the effective masses.
-		Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
+		Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
+		Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
 
 		m_uA.set(cA).add(m_rA).sub(m_groundAnchorA);
 		m_uB.set(cB).add(m_rB).sub(m_groundAnchorB);
@@ -322,8 +322,8 @@ public class PulleyJoint extends Joint implements Serializable {
 		qA.set(aA);
 		qB.set(aB);
 
-		Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_localCenterA), rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_localCenterB), rB);
+		Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_localCenterA), rA);
+		Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), rB);
 
 		uA.set(cA).add(rA).sub(m_groundAnchorA);
 		uB.set(cB).add(rB).sub(m_groundAnchorB);

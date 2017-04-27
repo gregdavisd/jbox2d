@@ -134,8 +134,8 @@ public class RevoluteJoint extends Joint implements Serializable {
 		qB.set(aB);
 
 		// Compute the effective masses.
-		Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
+		Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
+		Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
 
 		// J = [-I -r1_skew I r2_skew]
 		// [ 0 -1 0 1]
@@ -315,7 +315,7 @@ public class RevoluteJoint extends Joint implements Serializable {
 			temp.set(m_rA).setRightPerpendicular(wA);
 			Cdot.set(m_rB).setRightPerpendicular(wB);
 			Cdot.add(vB).sub(vA).sub(temp);
-			m_mass.solve22ToOut((Vec2) Cdot.negate(), impulse); // just leave negated
+			m_mass.solve22ToOut( Cdot.negate(), impulse); // just leave negated
 
 			m_impulse.x += impulse.x;
 			m_impulse.y += impulse.y;
@@ -394,8 +394,8 @@ public class RevoluteJoint extends Joint implements Serializable {
 			final Vec2 C = new Vec2();
 			final Vec2 impulse = new Vec2();
 
-			Rot.mulToOutUnsafe(qA, (Vec2) C.set(m_localAnchorA).sub(m_localCenterA), rA);
-			Rot.mulToOutUnsafe(qB, (Vec2) C.set(m_localAnchorB).sub(m_localCenterB), rB);
+			Rot.mulToOutUnsafe(qA,  C.set(m_localAnchorA).sub(m_localCenterA), rA);
+			Rot.mulToOutUnsafe(qB,  C.set(m_localAnchorB).sub(m_localCenterB), rB);
 			C.set(cB).add(rB).sub(cA).sub(rA);
 			positionError = C.length();
 

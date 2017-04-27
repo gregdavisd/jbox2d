@@ -193,8 +193,8 @@ public class DistanceJoint extends Joint implements Serializable {
 		qB.set(aB);
 
 		// use m_u as temporary variable
-		Rot.mulToOutUnsafe(qA, (Vec2) m_u.set(m_localAnchorA).sub(m_localCenterA), m_rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) m_u.set(m_localAnchorB).sub(m_localCenterB), m_rB);
+		Rot.mulToOutUnsafe(qA,  m_u.set(m_localAnchorA).sub(m_localCenterA), m_rA);
+		Rot.mulToOutUnsafe(qB,  m_u.set(m_localAnchorB).sub(m_localCenterB), m_rB);
 		m_u.set(cB).add(m_rB).sub(cA).sub(m_rA);
 
 		// Handle singularity.
@@ -273,11 +273,11 @@ public class DistanceJoint extends Joint implements Serializable {
 		final Vec2 vpB = new Vec2();
 
 		// Cdot = dot(u, v + cross(w, r))
-		((Vec2) vpA.set(m_rA)).setRightPerpendicular(wA);
+		( vpA.set(m_rA)).setRightPerpendicular(wA);
 		vpA.add(vA);
-		((Vec2) vpB.set(m_rB)).setRightPerpendicular(wB);
+		( vpB.set(m_rB)).setRightPerpendicular(wB);
 		vpB.add(vB);
-		float Cdot = m_u.dot((Vec2) vpB.sub(vpA));
+		float Cdot = m_u.dot( vpB.sub(vpA));
 
 		float impulse = -m_mass * (Cdot + m_bias + m_gamma * m_impulse);
 		m_impulse += impulse;
@@ -318,8 +318,8 @@ public class DistanceJoint extends Joint implements Serializable {
 		qA.set(aA);
 		qB.set(aB);
 
-		Rot.mulToOutUnsafe(qA, (Vec2) u.set(m_localAnchorA).sub(m_localCenterA), rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) u.set(m_localAnchorB).sub(m_localCenterB), rB);
+		Rot.mulToOutUnsafe(qA,  u.set(m_localAnchorA).sub(m_localCenterA), rA);
+		Rot.mulToOutUnsafe(qB,  u.set(m_localAnchorB).sub(m_localCenterB), rB);
 		u.set(cB).add(rB).sub(cA).sub(rA);
 
 		float length = u.length();

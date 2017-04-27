@@ -162,8 +162,8 @@ public class PolygonShape extends Shape implements Serializable {
 					continue;
 				}
 
-				Vec2 r = (Vec2) new Vec2(ps[ie]).sub(ps[hull[m]]);
-				Vec2 v = (Vec2) new Vec2(ps[j]).sub(ps[hull[m]]);
+				Vec2 r =  new Vec2(ps[ie]).sub(ps[hull[m]]);
+				Vec2 v =  new Vec2(ps[j]).sub(ps[hull[m]]);
 				float c = r.cross(v);
 				if (c < 0.0f) {
 					ie = j;
@@ -202,7 +202,7 @@ public class PolygonShape extends Shape implements Serializable {
 			edge.set(m_vertices[i2]).sub(m_vertices[i1]);
 
 			assert (edge.lengthSquared() > Settings.EPSILON * Settings.EPSILON);
-			((Vec2) m_normals[i].set(edge)).setLeftPerpendicular(1f);
+			( m_normals[i].set(edge)).setLeftPerpendicular(1f);
 			m_normals[i].normalize();
 		}
 
@@ -616,14 +616,14 @@ public class PolygonShape extends Shape implements Serializable {
 			int i1 = i;
 			int i2 = i < m_count - 1 ? i1 + 1 : 0;
 			Vec2 p = m_vertices[i1];
-			Vec2 e = (Vec2) new Vec2(m_vertices[i2]).sub(p);
+			Vec2 e =  new Vec2(m_vertices[i2]).sub(p);
 
 			for (int j = 0; j < m_count; ++j) {
 				if (j == i1 || j == i2) {
 					continue;
 				}
 
-				Vec2 v = (Vec2) new Vec2(m_vertices[j]).sub(p);
+				Vec2 v =  new Vec2(m_vertices[j]).sub(p);
 				float c = e.cross(v);
 				if (c < 0.0f) {
 					return false;

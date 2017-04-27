@@ -415,8 +415,8 @@ public class PrismaticJoint extends Joint implements Serializable {
 		qB.set(aB);
 
 		// Compute the effective masses.
-		Rot.mulToOutUnsafe(qA, (Vec2) d.set(m_localAnchorA).sub(m_localCenterA), rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) d.set(m_localAnchorB).sub(m_localCenterB), rB);
+		Rot.mulToOutUnsafe(qA,  d.set(m_localAnchorA).sub(m_localCenterA), rA);
+		Rot.mulToOutUnsafe(qB,  d.set(m_localAnchorB).sub(m_localCenterB), rB);
 		d.set(cB).sub(cA).add(rB).sub(rA);
 
 		float mA = m_invMassA, mB = m_invMassB;
@@ -619,7 +619,7 @@ public class PrismaticJoint extends Joint implements Serializable {
 		} else {
 			// Limit is inactive, just solve the prismatic constraint in block form.
 			final Vec2 df = new Vec2();
-			m_K.solve22ToOut((Vec2) Cdot1.negate(), df);
+			m_K.solve22ToOut( Cdot1.negate(), df);
 			Cdot1.negate();
 
 			m_impulse.x += df.x;
@@ -674,8 +674,8 @@ public class PrismaticJoint extends Joint implements Serializable {
 		float iA = m_invIA, iB = m_invIB;
 
 		// Compute fresh Jacobians
-		Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_localCenterA), rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_localCenterB), rB);
+		Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_localCenterA), rA);
+		Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), rB);
 		d.set(cB).add(rB).sub(cA).sub(rA);
 
 		Rot.mulToOutUnsafe(qA, m_localXAxisA, axis);
@@ -756,7 +756,7 @@ public class PrismaticJoint extends Joint implements Serializable {
 			K.setColumn(1, k12, k22);
 
 			// temp is impulse1
-			K.solveToOut((Vec2) C1.negate(), temp);
+			K.solveToOut( C1.negate(), temp);
 			C1.negate();
 
 			impulse.x = temp.x;

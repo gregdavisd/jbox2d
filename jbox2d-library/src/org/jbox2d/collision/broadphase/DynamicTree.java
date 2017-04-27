@@ -236,13 +236,13 @@ public class DynamicTree implements BroadPhaseStrategy, Serializable {
 		final Vec2 p2 = input.p2;
 
 		float tempx, tempy;
-		Vec2 r = (Vec2) new Vec2(p2).sub(p1);
+		Vec2 r =  new Vec2(p2).sub(p1);
 		assert ((r.x * r.x + r.y * r.y) > 0f);
 		r.normalize();
 
 		// v is perpendicular to the segment.
 		Vec2 v = new Vec2(-1f * r.y, 1f * r.x);
-		Vec2 abs_v = (Vec2) new Vec2(v).absolute();
+		Vec2 abs_v =  new Vec2(v).absolute();
 
 		// Separating axis for segment (Gino, p80).
 		// |dot(v, p1 - c)| > dot(|v|, h)

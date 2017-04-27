@@ -29,7 +29,7 @@ import javax.vecmath.Matrix2f;
 /**
  * A 2-by-2 matrix. Stored in column-major order.
  */
-public final class Mat22 extends Matrix2f implements Serializable {
+public final class Mat22 extends Matrix2f<Mat22> implements Serializable {
 
 	static final long serialVersionUID = 1L;
 

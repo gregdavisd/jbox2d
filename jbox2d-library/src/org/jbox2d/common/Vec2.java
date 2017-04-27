@@ -18,7 +18,7 @@ import javax.vecmath.Tuple2f;
  *
  * @author Gregery Barton
  */
-public final class Vec2 extends Tuple2f implements Serializable {
+public final class Vec2 extends Tuple2f<Vec2> implements Serializable {
 
 	static final long serialVersionUID = 1L;
 

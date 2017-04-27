@@ -108,7 +108,7 @@ public class DistanceJointDef extends JointDef implements Serializable {
 		bodyB = b2;
 		localAnchorA.set(bodyA.getLocalPoint(anchor1));
 		localAnchorB.set(bodyB.getLocalPoint(anchor2));
-		Vec2 d = (Vec2) new Vec2(anchor2).sub(anchor1);
+		Vec2 d =  new Vec2(anchor2).sub(anchor1);
 		length = d.length();
 	}
 }

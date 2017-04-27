@@ -172,8 +172,8 @@ public class WeldJoint extends Joint implements Serializable {
 		qB.set(aB);
 
 		// Compute the effective masses.
-		Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
+		Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
+		Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
 
 		// J = [-I -r1_skew I r2_skew]
 		// [ 0 -1 0 1]
@@ -344,8 +344,8 @@ public class WeldJoint extends Joint implements Serializable {
 		float mA = m_invMassA, mB = m_invMassB;
 		float iA = m_invIA, iB = m_invIB;
 
-		Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_localCenterA), rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_localCenterB), rB);
+		Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_localCenterA), rA);
+		Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), rB);
 		float positionError, angularError;
 
 		final Mat33 K = new Mat33();

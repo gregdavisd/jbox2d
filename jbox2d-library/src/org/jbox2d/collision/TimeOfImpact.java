@@ -368,7 +368,7 @@ class SeparationFunction implements Serializable {
 			localPointB2.set(m_proxyB.getVertex(cache.indexB[1]));
 			final Vec2 temp = new Vec2();
 			temp.set(localPointB2).sub(localPointB1);
-			((Vec2) m_axis.set(temp)).setLeftPerpendicular(1f);
+			( m_axis.set(temp)).setLeftPerpendicular(1f);
 			m_axis.normalize();
 
 			final Vec2 normal = new Vec2();
@@ -399,7 +399,7 @@ class SeparationFunction implements Serializable {
 
 			final Vec2 temp = new Vec2();
 			temp.set(localPointA2).sub(localPointA1);
-			((Vec2) m_axis.set(temp)).setLeftPerpendicular(1f);
+			( m_axis.set(temp)).setLeftPerpendicular(1f);
 			m_axis.normalize();
 
 			final Vec2 normal = new Vec2();
@@ -434,7 +434,7 @@ class SeparationFunction implements Serializable {
 				final Vec2 axisA = new Vec2();
 				Rot.mulTransUnsafe(xfa.q, m_axis, axisA);
 				final Vec2 axisB = new Vec2();
-				Rot.mulTransUnsafe(xfb.q, (Vec2) m_axis.negate(), axisB);
+				Rot.mulTransUnsafe(xfb.q,  m_axis.negate(), axisB);
 				m_axis.negate();
 
 				indexes[0] = m_proxyA.getSupport(axisA);
@@ -447,7 +447,7 @@ class SeparationFunction implements Serializable {
 				final Vec2 pointB = new Vec2();
 				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 
-				float separation = ((Vec2) pointB.sub(pointA)).dot(m_axis);
+				float separation = ( pointB.sub(pointA)).dot(m_axis);
 				return separation;
 			}
 			case Type.FACE_A: {
@@ -457,7 +457,7 @@ class SeparationFunction implements Serializable {
 				Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 
 				final Vec2 axisB = new Vec2();
-				Rot.mulTransUnsafe(xfb.q, (Vec2) normal.negate(), axisB);
+				Rot.mulTransUnsafe(xfb.q,  normal.negate(), axisB);
 				normal.negate();
 
 				indexes[0] = -1;
@@ -477,7 +477,7 @@ class SeparationFunction implements Serializable {
 				final Vec2 pointB = new Vec2();
 				Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 
-				Rot.mulTransUnsafe(xfa.q, (Vec2) normal.negate(), axisA);
+				Rot.mulTransUnsafe(xfa.q,  normal.negate(), axisA);
 				normal.negate();
 
 				indexes[1] = -1;

@@ -193,11 +193,11 @@ public class Distance implements Serializable {
 
 					if (sgn > 0f) {
 						// Origin is left of e12.
-						((Vec2) out.set(e12)).setRightPerpendicular(1f);
+						( out.set(e12)).setRightPerpendicular(1f);
 						return;
 					} else {
 						// Origin is right of e12.
-						((Vec2) out.set(e12)).setLeftPerpendicular(1f);
+						( out.set(e12)).setLeftPerpendicular(1f);
 						return;
 					}
 				default:
@@ -716,11 +716,11 @@ public class Distance implements Serializable {
 			// Compute a tentative new simplex vertex using support points.
 			SimplexVertex vertex = vertices[simplex.m_count];
  Vec2 temp = new Vec2();
-			Rot.mulTransUnsafe(transformA.q, (Vec2) d.negate(), temp);
+			Rot.mulTransUnsafe(transformA.q,  d.negate(), temp);
 			vertex.indexA = proxyA.getSupport(temp);
 			Transform.mulToOutUnsafe(transformA, proxyA.getVertex(vertex.indexA), vertex.wA);
 			// Vec2 wBLocal;
-			Rot.mulTransUnsafe(transformB.q, (Vec2) d.negate(), temp);
+			Rot.mulTransUnsafe(transformB.q,  d.negate(), temp);
 			vertex.indexB = proxyB.getSupport(temp);
 			Transform.mulToOutUnsafe(transformB, proxyB.getVertex(vertex.indexB), vertex.wB);
 			vertex.w.set(vertex.wB).sub(vertex.wA);

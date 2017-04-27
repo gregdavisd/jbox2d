@@ -72,7 +72,7 @@ public class ConstantVolumeJoint extends Joint implements Serializable {
 		targetLengths = new float[bodies.length];
 		for (int i = 0; i < targetLengths.length; ++i) {
 			final int next = (i == targetLengths.length - 1) ? 0 : i + 1;
-			float dist = ((Vec2) new Vec2(bodies[i].getWorldCenter()).sub(bodies[next].getWorldCenter())).length();
+			float dist = ( new Vec2(bodies[i].getWorldCenter()).sub(bodies[next].getWorldCenter())).length();
 			targetLengths[i] = dist;
 		}
 		targetVolume = getBodyArea();

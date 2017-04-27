@@ -319,7 +319,7 @@ public class ParticleSystem extends CircularWorld implements Serializable {
 						particleDef.position.x = p.x;
 						particleDef.position.y = p.y;
 						p.sub(groupDef.position);
-						((Vec2) particleDef.velocity.set(p)).setRightPerpendicular(groupDef.angularVelocity);
+						( particleDef.velocity.set(p)).setRightPerpendicular(groupDef.angularVelocity);
 						particleDef.velocity.add(groupDef.linearVelocity);
 						createParticle(particleDef);
 					}

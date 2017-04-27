@@ -258,8 +258,8 @@ public class WheelJoint extends Joint implements Serializable {
 		qB.set(aB);
 
 		// Compute the effective masses.
-		Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_localCenterA), rA);
-		Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_localCenterB), rB);
+		Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_localCenterA), rA);
+		Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), rB);
 		d.set(cB).add(rB).sub(cA).sub(rA);
 
 		// Point to line constraint
@@ -447,8 +447,8 @@ public class WheelJoint extends Joint implements Serializable {
 		qA.set(aA);
 		qB.set(aB);
 
-		Rot.mulToOut(qA, (Vec2) temp.set(m_localAnchorA).sub(m_localCenterA), rA);
-		Rot.mulToOut(qB, (Vec2) temp.set(m_localAnchorB).sub(m_localCenterB), rB);
+		Rot.mulToOut(qA,  temp.set(m_localAnchorA).sub(m_localCenterA), rA);
+		Rot.mulToOut(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), rB);
 		d.set(cB).sub(cA).add(rB).sub(rA);
 
 		Vec2 ay = new Vec2();

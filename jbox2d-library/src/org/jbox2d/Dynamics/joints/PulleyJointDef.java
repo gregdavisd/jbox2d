@@ -98,9 +98,9 @@ public class PulleyJointDef extends JointDef implements Serializable {
 		groundAnchorB = ga2;
 		localAnchorA = bodyA.getLocalPoint(anchor1);
 		localAnchorB = bodyB.getLocalPoint(anchor2);
-		Vec2 d1 = (Vec2) new Vec2(anchor1).sub(ga1);
+		Vec2 d1 =  new Vec2(anchor1).sub(ga1);
 		lengthA = d1.length();
-		Vec2 d2 = (Vec2) new Vec2(anchor2).sub(ga2);
+		Vec2 d2 =  new Vec2(anchor2).sub(ga2);
 		lengthB = d2.length();
 		ratio = r;
 		assert (ratio > Settings.EPSILON);

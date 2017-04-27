@@ -602,7 +602,7 @@ public class Collision implements Serializable {
 		final int iv2 = edge1 + 1 < count1 ? edge1 + 1 : 0;
 		final Vec2 v11 = new Vec2(vertices1[iv1]);
 		final Vec2 v12 = new Vec2(vertices1[iv2]);
-		final Vec2 localTangent = (Vec2) new Vec2(v12.x - v11.x, v12.y - v11.y).normalize();
+		final Vec2 localTangent =  new Vec2(v12.x - v11.x, v12.y - v11.y).normalize();
 
 		// Vec2 localNormal = Vec2.cross(dv, 1.0f);
 		final Vec2 localNormal = new Vec2(localTangent.y, -localTangent.x);
@@ -700,11 +700,11 @@ public class Collision implements Serializable {
 
 		final Vec2 A = edgeA.m_vertex1;
 		final Vec2 B = edgeA.m_vertex2;
-		final Vec2 e = (Vec2) new Vec2(B).sub(A);
+		final Vec2 e =  new Vec2(B).sub(A);
 
 		// Barycentric coordinates
-		float u = e.dot((Vec2) temp.set(B).sub(Q));
-		float v = e.dot((Vec2) temp.set(Q).sub(A));
+		float u = e.dot( temp.set(B).sub(Q));
+		float v = e.dot( temp.set(Q).sub(A));
 
 		float radius = edgeA.m_radius + circleB.m_radius;
 
@@ -729,7 +729,7 @@ public class Collision implements Serializable {
 				final Vec2 A1 = edgeA.m_vertex0;
 				final Vec2 B1 = A;
 				e1.set(B1).sub(A1);
-				float u1 = e1.dot((Vec2) temp.set(B1).sub(Q));
+				float u1 = e1.dot( temp.set(B1).sub(Q));
 
 				// Is the circle in Region AB of the previous edge?
 				if (u1 > 0.0f) {
@@ -762,8 +762,8 @@ public class Collision implements Serializable {
 			if (edgeA.m_hasVertex3) {
 				final Vec2 B2 = edgeA.m_vertex3;
 				final Vec2 A2 = B;
-				final Vec2 e2 = (Vec2) new Vec2(B2).sub(A2);
-				float v2 = e2.dot((Vec2) temp.set(Q).sub(A2));
+				final Vec2 e2 =  new Vec2(B2).sub(A2);
+				float v2 = e2.dot( temp.set(Q).sub(A2));
 
 				// Is the circle in Region AB of the next edge?
 				if (v2 > 0.0f) {
@@ -799,7 +799,7 @@ public class Collision implements Serializable {
 
 		Vec2 n = new Vec2(-e.y, e.x);
 
-		if (n.dot((Vec2) temp.set(Q).sub(A)) < 0.0f) {
+		if (n.dot( temp.set(Q).sub(A)) < 0.0f) {
 			n.set(-n.x, -n.y);
 		}
 		n.normalize();
@@ -992,12 +992,12 @@ public class Collision implements Serializable {
 			boolean hasVertex0 = edgeA.m_hasVertex0;
 			boolean hasVertex3 = edgeA.m_hasVertex3;
 
-			final Vec2 edge1 = (Vec2) new Vec2(m_v2).sub(m_v1);
+			final Vec2 edge1 =  new Vec2(m_v2).sub(m_v1);
 			edge1.normalize();
 			m_normal1.set(edge1.y, -edge1.x);
 
 			float offset1 = m_normal1
-				.dot((Vec2) new Vec2(m_centroidB)
+				.dot( new Vec2(m_centroidB)
 					.sub(m_v1));
 			float offset0 = 0.0f, offset2 = 0.0f;
 			boolean convex1 = false, convex2 = false;
@@ -1005,24 +1005,24 @@ public class Collision implements Serializable {
 			// Is there a preceding edge?
 			if (hasVertex0) {
 				final Vec2 edge0
-					= (Vec2) new Vec2(m_v1)
+					=  new Vec2(m_v1)
 						.sub(m_v0)
 						.normalize();
 				m_normal0.set(edge0.y, -edge0.x);
 				convex1 = edge0.cross(edge1) >= 0.0f;
-				offset0 = m_normal0.dot((Vec2) new Vec2(m_centroidB).sub(m_v0));
+				offset0 = m_normal0.dot( new Vec2(m_centroidB).sub(m_v0));
 			}
 
 			// Is there a following edge?
 			if (hasVertex3) {
 				final Vec2 edge2
-					= (Vec2) new Vec2(m_v3)
+					=  new Vec2(m_v3)
 						.sub(m_v2)
 						.normalize();
 				m_normal2.set(edge2.y, -edge2.x);
 				convex2 = edge1.cross(edge2) > 0.0f;
 				offset2 = m_normal2
-					.dot((Vec2) new Vec2(m_centroidB)
+					.dot( new Vec2(m_centroidB)
 						.sub(m_v2));
 			}
 
@@ -1332,7 +1332,7 @@ public class Collision implements Serializable {
 			for (int i = 0; i < Settings.maxManifoldPoints; ++i) {
 				float separation;
 
-				separation = rf.normal.dot((Vec2) new Vec2(clipPoints2[i].v).sub(rf.v1));
+				separation = rf.normal.dot( new Vec2(clipPoints2[i].v).sub(rf.v1));
 
 				if (separation <= m_radius) {
 					ManifoldPoint cp = manifold.points[pointCount];
@@ -1407,11 +1407,11 @@ public class Collision implements Serializable {
 
 				// Adjacency
 				if (n.x * perp.x + n.y * perp.y >= 0.0f) {
-					if (((Vec2) new Vec2(n).sub(m_upperLimit)).dot(m_normal) < -Settings.angularSlop) {
+					if (( new Vec2(n).sub(m_upperLimit)).dot(m_normal) < -Settings.angularSlop) {
 						continue;
 					}
 				} else {
-					if (((Vec2) new Vec2(n).sub(m_lowerLimit)).dot(m_normal) < -Settings.angularSlop) {
+					if (( new Vec2(n).sub(m_lowerLimit)).dot(m_normal) < -Settings.angularSlop) {
 						continue;
 					}
 				}

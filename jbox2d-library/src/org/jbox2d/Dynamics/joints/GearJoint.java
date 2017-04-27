@@ -151,7 +151,7 @@ public class GearJoint extends Joint implements Serializable {
 			Rot.mulToOutUnsafe(xfA.q, m_localAnchorA, temp);
 			temp.add(xfA.p).sub(xfC.p);
 			Rot.mulTransUnsafe(xfC.q, temp, pA);
-			coordinateA = ((Vec2) pA.sub(pC)).dot(m_localAxisC);
+			coordinateA = ( pA.sub(pC)).dot(m_localAxisC);
 		}
 
 		m_bodyD = m_joint2.getBodyA();
@@ -282,8 +282,8 @@ public class GearJoint extends Joint implements Serializable {
 			Vec2 rC = new Vec2();
 			Vec2 rA = new Vec2();
 			Rot.mulToOutUnsafe(qC, m_localAxisC, m_JvAC);
-			Rot.mulToOutUnsafe(qC, (Vec2) temp.set(m_localAnchorC).sub(m_lcC), rC);
-			Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_lcA), rA);
+			Rot.mulToOutUnsafe(qC,  temp.set(m_localAnchorC).sub(m_lcC), rC);
+			Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_lcA), rA);
 			m_JwC = rC.cross(m_JvAC);
 			m_JwA = rA.cross(m_JvAC);
 			m_mass += m_mC + m_mA + m_iC * m_JwC * m_JwC + m_iA * m_JwA * m_JwA;
@@ -299,8 +299,8 @@ public class GearJoint extends Joint implements Serializable {
 			Vec2 rD = new Vec2();
 			Vec2 rB = new Vec2();
 			Rot.mulToOutUnsafe(qD, m_localAxisD, u);
-			Rot.mulToOutUnsafe(qD, (Vec2) temp.set(m_localAnchorD).sub(m_lcD), rD);
-			Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_lcB), rB);
+			Rot.mulToOutUnsafe(qD,  temp.set(m_localAnchorD).sub(m_lcD), rD);
+			Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_lcB), rB);
 			m_JvBD.set(u).scale(m_ratio);
 			m_JwD = m_ratio * rD.cross(u);
 			m_JwB = m_ratio * rB.cross(u);
@@ -352,7 +352,7 @@ public class GearJoint extends Joint implements Serializable {
 		float wD = data.velocities[m_indexD].w;
 
 		float Cdot
-			= m_JvAC.dot((Vec2) new Vec2(vA).sub(vC)) + m_JvBD.dot((Vec2) new Vec2(vB).sub(vD));
+			= m_JvAC.dot( new Vec2(vA).sub(vC)) + m_JvBD.dot( new Vec2(vB).sub(vD));
 		Cdot += (m_JwA * wA - m_JwC * wC) + (m_JwB * wB - m_JwD * wD);
 
 		float impulse = -m_mass * Cdot;
@@ -432,15 +432,15 @@ public class GearJoint extends Joint implements Serializable {
 			Vec2 pC = new Vec2();
 			Vec2 pA = new Vec2();
 			Rot.mulToOutUnsafe(qC, m_localAxisC, JvAC);
-			Rot.mulToOutUnsafe(qC, (Vec2) temp.set(m_localAnchorC).sub(m_lcC), rC);
-			Rot.mulToOutUnsafe(qA, (Vec2) temp.set(m_localAnchorA).sub(m_lcA), rA);
+			Rot.mulToOutUnsafe(qC,  temp.set(m_localAnchorC).sub(m_lcC), rC);
+			Rot.mulToOutUnsafe(qA,  temp.set(m_localAnchorA).sub(m_lcA), rA);
 			JwC = rC.cross(JvAC);
 			JwA = rA.cross(JvAC);
 			mass += m_mC + m_mA + m_iC * JwC * JwC + m_iA * JwA * JwA;
 
 			pC.set(m_localAnchorC).sub(m_lcC);
-			Rot.mulTransUnsafe(qC, (Vec2) temp.set(rA).add(cA).sub(cC), pA);
-			coordinateA = ((Vec2) pA.sub(pC)).dot(m_localAxisC);
+			Rot.mulTransUnsafe(qC,  temp.set(rA).add(cA).sub(cC), pA);
+			coordinateA = ( pA.sub(pC)).dot(m_localAxisC);
 		}
 
 		if (m_typeB == JointType.REVOLUTE) {
@@ -457,16 +457,16 @@ public class GearJoint extends Joint implements Serializable {
 			Vec2 pD = new Vec2();
 			Vec2 pB = new Vec2();
 			Rot.mulToOutUnsafe(qD, m_localAxisD, u);
-			Rot.mulToOutUnsafe(qD, (Vec2) temp.set(m_localAnchorD).sub(m_lcD), rD);
-			Rot.mulToOutUnsafe(qB, (Vec2) temp.set(m_localAnchorB).sub(m_lcB), rB);
+			Rot.mulToOutUnsafe(qD,  temp.set(m_localAnchorD).sub(m_lcD), rD);
+			Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_lcB), rB);
 			JvBD.set(u).scale(m_ratio);
 			JwD = rD.cross(u);
 			JwB = rB.cross(u);
 			mass += m_ratio * m_ratio * (m_mD + m_mB) + m_iD * JwD * JwD + m_iB * JwB * JwB;
 
 			pD.set(m_localAnchorD).sub(m_lcD);
-			Rot.mulTransUnsafe(qD, (Vec2) temp.set(rB).add(cB).sub(cD), pB);
-			coordinateB = ((Vec2) pB.sub(pD)).dot(m_localAxisD);
+			Rot.mulTransUnsafe(qD,  temp.set(rB).add(cB).sub(cD), pB);
+			coordinateB = ( pB.sub(pD)).dot(m_localAxisD);
 		}
 
 		float C = (coordinateA + m_ratio * coordinateB) - m_constant;
