@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -15,58 +16,59 @@
  * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.testbed.framework;
 
 /**
- * This class contains most control logic for the testbed and the update loop. It also watches the model to switch tests and
- * populates the model with some loop statistics.
+ * This class contains most control logic for the testbed and the update loop. It also watches the
+ * model to switch tests and populates the model with some loop statistics.
  *
  * @author Daniel Murphy
  */
 public class TestbedController extends AbstractTestbedController implements Runnable {
 
-	private Thread animator;
+ private Thread animator;
 
-	public TestbedController(TestbedModel argModel, UpdateBehavior behavior,
-		MouseBehavior mouseBehavior, TestbedErrorHandler errorHandler) {
-		super(argModel, behavior, mouseBehavior, errorHandler);
-		animator = new Thread(this, "Testbed");
-	}
+ public TestbedController(TestbedModel argModel, UpdateBehavior behavior,
+  MouseBehavior mouseBehavior, TestbedErrorHandler errorHandler) {
+  super(argModel, behavior, mouseBehavior, errorHandler);
+  animator = new Thread(this, "Testbed");
+ }
 
-	@Override
-	public void startAnimator() {
-		super.startAnimator();
-		if (!animator.isAlive()) {
-			animator.start();
-		}
-	}
+ @Override
+ public void startAnimator() {
+  super.startAnimator();
+  if (!animator.isAlive()) {
+   animator.start();
+  }
+ }
 
-	@Override
-	public void stopAnimator() {
-		super.stopAnimator();
-		animator.stop();
-	}
+ @Override
+ public void stopAnimator() {
+  super.stopAnimator();
+  animator.stop();
+ }
 
-	@Override
-	public void run() {
-		beforeTime = startTime = updateTime = System.nanoTime();
-		sleepTime = 0;
-		startAnimator();
-		loopInit();
-		while (isAnimating()) {
-			stepAndRender();
-		}
-	}
+ @Override
+ public void run() {
+  beforeTime = startTime = updateTime = System.nanoTime();
+  sleepTime = 0;
+  startAnimator();
+  loopInit();
+  while (isAnimating()) {
+   stepAndRender();
+  }
+ }
 
-	@Override
-	protected void stepAndRender() {
-		super.stepAndRender();
-		if (sleepTime > 0) {
-			try {
-				Thread.sleep(sleepTime);
-			} catch (InterruptedException ex) {
-			}
-		}
-	}
+ @Override
+ protected void stepAndRender() {
+  super.stepAndRender();
+  if (sleepTime > 0) {
+   try {
+    Thread.sleep(sleepTime);
+   } catch (InterruptedException ex) {
+   }
+  }
+ }
 }

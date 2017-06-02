@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 7:09:57 PM Jan 18, 2011
  */
@@ -62,128 +64,126 @@ import org.jbox2d.profile.BasicPerformanceTest;
  */
 public class MathPerf extends BasicPerformanceTest {
 
-	public static int INNER_ITERS = 5000;
-	public static int OUTER_ITERS = 5000;
+ public static int INNER_ITERS = 5000;
+ public static int OUTER_ITERS = 5000;
+ String[] tests = new String[]{"Sin", "SinLUT", "Pow", "FastPow", "Max", "FastMax", "Floor",
+  "fastFloor", "aTan2", "fastATan2", "ceil", "fastCeil"};
+ public float aStore = 0;
 
-	String[] tests = new String[]{"Sin", "SinLUT", "Pow", "FastPow", "Max", "FastMax", "Floor",
-		"fastFloor", "aTan2", "fastATan2", "ceil", "fastCeil"};
+ public MathPerf() {
+  super(12, OUTER_ITERS, INNER_ITERS);
+ }
 
-	public float aStore = 0;
+ @Override
+ public void step(int argNum) {
+  float random = MathUtils.randomFloat(-Float.MAX_VALUE / 3, Float.MAX_VALUE / 3);
+  switch (argNum) {
+   case 0:
+    runSinTest(random);
+    break;
+   case 1:
+    runSinLUTTest(random);
+    break;
+   case 2:
+    runPowTest(random);
+    break;
+   case 3:
+    runFastPowTest(random);
+    break;
+   case 4:
+    runMaxTest(random);
+    break;
+   case 5:
+    runFastMaxTest(random);
+    break;
+   case 6:
+    runFloorTest(random);
+    break;
+   case 7:
+    runFastFloorTest(random);
+    break;
+   case 8:
+    runAtan2Test(random);
+    break;
+   case 9:
+    runFastAtan2Test(random);
+    break;
+   case 10:
+    runCeilTest(random);
+    break;
+   case 11:
+    runFastCeilTest(random);
+    break;
+  }
+ }
 
-	public MathPerf() {
-		super(12, OUTER_ITERS, INNER_ITERS);
-	}
+ public void runSinTest(float argRandom) {
+  float a = (float) StrictMath.sin(argRandom);
+  aStore += a;
+ }
 
-	@Override
-	public void step(int argNum) {
-		float random = MathUtils.randomFloat(-Float.MAX_VALUE / 3, Float.MAX_VALUE / 3);
-		switch (argNum) {
-			case 0:
-				runSinTest(random);
-				break;
-			case 1:
-				runSinLUTTest(random);
-				break;
-			case 2:
-				runPowTest(random);
-				break;
-			case 3:
-				runFastPowTest(random);
-				break;
-			case 4:
-				runMaxTest(random);
-				break;
-			case 5:
-				runFastMaxTest(random);
-				break;
-			case 6:
-				runFloorTest(random);
-				break;
-			case 7:
-				runFastFloorTest(random);
-				break;
-			case 8:
-				runAtan2Test(random);
-				break;
-			case 9:
-				runFastAtan2Test(random);
-				break;
-			case 10:
-				runCeilTest(random);
-				break;
-			case 11:
-				runFastCeilTest(random);
-				break;
-		}
-	}
+ public void runSinLUTTest(float argRandom) {
+  float a = (float) Math.sin(argRandom);
+  aStore += a;
+ }
 
-	public void runSinTest(float argRandom) {
-		float a = (float) StrictMath.sin(argRandom);
-		aStore += a;
-	}
+ public void runPowTest(float argRandom) {
+  float a = (float) StrictMath.pow(argRandom, MathUtils.randomFloat(-100, 100));
+  aStore += a;
+ }
 
-	public void runSinLUTTest(float argRandom) {
-		float a = (float) Math.sin(argRandom);
-		aStore += a;
-	}
+ public void runFastPowTest(float argRandom) {
+  float a = (float) Math.pow(argRandom, MathUtils.randomFloat(-100, 100));
+  aStore += a;
+ }
 
-	public void runPowTest(float argRandom) {
-		float a = (float) StrictMath.pow(argRandom, MathUtils.randomFloat(-100, 100));
-		aStore += a;
-	}
+ public void runMaxTest(float argRandom) {
+  float a = StrictMath.max(argRandom, MathUtils.randomFloat(-100, 100));
+  aStore += a;
+ }
 
-	public void runFastPowTest(float argRandom) {
-		float a = (float) Math.pow(argRandom, MathUtils.randomFloat(-100, 100));
-		aStore += a;
-	}
+ public void runFastMaxTest(float argRandom) {
+  float a = Math.max(argRandom, MathUtils.randomFloat(-100, 100));
+  aStore += a;
+ }
 
-	public void runMaxTest(float argRandom) {
-		float a = StrictMath.max(argRandom, MathUtils.randomFloat(-100, 100));
-		aStore += a;
-	}
+ public void runFloorTest(float argRandom) {
+  float a = (float) StrictMath.floor(argRandom);
+  aStore += a;
+ }
 
-	public void runFastMaxTest(float argRandom) {
-		float a = Math.max(argRandom, MathUtils.randomFloat(-100, 100));
-		aStore += a;
-	}
+ public void runFastFloorTest(float argRandom) {
+  float a = (float) Math.floor(argRandom);
+  aStore += a;
+ }
 
-	public void runFloorTest(float argRandom) {
-		float a = (float) StrictMath.floor(argRandom);
-		aStore += a;
-	}
+ public void runAtan2Test(float argRandom) {
+  float a = (float) StrictMath.atan2(argRandom, MathUtils.randomFloat(-10000, 10000));
+  aStore += a;
+ }
 
-	public void runFastFloorTest(float argRandom) {
-		float a = (float) Math.floor(argRandom);
-		aStore += a;
-	}
+ public void runFastAtan2Test(float argRandom) {
+  float a = (float) Math.atan2(argRandom, MathUtils.randomFloat(-10000, 10000));
+  aStore += a;
+ }
 
-	public void runAtan2Test(float argRandom) {
-		float a = (float) StrictMath.atan2(argRandom, MathUtils.randomFloat(-10000, 10000));
-		aStore += a;
-	}
+ public void runCeilTest(float argRandom) {
+  float a = (float) StrictMath.ceil(argRandom);
+  aStore += a;
+ }
 
-	public void runFastAtan2Test(float argRandom) {
-		float a = (float) Math.atan2(argRandom, MathUtils.randomFloat(-10000, 10000));
-		aStore += a;
-	}
+ public void runFastCeilTest(float argRandom) {
+  float a = (float) Math.ceil(argRandom);
+  aStore += a;
+ }
 
-	public void runCeilTest(float argRandom) {
-		float a = (float) StrictMath.ceil(argRandom);
-		aStore += a;
-	}
+ @Override
+ public String getTestName(int argNum) {
+  return tests[argNum];
+ }
 
-	public void runFastCeilTest(float argRandom) {
-		float a = (float) Math.ceil(argRandom);
-		aStore += a;
-	}
-
-	@Override
-	public String getTestName(int argNum) {
-		return tests[argNum];
-	}
-
-	public static void main(String[] c) {
-		MathPerf p = new MathPerf();
-		p.go();
-	}
+ public static void main(String[] c) {
+  MathPerf p = new MathPerf();
+  p.go();
+ }
 }

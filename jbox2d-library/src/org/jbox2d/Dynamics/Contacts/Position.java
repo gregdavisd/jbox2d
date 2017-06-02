@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.contacts;
 
 import java.io.Serializable;
@@ -28,8 +30,7 @@ import org.jbox2d.common.Vec2;
 
 public class Position implements Serializable {
 
-	static final long serialVersionUID = 1L;
-
-	public final Vec2 c = new Vec2();
-	public float a;
+ static final long serialVersionUID = 1L;
+ public final Vec2 c = new Vec2();
+ public float a;
 }

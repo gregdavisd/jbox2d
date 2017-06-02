@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 3:59:59 AM Jul 7, 2010
  */
@@ -30,15 +32,16 @@ package org.jbox2d.dynamics;
 import java.io.Serializable;
 
 /**
- * The body type. static: zero mass, zero velocity, may be manually moved kinematic: zero mass, non-zero velocity set by user,
- * moved by solver dynamic: positive mass, non-zero velocity determined by forces, moved by solver
+ * The body type. static: zero mass, zero velocity, may be manually moved kinematic: zero mass,
+ * non-zero velocity set by user, moved by solver dynamic: positive mass, non-zero velocity
+ * determined by forces, moved by solver
  *
  * @author daniel
  */
 public class BodyType implements Serializable {
 
-	static final long serialVersionUID = 1L;
-	public static final byte STATIC = 0;
-	public static final byte KINEMATIC = 1;
-	public static final byte DYNAMIC = 2;
+ static final long serialVersionUID = 1L;
+ public static final byte STATIC = 0;
+ public static final byte KINEMATIC = 1;
+ public static final byte DYNAMIC = 2;
 }

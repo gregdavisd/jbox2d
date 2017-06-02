@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.contacts;
 
 import java.io.Serializable;
@@ -36,15 +38,15 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
- * The class manages contact between two shapes. A contact exists for each overlapping AABB in the broad-phase (except if
- * filtered). Therefore a contact object may exist that has no contact points.
+ * The class manages contact between two shapes. A contact exists for each overlapping AABB in the
+ * broad-phase (except if filtered). Therefore a contact object may exist that has no contact
+ * points.
  *
  * @author daniel
  */
 public abstract class Contact implements Serializable {
 
-	static final long serialVersionUID = 1L;
-
+ static final long serialVersionUID = 1L;
 //  // Flags stored in m_flags
 //  // Used when crawling contact graph when forming islands.
 //  public static final int ISLAND_FLAG = 0x0001;
@@ -58,277 +60,251 @@ public abstract class Contact implements Serializable {
 //  public static final int BULLET_HIT_FLAG = 0x0010;
 //  public static final int TOI_FLAG = 0x0020;
 //  public int m_flags;
-	public boolean is_island;
-	private boolean is_touching;
-	private boolean is_enabled;
-	private boolean is_filter;
-	public boolean is_toi;
+ public boolean is_island;
+ private boolean is_touching;
+ private boolean is_enabled;
+ private boolean is_filter;
+ public boolean is_toi;
+ // Nodes for connecting bodies.
+ public ContactEdge m_nodeA;
+ public ContactEdge m_nodeB;
+ public Fixture m_fixtureA;
+ public Fixture m_fixtureB;
+ public int m_indexA;
+ public int m_indexB;
+ public final Manifold m_manifold;
+ public float m_toiCount;
+ public float m_toi;
+ public float m_friction;
+ public float m_restitution;
+ public float m_tangentSpeed;
+ protected final IWorldPool pool;
 
-	// Nodes for connecting bodies.
-	public ContactEdge m_nodeA;
-	public ContactEdge m_nodeB;
+ protected Contact(IWorldPool argPool) {
+  m_nodeA = new ContactEdge();
+  m_nodeB = new ContactEdge();
+  m_manifold = new Manifold();
+  pool = argPool;
+ }
 
-	public Fixture m_fixtureA;
-	public Fixture m_fixtureB;
+ /**
+  * initialization for pooling
+  */
+ public void init(Fixture fA, int indexA, Fixture fB, int indexB) {
+  is_enabled = true;
+  m_fixtureA = fA;
+  m_fixtureB = fB;
+  m_indexA = indexA;
+  m_indexB = indexB;
+  m_friction = Contact.mixFriction(fA.m_friction, fB.m_friction);
+  m_restitution = Contact.mixRestitution(fA.m_restitution, fB.m_restitution);
+ }
 
-	public int m_indexA;
-	public int m_indexB;
+ /**
+  * Get the contact manifold. Do not set the point count to zero. Instead call Disable.
+  */
+ public Manifold getManifold() {
+  return m_manifold;
+ }
 
-	public final Manifold m_manifold;
+ /**
+  * Get the world manifold.
+  */
+ public void getWorldManifold(WorldManifold worldManifold) {
+  final Body bodyA = m_fixtureA.getBody();
+  final Body bodyB = m_fixtureB.getBody();
+  final Shape shapeA = m_fixtureA.getShape();
+  final Shape shapeB = m_fixtureB.getShape();
+  worldManifold.initialize(m_manifold, bodyA.getTransform(), shapeA.m_radius,
+   bodyB.getTransform(), shapeB.m_radius);
+ }
 
-	public float m_toiCount;
-	public float m_toi;
+ /**
+  * Is this contact touching
+  *
+  * @return
+  */
+ public boolean isTouching() {
+  return is_touching;
+ }
 
-	public float m_friction;
-	public float m_restitution;
+ /**
+  * Enable/disable this contact. This can be used inside the pre-solve contact listener. The contact
+  * is only disabled for the current time step (or sub-step in continuous collisions).
+  *
+  * @param flag
+  */
+ public void setEnabled(boolean flag) {
+  is_enabled = true;
+ }
 
-	public float m_tangentSpeed;
+ /**
+  * Has this contact been disabled?
+  *
+  * @return
+  */
+ public boolean isEnabled() {
+  return is_enabled;
+ }
 
-	protected final IWorldPool pool;
+ /**
+  * Get the first fixture in this contact.
+  *
+  * @return
+  */
+ public Fixture getFixtureA() {
+  return m_fixtureA;
+ }
 
-	protected Contact(IWorldPool argPool) {
-		m_nodeA = new ContactEdge();
-		m_nodeB = new ContactEdge();
-		m_manifold = new Manifold();
-		pool = argPool;
-	}
+ public int getChildIndexA() {
+  return m_indexA;
+ }
 
-	/**
-	 * initialization for pooling
-	 */
-	public void init(Fixture fA, int indexA, Fixture fB, int indexB) {
-		is_enabled = true;
-		m_fixtureA = fA;
-		m_fixtureB = fB;
-		m_indexA = indexA;
-		m_indexB = indexB;
-		m_friction = Contact.mixFriction(fA.m_friction, fB.m_friction);
-		m_restitution = Contact.mixRestitution(fA.m_restitution, fB.m_restitution);
+ /**
+  * Get the second fixture in this contact.
+  *
+  * @return
+  */
+ public Fixture getFixtureB() {
+  return m_fixtureB;
+ }
 
-	}
+ public int getChildIndexB() {
+  return m_indexB;
+ }
 
-	/**
-	 * Get the contact manifold. Do not set the point count to zero. Instead call Disable.
-	 */
-	public Manifold getManifold() {
-		return m_manifold;
-	}
+ public void setFriction(float friction) {
+  m_friction = friction;
+ }
 
-	/**
-	 * Get the world manifold.
-	 */
-	public void getWorldManifold(WorldManifold worldManifold) {
-		final Body bodyA = m_fixtureA.getBody();
-		final Body bodyB = m_fixtureB.getBody();
-		final Shape shapeA = m_fixtureA.getShape();
-		final Shape shapeB = m_fixtureB.getShape();
+ public float getFriction() {
+  return m_friction;
+ }
 
-		worldManifold.initialize(m_manifold, bodyA.getTransform(), shapeA.m_radius,
-			bodyB.getTransform(), shapeB.m_radius);
-	}
+ public void resetFriction() {
+  m_friction = Contact.mixFriction(m_fixtureA.m_friction, m_fixtureB.m_friction);
+ }
 
-	/**
-	 * Is this contact touching
-	 *
-	 * @return
-	 */
-	public boolean isTouching() {
-		return is_touching;
-	}
+ public void setRestitution(float restitution) {
+  m_restitution = restitution;
+ }
 
-	/**
-	 * Enable/disable this contact. This can be used inside the pre-solve contact listener. The contact is only disabled for the
-	 * current time step (or sub-step in continuous collisions).
-	 *
-	 * @param flag
-	 */
-	public void setEnabled(boolean flag) {
-		is_enabled = true;
-	}
+ public float getRestitution() {
+  return m_restitution;
+ }
 
-	/**
-	 * Has this contact been disabled?
-	 *
-	 * @return
-	 */
-	public boolean isEnabled() {
-		return is_enabled;
-	}
+ public void resetRestitution() {
+  m_restitution = Contact.mixRestitution(m_fixtureA.m_restitution, m_fixtureB.m_restitution);
+ }
 
-	/**
-	 * Get the first fixture in this contact.
-	 *
-	 * @return
-	 */
-	public Fixture getFixtureA() {
-		return m_fixtureA;
-	}
+ public void setTangentSpeed(float speed) {
+  m_tangentSpeed = speed;
+ }
 
-	public int getChildIndexA() {
-		return m_indexA;
-	}
+ public float getTangentSpeed() {
+  return m_tangentSpeed;
+ }
 
-	/**
-	 * Get the second fixture in this contact.
-	 *
-	 * @return
-	 */
-	public Fixture getFixtureB() {
-		return m_fixtureB;
-	}
+ public abstract void evaluate(Manifold manifold, Transform xfA, Transform xfB);
 
-	public int getChildIndexB() {
-		return m_indexB;
-	}
+ /**
+  * Flag this contact for filtering. Filtering will occur the next time step.
+  */
+ public final void flagForFiltering() {
+  is_filter = true;
+ }
 
-	public void setFriction(float friction) {
-		m_friction = friction;
-	}
+ public final void unflagForFiltering() {
+  is_filter = false;
+ }
 
-	public float getFriction() {
-		return m_friction;
-	}
+ public final boolean isFlaggedForFiltering() {
+  return is_filter;
+ }
+ // djm pooling
+ private final Manifold oldManifold = new Manifold();
 
-	public void resetFriction() {
-		m_friction = Contact.mixFriction(m_fixtureA.m_friction, m_fixtureB.m_friction);
-	}
+ public void update(ContactListener listener) {
+  oldManifold.set(m_manifold);
+  // Re-enable this contact.
+  is_enabled = true;
+  boolean touching = false;
+  boolean wasTouching = is_touching;
+  boolean sensorA = m_fixtureA.isSensor();
+  boolean sensorB = m_fixtureB.isSensor();
+  boolean sensor = sensorA || sensorB;
+  Body bodyA = m_fixtureA.getBody();
+  Body bodyB = m_fixtureB.getBody();
+  Transform xfA = bodyA.getTransform();
+  Transform xfB = bodyB.getTransform();
+  // log.debug("TransformA: "+xfA);
+  // log.debug("TransformB: "+xfB);
+  if (sensor) {
+   Shape shapeA = m_fixtureA.getShape();
+   Shape shapeB = m_fixtureB.getShape();
+   touching = pool.getCollision().testOverlap(shapeA, m_indexA, shapeB, m_indexB, xfA, xfB);
+   // Sensors don't generate manifolds.
+   m_manifold.pointCount = 0;
+  } else {
+   evaluate(m_manifold, xfA, xfB);
+   touching = m_manifold.pointCount > 0;
+   // Match old contact ids to new contact ids and copy the
+   // stored impulses to warm start the solver.
+   for (int i = 0; i < m_manifold.pointCount; ++i) {
+    ManifoldPoint mp2 = m_manifold.points[i];
+    mp2.normalImpulse = 0.0f;
+    mp2.tangentImpulse = 0.0f;
+    ContactID id2 = mp2.id;
+    for (int j = 0; j < oldManifold.pointCount; ++j) {
+     ManifoldPoint mp1 = oldManifold.points[j];
+     if (mp1.id.isEqual(id2)) {
+      mp2.normalImpulse = mp1.normalImpulse;
+      mp2.tangentImpulse = mp1.tangentImpulse;
+      break;
+     }
+    }
+   }
+   if (touching != wasTouching) {
+    bodyA.setAwake(true);
+    bodyB.setAwake(true);
+   }
+  }
+  is_touching = touching;
+  if (listener == null) {
+   return;
+  }
+  if (wasTouching == false && touching == true) {
+   listener.beginContact(this);
+  }
+  if (wasTouching == true && touching == false) {
+   listener.endContact(this);
+  }
+  if (sensor == false && touching) {
+   listener.preSolve(this, oldManifold);
+  }
+ }
 
-	public void setRestitution(float restitution) {
-		m_restitution = restitution;
-	}
+ /**
+  * Friction mixing law. The idea is to allow either fixture to drive the restitution to zero. For
+  * example, anything slides on ice.
+  *
+  * @param friction1
+  * @param friction2
+  * @return
+  */
+ public static final float mixFriction(float friction1, float friction2) {
+  return (float) Math.sqrt(friction1 * friction2);
+ }
 
-	public float getRestitution() {
-		return m_restitution;
-	}
-
-	public void resetRestitution() {
-		m_restitution = Contact.mixRestitution(m_fixtureA.m_restitution, m_fixtureB.m_restitution);
-	}
-
-	public void setTangentSpeed(float speed) {
-		m_tangentSpeed = speed;
-	}
-
-	public float getTangentSpeed() {
-		return m_tangentSpeed;
-	}
-
-	public abstract void evaluate(Manifold manifold, Transform xfA, Transform xfB);
-
-	/**
-	 * Flag this contact for filtering. Filtering will occur the next time step.
-	 */
-	public final void flagForFiltering() {
-		is_filter = true;
-	}
-
-	public final void unflagForFiltering() {
-		is_filter = false;
-	}
-
-	public final boolean isFlaggedForFiltering() {
-		return is_filter;
-	}
-	// djm pooling
-	private final Manifold oldManifold = new Manifold();
-
-	public void update(ContactListener listener) {
-
-		oldManifold.set(m_manifold);
-
-		// Re-enable this contact.
-		is_enabled = true;
-
-		boolean touching = false;
-		boolean wasTouching = is_touching;
-
-		boolean sensorA = m_fixtureA.isSensor();
-		boolean sensorB = m_fixtureB.isSensor();
-		boolean sensor = sensorA || sensorB;
-
-		Body bodyA = m_fixtureA.getBody();
-		Body bodyB = m_fixtureB.getBody();
-		Transform xfA = bodyA.getTransform();
-		Transform xfB = bodyB.getTransform();
-		// log.debug("TransformA: "+xfA);
-		// log.debug("TransformB: "+xfB);
-
-		if (sensor) {
-			Shape shapeA = m_fixtureA.getShape();
-			Shape shapeB = m_fixtureB.getShape();
-			touching = pool.getCollision().testOverlap(shapeA, m_indexA, shapeB, m_indexB, xfA, xfB);
-
-			// Sensors don't generate manifolds.
-			m_manifold.pointCount = 0;
-		} else {
-			evaluate(m_manifold, xfA, xfB);
-			touching = m_manifold.pointCount > 0;
-
-			// Match old contact ids to new contact ids and copy the
-			// stored impulses to warm start the solver.
-			for (int i = 0; i < m_manifold.pointCount; ++i) {
-				ManifoldPoint mp2 = m_manifold.points[i];
-				mp2.normalImpulse = 0.0f;
-				mp2.tangentImpulse = 0.0f;
-				ContactID id2 = mp2.id;
-
-				for (int j = 0; j < oldManifold.pointCount; ++j) {
-					ManifoldPoint mp1 = oldManifold.points[j];
-
-					if (mp1.id.isEqual(id2)) {
-						mp2.normalImpulse = mp1.normalImpulse;
-						mp2.tangentImpulse = mp1.tangentImpulse;
-						break;
-					}
-				}
-			}
-
-			if (touching != wasTouching) {
-				bodyA.setAwake(true);
-				bodyB.setAwake(true);
-			}
-		}
-
-		is_touching = touching;
-
-		if (listener == null) {
-			return;
-		}
-
-		if (wasTouching == false && touching == true) {
-			listener.beginContact(this);
-		}
-
-		if (wasTouching == true && touching == false) {
-			listener.endContact(this);
-		}
-
-		if (sensor == false && touching) {
-			listener.preSolve(this, oldManifold);
-		}
-	}
-
-	/**
-	 * Friction mixing law. The idea is to allow either fixture to drive the restitution to zero. For example, anything slides on
-	 * ice.
-	 *
-	 * @param friction1
-	 * @param friction2
-	 * @return
-	 */
-	public static final float mixFriction(float friction1, float friction2) {
-		return (float) Math.sqrt(friction1 * friction2);
-	}
-
-	/**
-	 * Restitution mixing law. The idea is allow for anything to bounce off an inelastic surface. For example, a superball bounces on
-	 * anything.
-	 *
-	 * @param restitution1
-	 * @param restitution2
-	 * @return
-	 */
-	public static final float mixRestitution(float restitution1, float restitution2) {
-		return restitution1 > restitution2 ? restitution1 : restitution2;
-	}
+ /**
+  * Restitution mixing law. The idea is allow for anything to bounce off an inelastic surface. For
+  * example, a superball bounces on anything.
+  *
+  * @param restitution1
+  * @param restitution2
+  * @return
+  */
+ public static final float mixRestitution(float restitution1, float restitution2) {
+  return restitution1 > restitution2 ? restitution1 : restitution2;
+ }
 }

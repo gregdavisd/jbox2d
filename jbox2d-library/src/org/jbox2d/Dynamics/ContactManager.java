@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics;
 
 import java.io.Serializable;
@@ -41,250 +43,218 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
  */
 public class ContactManager extends CircularWorld implements PairCallback, Serializable {
 
-	static final long serialVersionUID = 1L;
-	public BroadPhase m_broadPhase;
-	private final List<Contact> m_contactList;
-	public ContactFilter m_contactFilter;
-	private ContactListener m_contactListener;
+ static final long serialVersionUID = 1L;
+ public BroadPhase m_broadPhase;
+ private final List<Contact> m_contactList;
+ public ContactFilter m_contactFilter;
+ private ContactListener m_contactListener;
 
-	public ContactManager(World argPool, BroadPhase broadPhase) {
-		super(argPool);
-		m_contactFilter = new ContactFilter();
-		m_broadPhase = broadPhase;
-		m_contactList = new ArrayList<>();
-	}
+ public ContactManager(World argPool, BroadPhase broadPhase) {
+  super(argPool);
+  m_contactFilter = new ContactFilter();
+  m_broadPhase = broadPhase;
+  m_contactList = new ArrayList<>();
+ }
 
-	/**
-	 * Broad-phase callback.
-	 *
-	 * @param proxyUserDataA
-	 * @param proxyUserDataB
-	 */
-	public void addPair(Object proxyUserDataA, Object proxyUserDataB) {
-		FixtureProxy proxyA = (FixtureProxy) proxyUserDataA;
-		FixtureProxy proxyB = (FixtureProxy) proxyUserDataB;
+ /**
+  * Broad-phase callback.
+  *
+  * @param proxyUserDataA
+  * @param proxyUserDataB
+  */
+ public void addPair(Object proxyUserDataA, Object proxyUserDataB) {
+  FixtureProxy proxyA = (FixtureProxy) proxyUserDataA;
+  FixtureProxy proxyB = (FixtureProxy) proxyUserDataB;
+  Fixture fixtureA = proxyA.fixture;
+  Fixture fixtureB = proxyB.fixture;
+  int indexA = proxyA.childIndex;
+  int indexB = proxyB.childIndex;
+  Body bodyA = fixtureA.getBody();
+  Body bodyB = fixtureB.getBody();
+  // Are the fixtures on the same body?
+  if (bodyA == bodyB) {
+   return;
+  }
+  // TODO_ERIN use a hash table to remove a potential bottleneck when both
+  // bodies have a lot of contacts.
+  // Does a contact already exist?
+  for (int i_contact_edge = 0; i_contact_edge < bodyB.getContactList().size(); ++i_contact_edge) {
+   ContactEdge edge = bodyB.getContactList().get(i_contact_edge);
+   if (edge.other == bodyA) {
+    Fixture fA = edge.contact.getFixtureA();
+    Fixture fB = edge.contact.getFixtureB();
+    int iA = edge.contact.getChildIndexA();
+    int iB = edge.contact.getChildIndexB();
+    if (fA == fixtureA && iA == indexA && fB == fixtureB && iB == indexB) {
+     // A contact already exists.
+     return;
+    }
+    if (fA == fixtureB && iA == indexB && fB == fixtureA && iB == indexA) {
+     // A contact already exists.
+     return;
+    }
+   }
+  }
+  // Does a joint override collision? is at least one body dynamic?
+  if (bodyB.shouldCollide(bodyA) == false) {
+   return;
+  }
+  // Check user filtering.
+  if (m_contactFilter != null && m_contactFilter.shouldCollide(fixtureA, fixtureB) == false) {
+   return;
+  }
+  // Call the factory.
+  Contact c = getWorld().popContact(fixtureA, indexA, fixtureB, indexB);
+  if (c == null) {
+   return;
+  }
+  // Contact creation may swap fixtures.
+  fixtureA = c.getFixtureA();
+  fixtureB = c.getFixtureB();
+  bodyA = fixtureA.getBody();
+  bodyB = fixtureB.getBody();
+  // Insert into the world.
+  m_contactList.add(c);
+  // Connect to island graph.
+  // Connect to body A
+  c.m_nodeA.contact = c;
+  c.m_nodeA.other = bodyB;
+  bodyA.getContactList().add(c.m_nodeA);
+  // Connect to body B
+  c.m_nodeB.contact = c;
+  c.m_nodeB.other = bodyA;
+  bodyB.getContactList().add(c.m_nodeB);
+  // wake up the bodies
+  if (!fixtureA.isSensor() && !fixtureB.isSensor()) {
+   bodyA.setAwake(true);
+   bodyB.setAwake(true);
+  }
+ }
 
-		Fixture fixtureA = proxyA.fixture;
-		Fixture fixtureB = proxyB.fixture;
+ public final void findNewContacts() {
+  m_broadPhase.updatePairs(this);
+ }
 
-		int indexA = proxyA.childIndex;
-		int indexB = proxyB.childIndex;
-
-		Body bodyA = fixtureA.getBody();
-		Body bodyB = fixtureB.getBody();
-
-		// Are the fixtures on the same body?
-		if (bodyA == bodyB) {
-			return;
-		}
-
-		// TODO_ERIN use a hash table to remove a potential bottleneck when both
-		// bodies have a lot of contacts.
-		// Does a contact already exist?
-		for (int i_contact_edge = 0; i_contact_edge < bodyB.getContactList().size(); ++i_contact_edge) {
-			ContactEdge edge = bodyB.getContactList().get(i_contact_edge);
-			if (edge.other == bodyA) {
-				Fixture fA = edge.contact.getFixtureA();
-				Fixture fB = edge.contact.getFixtureB();
-				int iA = edge.contact.getChildIndexA();
-				int iB = edge.contact.getChildIndexB();
-
-				if (fA == fixtureA && iA == indexA && fB == fixtureB && iB == indexB) {
-					// A contact already exists.
-					return;
-				}
-
-				if (fA == fixtureB && iA == indexB && fB == fixtureA && iB == indexA) {
-					// A contact already exists.
-					return;
-				}
-			}
-
-		}
-
-		// Does a joint override collision? is at least one body dynamic?
-		if (bodyB.shouldCollide(bodyA) == false) {
-			return;
-		}
-
-		// Check user filtering.
-		if (m_contactFilter != null && m_contactFilter.shouldCollide(fixtureA, fixtureB) == false) {
-			return;
-		}
-
-		// Call the factory.
-		Contact c = getWorld().popContact(fixtureA, indexA, fixtureB, indexB);
-		if (c == null) {
-			return;
-		}
-
-		// Contact creation may swap fixtures.
-		fixtureA = c.getFixtureA();
-		fixtureB = c.getFixtureB();
-		bodyA = fixtureA.getBody();
-		bodyB = fixtureB.getBody();
-
-		// Insert into the world.
-		m_contactList.add(c);
-
-		// Connect to island graph.
-		// Connect to body A
-		c.m_nodeA.contact = c;
-		c.m_nodeA.other = bodyB;
-
-		bodyA.getContactList().add(c.m_nodeA);
-
-		// Connect to body B
-		c.m_nodeB.contact = c;
-		c.m_nodeB.other = bodyA;
-
-		bodyB.getContactList().add(c.m_nodeB);
-
-		// wake up the bodies
-		if (!fixtureA.isSensor() && !fixtureB.isSensor()) {
-			bodyA.setAwake(true);
-			bodyB.setAwake(true);
-		}
-
-	}
-
-	public final void findNewContacts() {
-		m_broadPhase.updatePairs(this);
-	}
-
-	public final void destroyContact(Contact c) {
-		if (!m_contactList.remove(c)) {
-			/*
+ public final void destroyContact(Contact c) {
+  if (!m_contactList.remove(c)) {
+   /*
 			 * contact for removal is not in this ContactManager
 			 *
-			 */
-			throw new AssertionError();
-		}
-		destroy(c);
+    */
+   throw new AssertionError();
+  }
+  destroy(c);
+ }
 
-	}
-
-	private void destroy(Contact c) {
-		Fixture fixtureA = c.getFixtureA();
-		Fixture fixtureB = c.getFixtureB();
-		Body bodyA = fixtureA.getBody();
-		Body bodyB = fixtureB.getBody();
-
-		if (m_contactListener != null && c.isTouching()) {
-			m_contactListener.endContact(c);
-		}
-
-		// Remove from body 1
-		if (!bodyA.getContactList().remove(c.m_nodeA)) {
-			/*
+ private void destroy(Contact c) {
+  Fixture fixtureA = c.getFixtureA();
+  Fixture fixtureB = c.getFixtureB();
+  Body bodyA = fixtureA.getBody();
+  Body bodyB = fixtureB.getBody();
+  if (m_contactListener != null && c.isTouching()) {
+   m_contactListener.endContact(c);
+  }
+  // Remove from body 1
+  if (!bodyA.getContactList().remove(c.m_nodeA)) {
+   /*
 			 * Body A does not contain this contact edge to remove
 			 *
-			 */
-			throw new AssertionError();
-		}
-
-		// Remove from body 2
-		if (!bodyB.getContactList().remove(c.m_nodeB)) {
-			/*
+    */
+   throw new AssertionError();
+  }
+  // Remove from body 2
+  if (!bodyB.getContactList().remove(c.m_nodeB)) {
+   /*
 			 * Body A does not contain this contact edge to remove
 			 *
-			 */
-			throw new AssertionError();
-		}
+    */
+   throw new AssertionError();
+  }
 
-		/*
+  /*
 		 * Awaken any sensors that where in contact
 		 *
-		 */
-		if (c.m_manifold.pointCount > 0 && !fixtureA.isSensor() && !fixtureB.isSensor()) {
-			fixtureA.getBody().setAwake(true);
-			fixtureB.getBody().setAwake(true);
-		}
+   */
+  if (c.m_manifold.pointCount > 0 && !fixtureA.isSensor() && !fixtureB.isSensor()) {
+   fixtureA.getBody().setAwake(true);
+   fixtureB.getBody().setAwake(true);
+  }
+ }
 
-	}
-
-	/**
-	 * This is the top level collision call for the time step. Here all the narrow phase collision is processed for the world contact
-	 * list.
-	 */
-	public void collide() {
-		// Update awake contacts.
-		/*
+ /**
+  * This is the top level collision call for the time step. Here all the narrow phase collision is
+  * processed for the world contact list.
+  */
+ public void collide() {
+  // Update awake contacts.
+  /*
 		 * need iterator because items may be removed from the list
 		 *
-		 */
-		for (Iterator<Contact> i_contacts = m_contactList.iterator(); i_contacts.hasNext();) {
-			Contact c = (Contact) i_contacts.next();
-			Fixture fixtureA = c.getFixtureA();
-			Fixture fixtureB = c.getFixtureB();
-			int indexA = c.getChildIndexA();
-			int indexB = c.getChildIndexB();
-			Body bodyA = fixtureA.getBody();
-			Body bodyB = fixtureB.getBody();
+   */
+  for (Iterator<Contact> i_contacts = m_contactList.iterator(); i_contacts.hasNext();) {
+   Contact c = (Contact) i_contacts.next();
+   Fixture fixtureA = c.getFixtureA();
+   Fixture fixtureB = c.getFixtureB();
+   int indexA = c.getChildIndexA();
+   int indexB = c.getChildIndexB();
+   Body bodyA = fixtureA.getBody();
+   Body bodyB = fixtureB.getBody();
+   // is this contact flagged for filtering?
+   if (c.isFlaggedForFiltering()) {
+    // Should these bodies collide?
+    if (!bodyB.shouldCollide(bodyA)) {
+     i_contacts.remove();
+     destroy(c);
+     continue;
+    }
+    // Check user filtering.
+    if (m_contactFilter != null && !m_contactFilter.shouldCollide(fixtureA, fixtureB)) {
+     i_contacts.remove();
+     destroy(c);
+     continue;
+    }
+    // Clear the filtering flag.
+    c.unflagForFiltering();
+   }
+   boolean activeA = bodyA.isAwake() && bodyA.m_type != BodyType.STATIC;
+   boolean activeB = bodyB.isAwake() && bodyB.m_type != BodyType.STATIC;
+   // At least one body must be awake and it must be dynamic or kinematic.
+   if (activeA == false && activeB == false) {
+    continue;
+   }
+   int proxyIdA = fixtureA.m_proxies[indexA].proxyId;
+   int proxyIdB = fixtureB.m_proxies[indexB].proxyId;
+   boolean overlap = m_broadPhase.testOverlap(proxyIdA, proxyIdB);
+   // Here we destroy contacts that cease to overlap in the broad-phase.
+   if (overlap == false) {
+    i_contacts.remove();
+    destroy(c);
+    continue;
+   }
+   // The contact persists.
+   c.update(m_contactListener);
+  }
+ }
 
-			// is this contact flagged for filtering?
-			if (c.isFlaggedForFiltering()) {
-				// Should these bodies collide?
-				if (!bodyB.shouldCollide(bodyA)) {
-					i_contacts.remove();
-					destroy(c);
-					continue;
-				}
+ public final List<Contact> getContactList() {
+  return m_contactList;
+ }
 
-				// Check user filtering.
-				if (m_contactFilter != null && !m_contactFilter.shouldCollide(fixtureA, fixtureB)) {
-					i_contacts.remove();
-					destroy(c);
-					continue;
-				}
+ public final int getContactCount() {
+  return m_contactList.size();
+ }
 
-				// Clear the filtering flag.
-				c.unflagForFiltering();
-			}
+ public final ContactListener getContactListener() {
+  return m_contactListener;
+ }
 
-			boolean activeA = bodyA.isAwake() && bodyA.m_type != BodyType.STATIC;
-			boolean activeB = bodyB.isAwake() && bodyB.m_type != BodyType.STATIC;
+ public final void setContactListener(ContactListener listener) {
+  m_contactListener = listener;
+ }
 
-			// At least one body must be awake and it must be dynamic or kinematic.
-			if (activeA == false && activeB == false) {
-				continue;
-			}
-
-			int proxyIdA = fixtureA.m_proxies[indexA].proxyId;
-			int proxyIdB = fixtureB.m_proxies[indexB].proxyId;
-			boolean overlap = m_broadPhase.testOverlap(proxyIdA, proxyIdB);
-
-			// Here we destroy contacts that cease to overlap in the broad-phase.
-			if (overlap == false) {
-				i_contacts.remove();
-				destroy(c);
-				continue;
-			}
-
-			// The contact persists.
-			c.update(m_contactListener);
-		}
-	}
-
-	public final List<Contact> getContactList() {
-		return m_contactList;
-	}
-
-	public final int getContactCount() {
-		return m_contactList.size();
-	}
-
-	public final ContactListener getContactListener() {
-		return m_contactListener;
-	}
-
-	public final void setContactListener(ContactListener listener) {
-		m_contactListener = listener;
-	}
-
-	public final void removeContactListener(ContactListener listener) {
-		if (m_contactListener == listener) {
-			m_contactListener = null;
-		}
-	}
+ public final void removeContactListener(ContactListener listener) {
+  if (m_contactListener == listener) {
+   m_contactListener = null;
+  }
+ }
 }

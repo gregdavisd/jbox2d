@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 3:43:53 AM Jul 7, 2010
  */
@@ -30,16 +32,16 @@ import java.io.Serializable;
 import org.jbox2d.common.Settings;
 
 /**
- * Contact impulses for reporting. Impulses are used instead of forces because sub-step forces may approach infinity for rigid
- * body collisions. These match up one-to-one with the contact points in b2Manifold.
+ * Contact impulses for reporting. Impulses are used instead of forces because sub-step forces may
+ * approach infinity for rigid body collisions. These match up one-to-one with the contact points in
+ * b2Manifold.
  *
  * @author Daniel Murphy
  */
 public class ContactImpulse implements Serializable {
 
-	static final long serialVersionUID = 1L;
-
-	public float[] normalImpulses = new float[Settings.maxManifoldPoints];
-	public float[] tangentImpulses = new float[Settings.maxManifoldPoints];
-	public int count;
+ static final long serialVersionUID = 1L;
+ public float[] normalImpulses = new float[Settings.maxManifoldPoints];
+ public float[] tangentImpulses = new float[Settings.maxManifoldPoints];
+ public int count;
 }

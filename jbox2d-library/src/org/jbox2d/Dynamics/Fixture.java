@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics;
 
 import java.io.Serializable;
@@ -32,14 +34,13 @@ import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 
 /**
- * A fixture is used to attach a shape to a body for collision detection. A fixture inherits its transform from its parent.
- * Fixtures hold additional non-geometric data such as friction, collision filters, etc. Fixtures are created via
- * Body::CreateFixture.
+ * A fixture is used to attach a shape to a body for collision detection. A fixture inherits its
+ * transform from its parent. Fixtures hold additional non-geometric data such as friction,
+ * collision filters, etc. Fixtures are created via Body::CreateFixture.
  *
  * @warning you cannot reuse fixtures.
  *
@@ -47,363 +48,339 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
  */
 public class Fixture implements Serializable {
 
-	static final long serialVersionUID = 1L;
-	public float m_density;
+ static final long serialVersionUID = 1L;
+ public float m_density;
+ public Body m_body;
+ public Shape m_shape;
+ public float m_friction;
+ public float m_restitution;
+ public FixtureProxy[] m_proxies;
+ public int m_proxyCount;
+ public final Filter m_filter;
+ public boolean m_isSensor;
+ public Object m_userData;
 
-	public Body m_body;
+ public Fixture() {
+  m_filter = new Filter();
+ }
 
-	public Shape m_shape;
+ /**
+  * Get the type of the child shape. You can use this to down cast to the concrete shape.
+  *
+  * @return the shape type.
+  */
+ public byte getType() {
+  return m_shape.getType();
+ }
 
-	public float m_friction;
-	public float m_restitution;
+ /**
+  * Get the child shape. You can modify the child shape, however you should not change the number of
+  * vertices because this will crash some collision caching mechanisms.
+  *
+  * @return
+  */
+ public Shape getShape() {
+  return m_shape;
+ }
 
-	public FixtureProxy[] m_proxies;
-	public int m_proxyCount;
+ /**
+  * Is this fixture a sensor (non-solid)?
+  *
+  * @return the true if the shape is a sensor.
+  * @return
+  */
+ public boolean isSensor() {
+  return m_isSensor;
+ }
 
-	public final Filter m_filter;
+ /**
+  * Set if this fixture is a sensor.
+  *
+  * @param sensor
+  */
+ public void setSensor(boolean sensor) {
+  if (sensor != m_isSensor) {
+   m_body.setAwake(true);
+   m_isSensor = sensor;
+  }
+ }
 
-	public boolean m_isSensor;
+ /**
+  * Set the contact filtering data. This is an expensive operation and should not be called
+  * frequently. This will not update contacts until the next time step when either parent body is
+  * awake. This automatically calls refilter.
+  *
+  * @param filter
+  */
+ public void setFilterData(final Filter filter) {
+  m_filter.set(filter);
+  refilter();
+ }
 
-	public Object m_userData;
+ /**
+  * Get the contact filtering data.
+  *
+  * @return
+  */
+ public Filter getFilterData() {
+  return m_filter;
+ }
 
-	public Fixture() {
-		m_filter = new Filter();
-	}
+ /**
+  * Call this if you want to establish collision that was previously disabled by
+  * ContactFilter::ShouldCollide.
+  */
+ public void refilter() {
+  if (m_body == null) {
+   return;
+  }
+  // Flag associated contacts for filtering.
+  for (int i_contact_edge = 0; i_contact_edge < m_body.getContactList().size(); ++i_contact_edge) {
+   ContactEdge edge = m_body.getContactList().get(i_contact_edge);
+   Contact contact = edge.contact;
+   Fixture fixtureA = contact.getFixtureA();
+   Fixture fixtureB = contact.getFixtureB();
+   if (fixtureA == this || fixtureB == this) {
+    contact.flagForFiltering();
+   }
+  }
+  World world = m_body.getWorld();
+  if (world == null) {
+   return;
+  }
+  // Touch each proxy so that new pairs may be created
+  BroadPhase broadPhase = world.m_contactManager.m_broadPhase;
+  for (int i = 0; i < m_proxyCount; ++i) {
+   broadPhase.touchProxy(m_proxies[i].proxyId);
+  }
+ }
 
-	/**
-	 * Get the type of the child shape. You can use this to down cast to the concrete shape.
-	 *
-	 * @return the shape type.
-	 */
-	public byte getType() {
-		return m_shape.getType();
-	}
+ /**
+  * Get the parent body of this fixture. This is NULL if the fixture is not attached.
+  *
+  * @return the parent body.
+  * @return
+  */
+ public Body getBody() {
+  return m_body;
+ }
 
-	/**
-	 * Get the child shape. You can modify the child shape, however you should not change the number of vertices because this will
-	 * crash some collision caching mechanisms.
-	 *
-	 * @return
-	 */
-	public Shape getShape() {
-		return m_shape;
-	}
+ public void setDensity(float density) {
+  assert (density >= 0f);
+  m_density = density;
+ }
 
-	/**
-	 * Is this fixture a sensor (non-solid)?
-	 *
-	 * @return the true if the shape is a sensor.
-	 * @return
-	 */
-	public boolean isSensor() {
-		return m_isSensor;
-	}
+ public float getDensity() {
+  return m_density;
+ }
 
-	/**
-	 * Set if this fixture is a sensor.
-	 *
-	 * @param sensor
-	 */
-	public void setSensor(boolean sensor) {
-		if (sensor != m_isSensor) {
-			m_body.setAwake(true);
-			m_isSensor = sensor;
-		}
-	}
+ /**
+  * Get the user data that was assigned in the fixture definition. Use this to store your
+  * application specific data.
+  *
+  * @return
+  */
+ public Object getUserData() {
+  return m_userData;
+ }
 
-	/**
-	 * Set the contact filtering data. This is an expensive operation and should not be called frequently. This will not update
-	 * contacts until the next time step when either parent body is awake. This automatically calls refilter.
-	 *
-	 * @param filter
-	 */
-	public void setFilterData(final Filter filter) {
-		m_filter.set(filter);
+ /**
+  * Set the user data. Use this to store your application specific data.
+  *
+  * @param data
+  */
+ public void setUserData(Object data) {
+  m_userData = data;
+ }
 
-		refilter();
-	}
+ /**
+  * Test a point for containment in this fixture. This only works for convex shapes.
+  *
+  * @param p a point in world coordinates.
+  * @return
+  */
+ public boolean testPoint(final Vec2 p) {
+  return m_shape.testPoint(m_body.m_xf, p);
+ }
 
-	/**
-	 * Get the contact filtering data.
-	 *
-	 * @return
-	 */
-	public Filter getFilterData() {
-		return m_filter;
-	}
+ /**
+  * Cast a ray against this shape.
+  *
+  * @param output the ray-cast results.
+  * @param input the ray-cast input parameters.
+  * @param output
+  * @param input
+  */
+ public boolean raycast(RayCastOutput output, RayCastInput input, int childIndex) {
+  return m_shape.raycast(output, input, m_body.m_xf, childIndex);
+ }
 
-	/**
-	 * Call this if you want to establish collision that was previously disabled by ContactFilter::ShouldCollide.
-	 */
-	public void refilter() {
-		if (m_body == null) {
-			return;
-		}
+ /**
+  * Get the mass data for this fixture. The mass data is based on the density and the shape. The
+  * rotational inertia is about the shape's origin.
+  *
+  * @return
+  */
+ public void getMassData(MassData massData) {
+  m_shape.computeMass(massData, m_density);
+ }
 
-		// Flag associated contacts for filtering.
-		for (int i_contact_edge = 0; i_contact_edge < m_body.getContactList().size(); ++i_contact_edge) {
-			ContactEdge edge = m_body.getContactList().get(i_contact_edge);
-			Contact contact = edge.contact;
-			Fixture fixtureA = contact.getFixtureA();
-			Fixture fixtureB = contact.getFixtureB();
-			if (fixtureA == this || fixtureB == this) {
-				contact.flagForFiltering();
-			}
-		}
+ /**
+  * Get the coefficient of friction.
+  *
+  * @return
+  */
+ public float getFriction() {
+  return m_friction;
+ }
 
-		World world = m_body.getWorld();
+ /**
+  * Set the coefficient of friction. This will _not_ change the friction of existing contacts.
+  *
+  * @param friction
+  */
+ public void setFriction(float friction) {
+  m_friction = friction;
+ }
 
-		if (world == null) {
-			return;
-		}
+ /**
+  * Get the coefficient of restitution.
+  *
+  * @return
+  */
+ public float getRestitution() {
+  return m_restitution;
+ }
 
-		// Touch each proxy so that new pairs may be created
-		BroadPhase broadPhase = world.m_contactManager.m_broadPhase;
-		for (int i = 0; i < m_proxyCount; ++i) {
-			broadPhase.touchProxy(m_proxies[i].proxyId);
-		}
-	}
+ /**
+  * Set the coefficient of restitution. This will _not_ change the restitution of existing contacts.
+  *
+  * @param restitution
+  */
+ public void setRestitution(float restitution) {
+  m_restitution = restitution;
+ }
 
-	/**
-	 * Get the parent body of this fixture. This is NULL if the fixture is not attached.
-	 *
-	 * @return the parent body.
-	 * @return
-	 */
-	public Body getBody() {
-		return m_body;
-	}
+ /**
+  * Get the fixture's AABB. This AABB may be enlarge and/or stale. If you need a more accurate AABB,
+  * compute it using the shape and the body transform.
+  *
+  * @return
+  */
+ public AABB getAABB(int childIndex) {
+  assert (childIndex >= 0 && childIndex < m_proxyCount);
+  return m_proxies[childIndex].aabb;
+ }
 
-	public void setDensity(float density) {
-		assert (density >= 0f);
-		m_density = density;
-	}
+ /**
+  * Compute the distance from this fixture.
+  *
+  * @param p a point in world coordinates.
+  * @return distance
+  */
+ public float computeDistance(Vec2 p, int childIndex, Vec2 normalOut) {
+  return m_shape.computeDistanceToOut(m_body.getTransform(), p, childIndex, normalOut);
+ }
 
-	public float getDensity() {
-		return m_density;
-	}
+ // We need separation create/destroy functions from the constructor/destructor because
+ // the destructor cannot access the allocator (no destructor arguments allowed by C++).
+ void create(Body body, FixtureDef def) {
+  m_userData = def.userData;
+  m_friction = def.friction;
+  m_restitution = def.restitution;
+  m_body = body;
+  m_filter.set(def.filter);
+  m_isSensor = def.isSensor;
+  m_shape = def.shape.clone();
+  // Reserve proxy space
+  int childCount = m_shape.getChildCount();
+  if (m_proxies == null) {
+   m_proxies = new FixtureProxy[childCount];
+   for (int i = 0; i < childCount; i++) {
+    m_proxies[i] = new FixtureProxy();
+    m_proxies[i].fixture = null;
+    m_proxies[i].proxyId = BroadPhase.NULL_PROXY;
+   }
+  }
+  if (m_proxies.length < childCount) {
+   FixtureProxy[] old = m_proxies;
+   int newLen = Math.max(old.length * 2, childCount);
+   m_proxies = new FixtureProxy[newLen];
+   System.arraycopy(old, 0, m_proxies, 0, old.length);
+   for (int i = 0; i < newLen; i++) {
+    if (i >= old.length) {
+     m_proxies[i] = new FixtureProxy();
+    }
+    m_proxies[i].fixture = null;
+    m_proxies[i].proxyId = BroadPhase.NULL_PROXY;
+   }
+  }
+  m_proxyCount = 0;
+  m_density = def.density;
+ }
 
-	/**
-	 * Get the user data that was assigned in the fixture definition. Use this to store your application specific data.
-	 *
-	 * @return
-	 */
-	public Object getUserData() {
-		return m_userData;
-	}
+ // These support body activation/deactivation.
+ public void createProxies(BroadPhase broadPhase, final Transform xf) {
+  assert (m_proxyCount == 0);
+  // Create proxies in the broad-phase.
+  m_proxyCount = m_shape.getChildCount();
+  for (int i = 0; i < m_proxyCount; ++i) {
+   FixtureProxy proxy = m_proxies[i];
+   m_shape.computeAABB(proxy.aabb, xf, i);
+   proxy.proxyId = broadPhase.createProxy(proxy.aabb, proxy);
+   proxy.fixture = this;
+   proxy.childIndex = i;
+  }
+ }
 
-	/**
-	 * Set the user data. Use this to store your application specific data.
-	 *
-	 * @param data
-	 */
-	public void setUserData(Object data) {
-		m_userData = data;
-	}
+ /**
+  * Internal method
+  *
+  * @param broadPhase
+  */
+ public void destroyProxies(BroadPhase broadPhase) {
+  // Destroy proxies in the broad-phase.
+  for (int i = 0; i < m_proxyCount; ++i) {
+   FixtureProxy proxy = m_proxies[i];
+   broadPhase.destroyProxy(proxy.proxyId);
+   proxy.proxyId = BroadPhase.NULL_PROXY;
+  }
+  m_proxyCount = 0;
+ }
+ private final AABB pool1 = new AABB();
+ private final AABB pool2 = new AABB();
+ private final Vec2 displacement = new Vec2();
 
-	/**
-	 * Test a point for containment in this fixture. This only works for convex shapes.
-	 *
-	 * @param p a point in world coordinates.
-	 * @return
-	 */
-	public boolean testPoint(final Vec2 p) {
-		return m_shape.testPoint(m_body.m_xf, p);
-	}
-
-	/**
-	 * Cast a ray against this shape.
-	 *
-	 * @param output the ray-cast results.
-	 * @param input the ray-cast input parameters.
-	 * @param output
-	 * @param input
-	 */
-	public boolean raycast(RayCastOutput output, RayCastInput input, int childIndex) {
-		return m_shape.raycast(output, input, m_body.m_xf, childIndex);
-	}
-
-	/**
-	 * Get the mass data for this fixture. The mass data is based on the density and the shape. The rotational inertia is about the
-	 * shape's origin.
-	 *
-	 * @return
-	 */
-	public void getMassData(MassData massData) {
-		m_shape.computeMass(massData, m_density);
-	}
-
-	/**
-	 * Get the coefficient of friction.
-	 *
-	 * @return
-	 */
-	public float getFriction() {
-		return m_friction;
-	}
-
-	/**
-	 * Set the coefficient of friction. This will _not_ change the friction of existing contacts.
-	 *
-	 * @param friction
-	 */
-	public void setFriction(float friction) {
-		m_friction = friction;
-	}
-
-	/**
-	 * Get the coefficient of restitution.
-	 *
-	 * @return
-	 */
-	public float getRestitution() {
-		return m_restitution;
-	}
-
-	/**
-	 * Set the coefficient of restitution. This will _not_ change the restitution of existing contacts.
-	 *
-	 * @param restitution
-	 */
-	public void setRestitution(float restitution) {
-		m_restitution = restitution;
-	}
-
-	/**
-	 * Get the fixture's AABB. This AABB may be enlarge and/or stale. If you need a more accurate AABB, compute it using the shape
-	 * and the body transform.
-	 *
-	 * @return
-	 */
-	public AABB getAABB(int childIndex) {
-		assert (childIndex >= 0 && childIndex < m_proxyCount);
-		return m_proxies[childIndex].aabb;
-	}
-
-	/**
-	 * Compute the distance from this fixture.
-	 *
-	 * @param p a point in world coordinates.
-	 * @return distance
-	 */
-	public float computeDistance(Vec2 p, int childIndex, Vec2 normalOut) {
-		return m_shape.computeDistanceToOut(m_body.getTransform(), p, childIndex, normalOut);
-	}
-
-	// We need separation create/destroy functions from the constructor/destructor because
-	// the destructor cannot access the allocator (no destructor arguments allowed by C++).
-	void create(Body body, FixtureDef def) {
-		m_userData = def.userData;
-		m_friction = def.friction;
-		m_restitution = def.restitution;
-
-		m_body = body;
-
-		m_filter.set(def.filter);
-
-		m_isSensor = def.isSensor;
-
-		m_shape = def.shape.clone();
-
-		// Reserve proxy space
-		int childCount = m_shape.getChildCount();
-		if (m_proxies == null) {
-			m_proxies = new FixtureProxy[childCount];
-			for (int i = 0; i < childCount; i++) {
-				m_proxies[i] = new FixtureProxy();
-				m_proxies[i].fixture = null;
-				m_proxies[i].proxyId = BroadPhase.NULL_PROXY;
-			}
-		}
-
-		if (m_proxies.length < childCount) {
-			FixtureProxy[] old = m_proxies;
-			int newLen = Math.max(old.length * 2, childCount);
-			m_proxies = new FixtureProxy[newLen];
-			System.arraycopy(old, 0, m_proxies, 0, old.length);
-			for (int i = 0; i < newLen; i++) {
-				if (i >= old.length) {
-					m_proxies[i] = new FixtureProxy();
-				}
-				m_proxies[i].fixture = null;
-				m_proxies[i].proxyId = BroadPhase.NULL_PROXY;
-			}
-		}
-		m_proxyCount = 0;
-
-		m_density = def.density;
-	}
-
-	// These support body activation/deactivation.
-	public void createProxies(BroadPhase broadPhase, final Transform xf) {
-		assert (m_proxyCount == 0);
-
-		// Create proxies in the broad-phase.
-		m_proxyCount = m_shape.getChildCount();
-
-		for (int i = 0; i < m_proxyCount; ++i) {
-			FixtureProxy proxy = m_proxies[i];
-			m_shape.computeAABB(proxy.aabb, xf, i);
-			proxy.proxyId = broadPhase.createProxy(proxy.aabb, proxy);
-			proxy.fixture = this;
-			proxy.childIndex = i;
-		}
-	}
-
-	/**
-	 * Internal method
-	 *
-	 * @param broadPhase
-	 */
-	public void destroyProxies(BroadPhase broadPhase) {
-		// Destroy proxies in the broad-phase.
-		for (int i = 0; i < m_proxyCount; ++i) {
-			FixtureProxy proxy = m_proxies[i];
-			broadPhase.destroyProxy(proxy.proxyId);
-			proxy.proxyId = BroadPhase.NULL_PROXY;
-		}
-
-		m_proxyCount = 0;
-	}
-
-	private final AABB pool1 = new AABB();
-	private final AABB pool2 = new AABB();
-	private final Vec2 displacement = new Vec2();
-
-	/**
-	 * Internal method
-	 *
-	 * @param broadPhase
-	 * @param xf1
-	 * @param xf2
-	 */
-	protected void synchronize(BroadPhase broadPhase, final Transform transform1,
-		final Transform transform2) {
-		if (m_proxyCount == 0) {
-			return;
-		}
-
-		for (int i = 0; i < m_proxyCount; ++i) {
-			FixtureProxy proxy = m_proxies[i];
-
-			// Compute an AABB that covers the swept shape (may miss some rotation effect).
-			final AABB aabb1 = pool1;
-			final AABB aab = pool2;
-			m_shape.computeAABB(aabb1, transform1, proxy.childIndex);
-			m_shape.computeAABB(aab, transform2, proxy.childIndex);
-
-			proxy.aabb.lowerBound.x
-				= aabb1.lowerBound.x < aab.lowerBound.x ? aabb1.lowerBound.x : aab.lowerBound.x;
-			proxy.aabb.lowerBound.y
-				= aabb1.lowerBound.y < aab.lowerBound.y ? aabb1.lowerBound.y : aab.lowerBound.y;
-			proxy.aabb.upperBound.x
-				= aabb1.upperBound.x > aab.upperBound.x ? aabb1.upperBound.x : aab.upperBound.x;
-			proxy.aabb.upperBound.y
-				= aabb1.upperBound.y > aab.upperBound.y ? aabb1.upperBound.y : aab.upperBound.y;
-			displacement.x = transform2.p.x - transform1.p.x;
-			displacement.y = transform2.p.y - transform1.p.y;
-
-			broadPhase.moveProxy(proxy.proxyId, proxy.aabb, displacement);
-		}
-	}
+ /**
+  * Internal method
+  *
+  * @param broadPhase
+  * @param xf1
+  * @param xf2
+  */
+ protected void synchronize(BroadPhase broadPhase, final Transform transform1,
+  final Transform transform2) {
+  if (m_proxyCount == 0) {
+   return;
+  }
+  for (int i = 0; i < m_proxyCount; ++i) {
+   FixtureProxy proxy = m_proxies[i];
+   // Compute an AABB that covers the swept shape (may miss some rotation effect).
+   final AABB aabb1 = pool1;
+   final AABB aab = pool2;
+   m_shape.computeAABB(aabb1, transform1, proxy.childIndex);
+   m_shape.computeAABB(aab, transform2, proxy.childIndex);
+   proxy.aabb.lowerBound.x =
+    aabb1.lowerBound.x < aab.lowerBound.x ? aabb1.lowerBound.x : aab.lowerBound.x;
+   proxy.aabb.lowerBound.y =
+    aabb1.lowerBound.y < aab.lowerBound.y ? aabb1.lowerBound.y : aab.lowerBound.y;
+   proxy.aabb.upperBound.x =
+    aabb1.upperBound.x > aab.upperBound.x ? aabb1.upperBound.x : aab.upperBound.x;
+   proxy.aabb.upperBound.y =
+    aabb1.upperBound.y > aab.upperBound.y ? aabb1.upperBound.y : aab.upperBound.y;
+   displacement.x = transform2.p.x - transform1.p.x;
+   displacement.y = transform2.p.y - transform1.p.y;
+   broadPhase.moveProxy(proxy.proxyId, proxy.aabb, displacement);
+  }
+ }
 }

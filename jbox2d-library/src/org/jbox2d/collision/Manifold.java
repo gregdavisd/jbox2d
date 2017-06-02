@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.collision;
 
 import java.io.Serializable;
@@ -45,86 +47,81 @@ import org.jbox2d.common.Vec2;
  * <li>e_faceA: the normal on polygonA</li>
  * <li>e_faceB: the normal on polygonB</li>
  * </ul>
- * We store contacts in this way so that position correction can account for movement, which is critical for continuous physics.
- * All contact scenarios must be expressed in one of these types. This structure is stored across time steps, so we keep it small.
+ * We store contacts in this way so that position correction can account for movement, which is
+ * critical for continuous physics. All contact scenarios must be expressed in one of these types.
+ * This structure is stored across time steps, so we keep it small.
  */
 public class Manifold implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ /**
+  * The points of contact.
+  */
+ public final ManifoldPoint[] points;
+ /**
+  * not use for Type::e_points
+  */
+ public final Vec2 localNormal;
+ /**
+  * usage depends on manifold type
+  */
+ public final Vec2 localPoint;
+ public byte type;
+ /**
+  * The number of manifold points.
+  */
+ public int pointCount;
 
+ /**
+  * creates a manifold with 0 points, with it's points array full of instantiated ManifoldPoints.
+  */
+ public Manifold() {
+  points = new ManifoldPoint[Settings.maxManifoldPoints];
+  for (int i = 0; i < Settings.maxManifoldPoints; i++) {
+   points[i] = new ManifoldPoint();
+  }
+  localNormal = new Vec2();
+  localPoint = new Vec2();
+  pointCount = 0;
+ }
 
-	/**
-	 * The points of contact.
-	 */
-	public final ManifoldPoint[] points;
+ /**
+  * Creates this manifold as a copy of the other
+  *
+  * @param other
+  */
+ public Manifold(Manifold other) {
+  points = new ManifoldPoint[Settings.maxManifoldPoints];
+  localNormal = new Vec2(other.localNormal);
+  localPoint = new Vec2(other.localPoint);
+  pointCount = other.pointCount;
+  type = other.type;
+  // djm: this is correct now
+  for (int i = 0; i < Settings.maxManifoldPoints; i++) {
+   points[i] = new ManifoldPoint(other.points[i]);
+  }
+ }
 
-	/**
-	 * not use for Type::e_points
-	 */
-	public final Vec2 localNormal;
+ /**
+  * copies this manifold from the given one
+  *
+  * @param cp manifold to copy from
+  */
+ public void set(Manifold cp) {
+  for (int i = 0; i < cp.pointCount; i++) {
+   points[i].set(cp.points[i]);
+  }
+  type = cp.type;
+  localNormal.set(cp.localNormal);
+  localPoint.set(cp.localPoint);
+  pointCount = cp.pointCount;
+ }
 
-	/**
-	 * usage depends on manifold type
-	 */
-	public final Vec2 localPoint;
+ public static class ManifoldType implements Serializable {
 
-	public byte type;
-
-	/**
-	 * The number of manifold points.
-	 */
-	public int pointCount;
-
-	/**
-	 * creates a manifold with 0 points, with it's points array full of instantiated ManifoldPoints.
-	 */
-	public Manifold() {
-		points = new ManifoldPoint[Settings.maxManifoldPoints];
-		for (int i = 0; i < Settings.maxManifoldPoints; i++) {
-			points[i] = new ManifoldPoint();
-		}
-		localNormal = new Vec2();
-		localPoint = new Vec2();
-		pointCount = 0;
-	}
-
-	/**
-	 * Creates this manifold as a copy of the other
-	 *
-	 * @param other
-	 */
-	public Manifold(Manifold other) {
-		points = new ManifoldPoint[Settings.maxManifoldPoints];
-		localNormal = new Vec2(other.localNormal);
-		localPoint = new Vec2(other.localPoint);
-		pointCount = other.pointCount;
-		type = other.type;
-		// djm: this is correct now
-		for (int i = 0; i < Settings.maxManifoldPoints; i++) {
-			points[i] = new ManifoldPoint(other.points[i]);
-		}
-	}
-
-	/**
-	 * copies this manifold from the given one
-	 *
-	 * @param cp manifold to copy from
-	 */
-	public void set(Manifold cp) {
-		for (int i = 0; i < cp.pointCount; i++) {
-			points[i].set(cp.points[i]);
-		}
-
-		type = cp.type;
-		localNormal.set(cp.localNormal);
-		localPoint.set(cp.localPoint);
-		pointCount = cp.pointCount;
-	}
-	public static class ManifoldType implements Serializable {
-		
-		static final long serialVersionUID = 1L;
-		public static final byte CIRCLES = 0;
-		public static final byte FACE_A = 1;
-		public static final byte FACE_B = 2;
-	}
+  static final long serialVersionUID = 1L;
+  public static final byte CIRCLES = 0;
+  public static final byte FACE_A = 1;
+  public static final byte FACE_B = 2;
+ }
 }

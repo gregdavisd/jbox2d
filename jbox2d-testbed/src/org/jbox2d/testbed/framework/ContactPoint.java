@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 2:12:15 PM Jul 17, 2010
  */
@@ -36,12 +38,12 @@ import org.jbox2d.dynamics.Fixture;
  */
 public class ContactPoint {
 
-	public Fixture fixtureA;
-	public Fixture fixtureB;
-	public final Vec2 normal = new Vec2();
-	public final Vec2 position = new Vec2();
-	public byte state;
-	public float normalImpulse;
-	public float tangentImpulse;
-	public float separation;
+ public Fixture fixtureA;
+ public Fixture fixtureB;
+ public final Vec2 normal = new Vec2();
+ public final Vec2 position = new Vec2();
+ public byte state;
+ public float normalImpulse;
+ public float tangentImpulse;
+ public float separation;
 }

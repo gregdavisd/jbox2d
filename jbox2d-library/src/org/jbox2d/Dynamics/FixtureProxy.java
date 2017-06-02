@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics;
 
 import java.io.Serializable;
@@ -33,9 +35,9 @@ import org.jbox2d.collision.AABB;
  */
 public class FixtureProxy implements Serializable {
 
-	static final long serialVersionUID = 1L;
-	final AABB aabb = new AABB();
-	Fixture fixture;
-	int childIndex;
-	int proxyId;
+ static final long serialVersionUID = 1L;
+ final AABB aabb = new AABB();
+ Fixture fixture;
+ int childIndex;
+ int proxyId;
 }

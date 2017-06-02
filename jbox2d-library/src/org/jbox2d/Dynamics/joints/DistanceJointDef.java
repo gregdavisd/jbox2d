@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  *
@@ -51,64 +53,59 @@ import org.jbox2d.dynamics.Body;
 
 //Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
 /**
- * Distance joint definition. This requires defining an anchor point on both bodies and the non-zero length of the distance joint.
- * The definition uses local anchor points so that the initial configuration can violate the constraint slightly. This helps when
- * saving and loading a game.
+ * Distance joint definition. This requires defining an anchor point on both bodies and the non-zero
+ * length of the distance joint. The definition uses local anchor points so that the initial
+ * configuration can violate the constraint slightly. This helps when saving and loading a game.
  *
  * @warning Do not use a zero or short length.
  */
 public class DistanceJointDef extends JointDef implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ /**
+  * The local anchor point relative to body1's origin.
+  */
+ public final Vec2 localAnchorA;
+ /**
+  * The local anchor point relative to body2's origin.
+  */
+ public final Vec2 localAnchorB;
+ /**
+  * The equilibrium length between the anchor points.
+  */
+ public float length;
+ /**
+  * The mass-spring-damper frequency in Hertz.
+  */
+ public float frequencyHz;
+ /**
+  * The damping ratio. 0 = no damping, 1 = critical damping.
+  */
+ public float dampingRatio;
 
-	/**
-	 * The local anchor point relative to body1's origin.
-	 */
-	public final Vec2 localAnchorA;
+ public DistanceJointDef() {
+  super(JointType.DISTANCE);
+  localAnchorA = new Vec2(0.0f, 0.0f);
+  localAnchorB = new Vec2(0.0f, 0.0f);
+  length = 1.0f;
+  frequencyHz = 0.0f;
+  dampingRatio = 0.0f;
+ }
 
-	/**
-	 * The local anchor point relative to body2's origin.
-	 */
-	public final Vec2 localAnchorB;
-
-	/**
-	 * The equilibrium length between the anchor points.
-	 */
-	public float length;
-
-	/**
-	 * The mass-spring-damper frequency in Hertz.
-	 */
-	public float frequencyHz;
-
-	/**
-	 * The damping ratio. 0 = no damping, 1 = critical damping.
-	 */
-	public float dampingRatio;
-
-	public DistanceJointDef() {
-		super(JointType.DISTANCE);
-		localAnchorA = new Vec2(0.0f, 0.0f);
-		localAnchorB = new Vec2(0.0f, 0.0f);
-		length = 1.0f;
-		frequencyHz = 0.0f;
-		dampingRatio = 0.0f;
-	}
-
-	/**
-	 * Initialize the bodies, anchors, and length using the world anchors.
-	 *
-	 * @param b1 First body
-	 * @param b2 Second body
-	 * @param anchor1 World anchor on first body
-	 * @param anchor2 World anchor on second body
-	 */
-	public void initialize(final Body b1, final Body b2, final Vec2 anchor1, final Vec2 anchor2) {
-		bodyA = b1;
-		bodyB = b2;
-		localAnchorA.set(bodyA.getLocalPoint(anchor1));
-		localAnchorB.set(bodyB.getLocalPoint(anchor2));
-		Vec2 d =  new Vec2(anchor2).sub(anchor1);
-		length = d.length();
-	}
+ /**
+  * Initialize the bodies, anchors, and length using the world anchors.
+  *
+  * @param b1 First body
+  * @param b2 Second body
+  * @param anchor1 World anchor on first body
+  * @param anchor2 World anchor on second body
+  */
+ public void initialize(final Body b1, final Body b2, final Vec2 anchor1, final Vec2 anchor2) {
+  bodyA = b1;
+  bodyB = b2;
+  localAnchorA.set(bodyA.getLocalPoint(anchor1));
+  localAnchorB.set(bodyB.getLocalPoint(anchor2));
+  Vec2 d = new Vec2(anchor2).sub(anchor1);
+  length = d.length();
+ }
 }

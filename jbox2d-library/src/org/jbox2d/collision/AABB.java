@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.collision;
 
 import java.io.Serializable;
@@ -32,286 +34,269 @@ import org.jbox2d.common.Vec2;
  */
 public class AABB implements Serializable {
 
-	static final long serialVersionUID = 1L;
-	/**
-	 * Bottom left vertex of bounding box.
-	 */
-	public final Vec2 lowerBound;
-	/**
-	 * Top right vertex of bounding box.
-	 */
-	public final Vec2 upperBound;
+ static final long serialVersionUID = 1L;
+ /**
+  * Bottom left vertex of bounding box.
+  */
+ public final Vec2 lowerBound;
+ /**
+  * Top right vertex of bounding box.
+  */
+ public final Vec2 upperBound;
 
-	/**
-	 * Creates the default object, with vertices at 0,0 and 0,0.
-	 */
-	public AABB() {
-		lowerBound = new Vec2();
-		upperBound = new Vec2();
-	}
+ /**
+  * Creates the default object, with vertices at 0,0 and 0,0.
+  */
+ public AABB() {
+  lowerBound = new Vec2();
+  upperBound = new Vec2();
+ }
 
-	/**
-	 * Copies from the given object
-	 *
-	 * @param copy the object to copy from
-	 */
-	public AABB(final AABB copy) {
-		this(copy.lowerBound, copy.upperBound);
-	}
+ /**
+  * Copies from the given object
+  *
+  * @param copy the object to copy from
+  */
+ public AABB(final AABB copy) {
+  this(copy.lowerBound, copy.upperBound);
+ }
 
-	/**
-	 * Creates an AABB object using the given bounding vertices.
-	 *
-	 * @param lowerVertex the bottom left vertex of the bounding box
-	 * @param maxVertex the top right vertex of the bounding box
-	 */
-	public AABB(final Vec2 lowerVertex, final Vec2 upperVertex) {
-		this.lowerBound = new Vec2(lowerVertex); // clone to be safe
-		this.upperBound = new Vec2(upperVertex);
-	}
+ /**
+  * Creates an AABB object using the given bounding vertices.
+  *
+  * @param lowerVertex the bottom left vertex of the bounding box
+  * @param maxVertex the top right vertex of the bounding box
+  */
+ public AABB(final Vec2 lowerVertex, final Vec2 upperVertex) {
+  this.lowerBound = new Vec2(lowerVertex); // clone to be safe
+  this.upperBound = new Vec2(upperVertex);
+ }
 
-	/**
-	 * Sets this object from the given object
-	 *
-	 * @param aabb the object to copy from
-	 */
-	public final void set(final AABB aabb) {
-		Vec2 v = aabb.lowerBound;
-		lowerBound.x = v.x;
-		lowerBound.y = v.y;
-		Vec2 v1 = aabb.upperBound;
-		upperBound.x = v1.x;
-		upperBound.y = v1.y;
-	}
+ /**
+  * Sets this object from the given object
+  *
+  * @param aabb the object to copy from
+  */
+ public final void set(final AABB aabb) {
+  Vec2 v = aabb.lowerBound;
+  lowerBound.x = v.x;
+  lowerBound.y = v.y;
+  Vec2 v1 = aabb.upperBound;
+  upperBound.x = v1.x;
+  upperBound.y = v1.y;
+ }
 
-	/**
-	 * Verify that the bounds are sorted
-	 */
-	public final boolean isValid() {
-		final float dx = upperBound.x - lowerBound.x;
-		if (dx < 0f) {
-			return false;
-		}
-		final float dy = upperBound.y - lowerBound.y;
-		if (dy < 0) {
-			return false;
-		}
-		return !(Float.isNaN(upperBound.x) || Float.isNaN(upperBound.y) || Float.isNaN(lowerBound.x) || Float.isNaN(
-			lowerBound.y));
-	}
+ /**
+  * Verify that the bounds are sorted
+  */
+ public final boolean isValid() {
+  final float dx = upperBound.x - lowerBound.x;
+  if (dx < 0f) {
+   return false;
+  }
+  final float dy = upperBound.y - lowerBound.y;
+  if (dy < 0) {
+   return false;
+  }
+  return !(Float.isNaN(upperBound.x) || Float.isNaN(upperBound.y) || Float.isNaN(lowerBound.x) ||
+   Float.isNaN(
+    lowerBound.y));
+ }
 
-	/**
-	 * Get the center of the AABB
-	 *
-	 * @return
-	 */
-	public final Vec2 getCenter() {
-		final Vec2 center = new Vec2(lowerBound);
-		center.add(upperBound);
-		center.scale(.5f);
-		return center;
-	}
+ /**
+  * Get the center of the AABB
+  *
+  * @return
+  */
+ public final Vec2 getCenter() {
+  final Vec2 center = new Vec2(lowerBound);
+  center.add(upperBound);
+  center.scale(.5f);
+  return center;
+ }
 
-	public final void getCenterToOut(final Vec2 out) {
-		out.x = (lowerBound.x + upperBound.x) * .5f;
-		out.y = (lowerBound.y + upperBound.y) * .5f;
-	}
+ public final void getCenterToOut(final Vec2 out) {
+  out.x = (lowerBound.x + upperBound.x) * .5f;
+  out.y = (lowerBound.y + upperBound.y) * .5f;
+ }
 
-	/**
-	 * Get the extents of the AABB (half-widths).
-	 *
-	 * @return
-	 */
-	public final Vec2 getExtents() {
-		final Vec2 center = new Vec2(upperBound);
-		center.sub(lowerBound);
-		center.scale(.5f);
-		return center;
-	}
+ /**
+  * Get the extents of the AABB (half-widths).
+  *
+  * @return
+  */
+ public final Vec2 getExtents() {
+  final Vec2 center = new Vec2(upperBound);
+  center.sub(lowerBound);
+  center.scale(.5f);
+  return center;
+ }
 
-	public final void getExtentsToOut(final Vec2 out) {
-		out.x = (upperBound.x - lowerBound.x) * .5f;
-		out.y = (upperBound.y - lowerBound.y) * .5f; // thanks FDN1
-	}
+ public final void getExtentsToOut(final Vec2 out) {
+  out.x = (upperBound.x - lowerBound.x) * .5f;
+  out.y = (upperBound.y - lowerBound.y) * .5f; // thanks FDN1
+ }
 
-	public final void getVertices(Vec2[] argRay) {
-		argRay[0].set(lowerBound);
-		argRay[1].set(lowerBound);
-		argRay[1].x += upperBound.x - lowerBound.x;
-		argRay[2].set(upperBound);
-		argRay[3].set(upperBound);
-		argRay[3].x -= upperBound.x - lowerBound.x;
-	}
+ public final void getVertices(Vec2[] argRay) {
+  argRay[0].set(lowerBound);
+  argRay[1].set(lowerBound);
+  argRay[1].x += upperBound.x - lowerBound.x;
+  argRay[2].set(upperBound);
+  argRay[3].set(upperBound);
+  argRay[3].x -= upperBound.x - lowerBound.x;
+ }
 
-	/**
-	 * Combine two AABBs into this one.
-	 *
-	 * @param aabb1
-	 * @param aab
-	 */
-	public final void combine(final AABB aabb1, final AABB aab) {
-		lowerBound.x = aabb1.lowerBound.x < aab.lowerBound.x ? aabb1.lowerBound.x : aab.lowerBound.x;
-		lowerBound.y = aabb1.lowerBound.y < aab.lowerBound.y ? aabb1.lowerBound.y : aab.lowerBound.y;
-		upperBound.x = aabb1.upperBound.x > aab.upperBound.x ? aabb1.upperBound.x : aab.upperBound.x;
-		upperBound.y = aabb1.upperBound.y > aab.upperBound.y ? aabb1.upperBound.y : aab.upperBound.y;
-	}
+ /**
+  * Combine two AABBs into this one.
+  *
+  * @param aabb1
+  * @param aab
+  */
+ public final void combine(final AABB aabb1, final AABB aab) {
+  lowerBound.x = aabb1.lowerBound.x < aab.lowerBound.x ? aabb1.lowerBound.x : aab.lowerBound.x;
+  lowerBound.y = aabb1.lowerBound.y < aab.lowerBound.y ? aabb1.lowerBound.y : aab.lowerBound.y;
+  upperBound.x = aabb1.upperBound.x > aab.upperBound.x ? aabb1.upperBound.x : aab.upperBound.x;
+  upperBound.y = aabb1.upperBound.y > aab.upperBound.y ? aabb1.upperBound.y : aab.upperBound.y;
+ }
 
-	/**
-	 * Gets the perimeter length
-	 *
-	 * @return
-	 */
-	public final float getPerimeter() {
-		return 2.0f * (upperBound.x - lowerBound.x + upperBound.y - lowerBound.y);
-	}
+ /**
+  * Gets the perimeter length
+  *
+  * @return
+  */
+ public final float getPerimeter() {
+  return 2.0f * (upperBound.x - lowerBound.x + upperBound.y - lowerBound.y);
+ }
 
-	/**
-	 * Combines another aabb with this one
-	 *
-	 * @param aabb
-	 */
-	public final void combine(final AABB aabb) {
-		lowerBound.x = lowerBound.x < aabb.lowerBound.x ? lowerBound.x : aabb.lowerBound.x;
-		lowerBound.y = lowerBound.y < aabb.lowerBound.y ? lowerBound.y : aabb.lowerBound.y;
-		upperBound.x = upperBound.x > aabb.upperBound.x ? upperBound.x : aabb.upperBound.x;
-		upperBound.y = upperBound.y > aabb.upperBound.y ? upperBound.y : aabb.upperBound.y;
-	}
+ /**
+  * Combines another aabb with this one
+  *
+  * @param aabb
+  */
+ public final void combine(final AABB aabb) {
+  lowerBound.x = lowerBound.x < aabb.lowerBound.x ? lowerBound.x : aabb.lowerBound.x;
+  lowerBound.y = lowerBound.y < aabb.lowerBound.y ? lowerBound.y : aabb.lowerBound.y;
+  upperBound.x = upperBound.x > aabb.upperBound.x ? upperBound.x : aabb.upperBound.x;
+  upperBound.y = upperBound.y > aabb.upperBound.y ? upperBound.y : aabb.upperBound.y;
+ }
 
-	/**
-	 * Does this aabb contain the provided AABB.
-	 *
-	 * @return
-	 */
-	public final boolean contains(final AABB aabb) {
-		/*
+ /**
+  * Does this aabb contain the provided AABB.
+  *
+  * @return
+  */
+ public final boolean contains(final AABB aabb) {
+  /*
 		 * boolean result = true; result = result && lowerBound.x <= aabb.lowerBound.x; result = result && lowerBound.y <=
 		 * aabb.lowerBound.y; result = result && aabb.upperBound.x <= upperBound.x; result = result && aabb.upperBound.y <=
 		 * upperBound.y; return result;
-		 */
-		// djm: faster putting all of them together, as if one is false we leave the logic
-		// early
-		return lowerBound.x <= aabb.lowerBound.x && lowerBound.y <= aabb.lowerBound.y
-			&& aabb.upperBound.x <= upperBound.x && aabb.upperBound.y <= upperBound.y;
-	}
+   */
+  // djm: faster putting all of them together, as if one is false we leave the logic
+  // early
+  return lowerBound.x <= aabb.lowerBound.x && lowerBound.y <= aabb.lowerBound.y &&
+   aabb.upperBound.x <= upperBound.x && aabb.upperBound.y <= upperBound.y;
+ }
 
-	/**
-	 * From Real-time Collision Detection, p179.
-	 *
-	 * @param output
-	 * @param input
-	 */
-	public final boolean raycast(final RayCastOutput output, final RayCastInput input) {
-		float tmin = -Float.MAX_VALUE;
-		float tmax = Float.MAX_VALUE;
+ /**
+  * From Real-time Collision Detection, p179.
+  *
+  * @param output
+  * @param input
+  */
+ public final boolean raycast(final RayCastOutput output, final RayCastInput input) {
+  float tmin = -Float.MAX_VALUE;
+  float tmax = Float.MAX_VALUE;
+  final Vec2 p = new Vec2();
+  final Vec2 d = new Vec2();
+  final Vec2 absD = new Vec2();
+  final Vec2 normal = new Vec2();
+  p.set(input.p1);
+  d.set(input.p2).sub(input.p1);
+  absD.absolute(d);
+  // x then y
+  if (absD.x < Settings.EPSILON) {
+   // Parallel.
+   if (p.x < lowerBound.x || upperBound.x < p.x) {
+    return false;
+   }
+  } else {
+   final float inv_d = 1.0f / d.x;
+   float t1 = (lowerBound.x - p.x) * inv_d;
+   float t2 = (upperBound.x - p.x) * inv_d;
+   // Sign of the normal vector.
+   float s = -1.0f;
+   if (t1 > t2) {
+    final float temp = t1;
+    t1 = t2;
+    t2 = temp;
+    s = 1.0f;
+   }
+   // Push the min up
+   if (t1 > tmin) {
+    normal.setZero();
+    normal.x = s;
+    tmin = t1;
+   }
+   // Pull the max down
+   tmax = Math.min(tmax, t2);
+   if (tmin > tmax) {
+    return false;
+   }
+  }
+  if (absD.y < Settings.EPSILON) {
+   // Parallel.
+   if (p.y < lowerBound.y || upperBound.y < p.y) {
+    return false;
+   }
+  } else {
+   final float inv_d = 1.0f / d.y;
+   float t1 = (lowerBound.y - p.y) * inv_d;
+   float t2 = (upperBound.y - p.y) * inv_d;
+   // Sign of the normal vector.
+   float s = -1.0f;
+   if (t1 > t2) {
+    final float temp = t1;
+    t1 = t2;
+    t2 = temp;
+    s = 1.0f;
+   }
+   // Push the min up
+   if (t1 > tmin) {
+    normal.setZero();
+    normal.y = s;
+    tmin = t1;
+   }
+   // Pull the max down
+   tmax = Math.min(tmax, t2);
+   if (tmin > tmax) {
+    return false;
+   }
+  }
+  // Does the ray start inside the box?
+  // Does the ray intersect beyond the max fraction?
+  if (tmin < 0.0f || input.maxFraction < tmin) {
+   return false;
+  }
+  // Intersection.
+  output.fraction = tmin;
+  output.normal.x = normal.x;
+  output.normal.y = normal.y;
+  return true;
+ }
 
-		final Vec2 p = new Vec2();
-		final Vec2 d = new Vec2();
-		final Vec2 absD = new Vec2();
-		final Vec2 normal = new Vec2();
+ public static final boolean testOverlap(final AABB a, final AABB b) {
+  if (b.lowerBound.x - a.upperBound.x > 0.0f || b.lowerBound.y - a.upperBound.y > 0.0f) {
+   return false;
+  }
+  if (a.lowerBound.x - b.upperBound.x > 0.0f || a.lowerBound.y - b.upperBound.y > 0.0f) {
+   return false;
+  }
+  return true;
+ }
 
-		p.set(input.p1);
-		d.set(input.p2).sub(input.p1);
-		absD.absolute(d);
-
-		// x then y
-		if (absD.x < Settings.EPSILON) {
-			// Parallel.
-			if (p.x < lowerBound.x || upperBound.x < p.x) {
-				return false;
-			}
-		} else {
-			final float inv_d = 1.0f / d.x;
-			float t1 = (lowerBound.x - p.x) * inv_d;
-			float t2 = (upperBound.x - p.x) * inv_d;
-
-			// Sign of the normal vector.
-			float s = -1.0f;
-
-			if (t1 > t2) {
-				final float temp = t1;
-				t1 = t2;
-				t2 = temp;
-				s = 1.0f;
-			}
-
-			// Push the min up
-			if (t1 > tmin) {
-				normal.setZero();
-				normal.x = s;
-				tmin = t1;
-			}
-
-			// Pull the max down
-			tmax = Math.min(tmax, t2);
-
-			if (tmin > tmax) {
-				return false;
-			}
-		}
-
-		if (absD.y < Settings.EPSILON) {
-			// Parallel.
-			if (p.y < lowerBound.y || upperBound.y < p.y) {
-				return false;
-			}
-		} else {
-			final float inv_d = 1.0f / d.y;
-			float t1 = (lowerBound.y - p.y) * inv_d;
-			float t2 = (upperBound.y - p.y) * inv_d;
-
-			// Sign of the normal vector.
-			float s = -1.0f;
-
-			if (t1 > t2) {
-				final float temp = t1;
-				t1 = t2;
-				t2 = temp;
-				s = 1.0f;
-			}
-
-			// Push the min up
-			if (t1 > tmin) {
-				normal.setZero();
-				normal.y = s;
-				tmin = t1;
-			}
-
-			// Pull the max down
-			tmax = Math.min(tmax, t2);
-
-			if (tmin > tmax) {
-				return false;
-			}
-		}
-
-		// Does the ray start inside the box?
-		// Does the ray intersect beyond the max fraction?
-		if (tmin < 0.0f || input.maxFraction < tmin) {
-			return false;
-		}
-
-		// Intersection.
-		output.fraction = tmin;
-		output.normal.x = normal.x;
-		output.normal.y = normal.y;
-		return true;
-	}
-
-	public static final boolean testOverlap(final AABB a, final AABB b) {
-		if (b.lowerBound.x - a.upperBound.x > 0.0f || b.lowerBound.y - a.upperBound.y > 0.0f) {
-			return false;
-		}
-
-		if (a.lowerBound.x - b.upperBound.x > 0.0f || a.lowerBound.y - b.upperBound.y > 0.0f) {
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public final String toString() {
-		final String s = "AABB[" + lowerBound + " . " + upperBound + "]";
-		return s;
-	}
+ @Override
+ public final String toString() {
+  final String s = "AABB[" + lowerBound + " . " + upperBound + "]";
+  return s;
+ }
 }

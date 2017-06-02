@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.callbacks;
 
 import java.io.Serializable;
@@ -34,13 +36,13 @@ import java.io.Serializable;
  */
 public interface TreeCallback extends Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	/**
-	 * Callback from a query request.
-	 *
-	 * @param proxyId the id of the proxy
-	 * @return if the query should be continued
-	 */
-	public boolean treeCallback(int proxyId);
+ /**
+  * Callback from a query request.
+  *
+  * @param proxyId the id of the proxy
+  * @return if the query should be continued
+  */
+ public boolean treeCallback(int proxyId);
 }

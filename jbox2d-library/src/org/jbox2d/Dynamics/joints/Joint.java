@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.joints;
 
 import java.io.Serializable;
@@ -32,192 +34,184 @@ import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
 /**
- * The base joint class. Joints are used to constrain two bodies together in various fashions. Some joints also feature limits and
- * motors.
+ * The base joint class. Joints are used to constrain two bodies together in various fashions. Some
+ * joints also feature limits and motors.
  *
  * @author Daniel Murphy
  */
 public abstract class Joint implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	public static Joint create(World world, JointDef def) {
-		// Joint joint = null;
-		switch (def.type) {
-			case JointType.MOUSE:
-				return new MouseJoint(world.getPool(), (MouseJointDef) def);
-			case JointType.DISTANCE:
-				return new DistanceJoint(world.getPool(), (DistanceJointDef) def);
-			case JointType.PRISMATIC:
-				return new PrismaticJoint(world.getPool(), (PrismaticJointDef) def);
-			case JointType.REVOLUTE:
-				return new RevoluteJoint(world.getPool(), (RevoluteJointDef) def);
-			case JointType.WELD:
-				return new WeldJoint(world.getPool(), (WeldJointDef) def);
-			case JointType.FRICTION:
-				return new FrictionJoint(world.getPool(), (FrictionJointDef) def);
-			case JointType.WHEEL:
-				return new WheelJoint(world.getPool(), (WheelJointDef) def);
-			case JointType.GEAR:
-				return new GearJoint(world.getPool(), (GearJointDef) def);
-			case JointType.PULLEY:
-				return new PulleyJoint(world.getPool(), (PulleyJointDef) def);
-			case JointType.CONSTANT_VOLUME:
-				return new ConstantVolumeJoint(world, (ConstantVolumeJointDef) def);
-			case JointType.ROPE:
-				return new RopeJoint(world.getPool(), (RopeJointDef) def);
-			case JointType.MOTOR:
-				return new MotorJoint(world.getPool(), (MotorJointDef) def);
-			case JointType.UNKNOWN:
-			default:
-				return null;
-		}
-	}
+ public static Joint create(World world, JointDef def) {
+  // Joint joint = null;
+  switch (def.type) {
+   case JointType.MOUSE:
+    return new MouseJoint(world.getPool(), (MouseJointDef) def);
+   case JointType.DISTANCE:
+    return new DistanceJoint(world.getPool(), (DistanceJointDef) def);
+   case JointType.PRISMATIC:
+    return new PrismaticJoint(world.getPool(), (PrismaticJointDef) def);
+   case JointType.REVOLUTE:
+    return new RevoluteJoint(world.getPool(), (RevoluteJointDef) def);
+   case JointType.WELD:
+    return new WeldJoint(world.getPool(), (WeldJointDef) def);
+   case JointType.FRICTION:
+    return new FrictionJoint(world.getPool(), (FrictionJointDef) def);
+   case JointType.WHEEL:
+    return new WheelJoint(world.getPool(), (WheelJointDef) def);
+   case JointType.GEAR:
+    return new GearJoint(world.getPool(), (GearJointDef) def);
+   case JointType.PULLEY:
+    return new PulleyJoint(world.getPool(), (PulleyJointDef) def);
+   case JointType.CONSTANT_VOLUME:
+    return new ConstantVolumeJoint(world, (ConstantVolumeJointDef) def);
+   case JointType.ROPE:
+    return new RopeJoint(world.getPool(), (RopeJointDef) def);
+   case JointType.MOTOR:
+    return new MotorJoint(world.getPool(), (MotorJointDef) def);
+   case JointType.UNKNOWN:
+   default:
+    return null;
+  }
+ }
 
-	public static void destroy(Joint joint) {
-		joint.destructor();
-	}
+ public static void destroy(Joint joint) {
+  joint.destructor();
+ }
+ private final int m_type;
+ public JointEdge m_edgeA;
+ public JointEdge m_edgeB;
+ protected Body m_bodyA;
+ protected Body m_bodyB;
+ public boolean m_islandFlag;
+ private boolean m_collideConnected;
+ public Object m_userData;
+ protected IWorldPool pool;
 
-	private final int m_type;
-	public JointEdge m_edgeA;
-	public JointEdge m_edgeB;
-	protected Body m_bodyA;
-	protected Body m_bodyB;
+ // Cache here per time step to reduce cache misses.
+ // final Vec2 m_localCenterA, m_localCenterB;
+ // float m_invMassA, m_invIA;
+ // float m_invMassB, m_invIB;
+ protected Joint(IWorldPool worldPool, JointDef def) {
+  assert (def.bodyA != def.bodyB);
+  pool = worldPool;
+  m_type = def.type;
+  m_bodyA = def.bodyA;
+  m_bodyB = def.bodyB;
+  m_collideConnected = def.collideConnected;
+  m_islandFlag = false;
+  m_userData = def.userData;
+  m_edgeA = new JointEdge();
+  m_edgeB = new JointEdge();
+  // m_localCenterA = new Vec2();
+  // m_localCenterB = new Vec2();
+ }
 
-	public boolean m_islandFlag;
-	private boolean m_collideConnected;
+ /**
+  * get the type of the concrete joint.
+  *
+  * @return
+  */
+ public int getType() {
+  return m_type;
+ }
 
-	public Object m_userData;
+ /**
+  * get the first body attached to this joint.
+  */
+ public final Body getBodyA() {
+  return m_bodyA;
+ }
 
-	protected IWorldPool pool;
+ /**
+  * get the second body attached to this joint.
+  *
+  * @return
+  */
+ public final Body getBodyB() {
+  return m_bodyB;
+ }
 
-	// Cache here per time step to reduce cache misses.
-	// final Vec2 m_localCenterA, m_localCenterB;
-	// float m_invMassA, m_invIA;
-	// float m_invMassB, m_invIB;
-	protected Joint(IWorldPool worldPool, JointDef def) {
-		assert (def.bodyA != def.bodyB);
+ /**
+  * get the anchor point on bodyA in world coordinates.
+  *
+  * @return
+  */
+ public abstract void getAnchorA(Vec2 out);
 
-		pool = worldPool;
-		m_type = def.type;
-		m_bodyA = def.bodyA;
-		m_bodyB = def.bodyB;
-		m_collideConnected = def.collideConnected;
-		m_islandFlag = false;
-		m_userData = def.userData;
+ /**
+  * get the anchor point on bodyB in world coordinates.
+  *
+  * @return
+  */
+ public abstract void getAnchorB(Vec2 out);
 
-		m_edgeA = new JointEdge();
+ /**
+  * get the reaction force on body2 at the joint anchor in Newtons.
+  *
+  * @param inv_dt
+  * @return
+  */
+ public abstract void getReactionForce(float inv_dt, Vec2 out);
 
-		m_edgeB = new JointEdge();
+ /**
+  * get the reaction torque on body2 in N*m.
+  *
+  * @param inv_dt
+  * @return
+  */
+ public abstract float getReactionTorque(float inv_dt);
 
-		// m_localCenterA = new Vec2();
-		// m_localCenterB = new Vec2();
-	}
+ /**
+  * get the user data pointer.
+  */
+ public Object getUserData() {
+  return m_userData;
+ }
 
-	/**
-	 * get the type of the concrete joint.
-	 *
-	 * @return
-	 */
-	public int getType() {
-		return m_type;
-	}
+ /**
+  * Set the user data pointer.
+  */
+ public void setUserData(Object data) {
+  m_userData = data;
+ }
 
-	/**
-	 * get the first body attached to this joint.
-	 */
-	public final Body getBodyA() {
-		return m_bodyA;
-	}
+ /**
+  * Get collide connected. Note: modifying the collide connect flag won't work correctly because the
+  * flag is only checked when fixture AABBs begin to overlap.
+  */
+ public final boolean getCollideConnected() {
+  return m_collideConnected;
+ }
 
-	/**
-	 * get the second body attached to this joint.
-	 *
-	 * @return
-	 */
-	public final Body getBodyB() {
-		return m_bodyB;
-	}
+ /**
+  * Short-cut function to determine if either body is inactive.
+  *
+  * @return
+  */
+ public boolean isActive() {
+  return m_bodyA.isActive() && m_bodyB.isActive();
+ }
 
-	/**
-	 * get the anchor point on bodyA in world coordinates.
-	 *
-	 * @return
-	 */
-	public abstract void getAnchorA(Vec2 out);
+ /**
+  * Internal
+  */
+ public abstract void initVelocityConstraints(SolverData data);
 
-	/**
-	 * get the anchor point on bodyB in world coordinates.
-	 *
-	 * @return
-	 */
-	public abstract void getAnchorB(Vec2 out);
+ /**
+  * Internal
+  */
+ public abstract void solveVelocityConstraints(SolverData data);
 
-	/**
-	 * get the reaction force on body2 at the joint anchor in Newtons.
-	 *
-	 * @param inv_dt
-	 * @return
-	 */
-	public abstract void getReactionForce(float inv_dt, Vec2 out);
+ /**
+  * This returns true if the position errors are within tolerance. Internal.
+  */
+ public abstract boolean solvePositionConstraints(SolverData data);
 
-	/**
-	 * get the reaction torque on body2 in N*m.
-	 *
-	 * @param inv_dt
-	 * @return
-	 */
-	public abstract float getReactionTorque(float inv_dt);
-
-	/**
-	 * get the user data pointer.
-	 */
-	public Object getUserData() {
-		return m_userData;
-	}
-
-	/**
-	 * Set the user data pointer.
-	 */
-	public void setUserData(Object data) {
-		m_userData = data;
-	}
-
-	/**
-	 * Get collide connected. Note: modifying the collide connect flag won't work correctly because the flag is only checked when
-	 * fixture AABBs begin to overlap.
-	 */
-	public final boolean getCollideConnected() {
-		return m_collideConnected;
-	}
-
-	/**
-	 * Short-cut function to determine if either body is inactive.
-	 *
-	 * @return
-	 */
-	public boolean isActive() {
-		return m_bodyA.isActive() && m_bodyB.isActive();
-	}
-
-	/**
-	 * Internal
-	 */
-	public abstract void initVelocityConstraints(SolverData data);
-
-	/**
-	 * Internal
-	 */
-	public abstract void solveVelocityConstraints(SolverData data);
-
-	/**
-	 * This returns true if the position errors are within tolerance. Internal.
-	 */
-	public abstract boolean solvePositionConstraints(SolverData data);
-
-	/**
-	 * Override to handle destruction of joint
-	 */
-	public void destructor() {
-	}
+ /**
+  * Override to handle destruction of joint
+  */
+ public void destructor() {
+ }
 }

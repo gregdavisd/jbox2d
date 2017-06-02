@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 3:26:14 AM Jan 11, 2011
  */
@@ -31,7 +33,6 @@ import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.TimeOfImpact;
 import org.jbox2d.common.Settings;
-
 import org.jbox2d.dynamics.contacts.ChainAndCircleContact;
 import org.jbox2d.dynamics.contacts.ChainAndPolygonContact;
 import org.jbox2d.dynamics.contacts.CircleContact;
@@ -52,8 +53,8 @@ import org.jbox2d.pooling.IWorldPool;
  * class factory of contact types.
  */
 /**
- * Provides object pooling for all objects used in the engine. Objects retrieved from here should only be used temporarily, and
- * then pushed back (with the exception of arrays).
+ * Provides object pooling for all objects used in the engine. Objects retrieved from here should
+ * only be used temporarily, and then pushed back (with the exception of arrays).
  *
  *
  *
@@ -61,144 +62,128 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class DefaultWorldPool implements IWorldPool, Serializable {
 
-	static final long serialVersionUID = 1L;
-	private final IWorldPool world = this;
+ static final long serialVersionUID = 1L;
+ private final IWorldPool world = this;
+ private final MutableStack<Contact> pcstack =
+  new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+  static final long serialVersionUID = 1L;
 
-	private final MutableStack<Contact> pcstack
-		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
-		static final long serialVersionUID = 1L;
+  @Override
+  protected Contact newInstance() {
+   return new PolygonContact(world);
+  }
+ };
+ private final MutableStack<Contact> ccstack =
+  new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+  static final long serialVersionUID = 1L;
 
-		@Override
-		protected Contact newInstance() {
-			return new PolygonContact(world);
-		}
+  @Override
+  protected Contact newInstance() {
+   return new CircleContact(world);
+  }
+ };
+ private final MutableStack<Contact> cpstack =
+  new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+  static final long serialVersionUID = 1L;
 
-	};
+  @Override
+  protected Contact newInstance() {
+   return new PolygonAndCircleContact(world);
+  }
+ };
+ private final MutableStack<Contact> ecstack =
+  new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+  static final long serialVersionUID = 1L;
 
-	private final MutableStack<Contact> ccstack
-		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
-		static final long serialVersionUID = 1L;
+  @Override
+  protected Contact newInstance() {
+   return new EdgeAndCircleContact(world);
+  }
+ };
+ private final MutableStack<Contact> epstack =
+  new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+  static final long serialVersionUID = 1L;
 
-		@Override
-		protected Contact newInstance() {
-			return new CircleContact(world);
-		}
+  @Override
+  protected Contact newInstance() {
+   return new EdgeAndPolygonContact(world);
+  }
+ };
+ private final MutableStack<Contact> chcstack =
+  new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+  static final long serialVersionUID = 1L;
 
-	};
+  @Override
+  protected Contact newInstance() {
+   return new ChainAndCircleContact(world);
+  }
+ };
+ private final MutableStack<Contact> chpstack =
+  new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
+  static final long serialVersionUID = 1L;
 
-	private final MutableStack<Contact> cpstack
-		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
-		static final long serialVersionUID = 1L;
+  @Override
+  protected Contact newInstance() {
+   return new ChainAndPolygonContact(world);
+  }
+ };
+ private final Collision collision;
+ private final TimeOfImpact toi;
+ private final Distance dist;
 
-		@Override
-		protected Contact newInstance() {
-			return new PolygonAndCircleContact(world);
-		}
+ public DefaultWorldPool(int argSize, int argContainerSize) {
+  dist = new Distance();
+  collision = new Collision(this);
+  toi = new TimeOfImpact(this);
+ }
 
-	};
+ @Override
+ public final IDynamicStack<Contact> getPolyContactStack() {
+  return pcstack;
+ }
 
-	private final MutableStack<Contact> ecstack
-		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
-		static final long serialVersionUID = 1L;
+ @Override
+ public final IDynamicStack<Contact> getCircleContactStack() {
+  return ccstack;
+ }
 
-		@Override
-		protected Contact newInstance() {
-			return new EdgeAndCircleContact(world);
-		}
+ @Override
+ public final IDynamicStack<Contact> getPolyCircleContactStack() {
+  return cpstack;
+ }
 
-	};
+ @Override
+ public IDynamicStack<Contact> getEdgeCircleContactStack() {
+  return ecstack;
+ }
 
-	private final MutableStack<Contact> epstack
-		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
-		static final long serialVersionUID = 1L;
+ @Override
+ public IDynamicStack<Contact> getEdgePolyContactStack() {
+  return epstack;
+ }
 
-		@Override
-		protected Contact newInstance() {
-			return new EdgeAndPolygonContact(world);
-		}
+ @Override
+ public IDynamicStack<Contact> getChainCircleContactStack() {
+  return chcstack;
+ }
 
-	};
+ @Override
+ public IDynamicStack<Contact> getChainPolyContactStack() {
+  return chpstack;
+ }
 
-	private final MutableStack<Contact> chcstack
-		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
-		static final long serialVersionUID = 1L;
+ @Override
+ public final Collision getCollision() {
+  return collision;
+ }
 
-		@Override
-		protected Contact newInstance() {
-			return new ChainAndCircleContact(world);
-		}
+ @Override
+ public final TimeOfImpact getTimeOfImpact() {
+  return toi;
+ }
 
-	};
-
-	private final MutableStack<Contact> chpstack
-		= new MutableStack<Contact>(Settings.CONTACT_STACK_INIT_SIZE) {
-		static final long serialVersionUID = 1L;
-
-		@Override
-		protected Contact newInstance() {
-			return new ChainAndPolygonContact(world);
-		}
-
-	};
-
-	private final Collision collision;
-	private final TimeOfImpact toi;
-	private final Distance dist;
-
-	public DefaultWorldPool(int argSize, int argContainerSize) {
-		dist = new Distance();
-		collision = new Collision(this);
-		toi = new TimeOfImpact(this);
-	}
-
-	@Override
-	public final IDynamicStack<Contact> getPolyContactStack() {
-		return pcstack;
-	}
-
-	@Override
-	public final IDynamicStack<Contact> getCircleContactStack() {
-		return ccstack;
-	}
-
-	@Override
-	public final IDynamicStack<Contact> getPolyCircleContactStack() {
-		return cpstack;
-	}
-
-	@Override
-	public IDynamicStack<Contact> getEdgeCircleContactStack() {
-		return ecstack;
-	}
-
-	@Override
-	public IDynamicStack<Contact> getEdgePolyContactStack() {
-		return epstack;
-	}
-
-	@Override
-	public IDynamicStack<Contact> getChainCircleContactStack() {
-		return chcstack;
-	}
-
-	@Override
-	public IDynamicStack<Contact> getChainPolyContactStack() {
-		return chpstack;
-	}
-
-	@Override
-	public final Collision getCollision() {
-		return collision;
-	}
-
-	@Override
-	public final TimeOfImpact getTimeOfImpact() {
-		return toi;
-	}
-
-	@Override
-	public final Distance getDistance() {
-		return dist;
-	}
-
+ @Override
+ public final Distance getDistance() {
+  return dist;
+ }
 }

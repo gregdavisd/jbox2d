@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.Manifold;
@@ -37,69 +39,61 @@ import org.jbox2d.testbed.framework.TestbedTest;
 
 public class ConveyorBelt extends TestbedTest {
 
-	private static long platformTag = 98752L;
-	private Fixture m_platform;
+ private static long platformTag = 98752L;
+ private Fixture m_platform;
 
-	@Override
-	public boolean isSaveLoadEnabled() {
-		return true;
-	}
+ @Override
+ public boolean isSaveLoadEnabled() {
+  return true;
+ }
 
-	@Override
-	public void initTest(boolean deserialized) {
-		if (deserialized) {
-			return;
-		}
-		// Ground
-		{
+ @Override
+ public void initTest(boolean deserialized) {
+  if (deserialized) {
+   return;
+  }
+  // Ground
+  {
+   EdgeShape shape = new EdgeShape();
+   shape.set(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
+   getGroundBody().createFixture(shape, 0.0f);
+  }
+  // Platform
+  {
+   BodyDef bd = new BodyDef();
+   bd.position.set(-5.0f, 5.0f);
+   Body body = getWorld().createBody(bd);
+   PolygonShape shape = new PolygonShape();
+   shape.setAsBox(10.0f, 0.5f);
+   FixtureDef fd = new FixtureDef();
+   fd.shape = shape;
+   fd.friction = 0.8f;
+   m_platform = body.createFixture(fd);
+  }
+  // Boxes
+  for (int i = 0; i < 5; ++i) {
+   BodyDef bd = new BodyDef();
+   bd.type = BodyType.DYNAMIC;
+   bd.position.set(-10.0f + 2.0f * i, 7.0f);
+   Body body = m_world.createBody(bd);
+   PolygonShape shape = new PolygonShape();
+   shape.setAsBox(0.5f, 0.5f);
+   body.createFixture(shape, 20.0f);
+  }
+ }
 
-			EdgeShape shape = new EdgeShape();
-			shape.set(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
-			getGroundBody().createFixture(shape, 0.0f);
-		}
+ @Override
+ public void preSolve(Contact contact, Manifold oldManifold) {
+  super.preSolve(contact, oldManifold);
+  Fixture fixtureA = contact.getFixtureA();
+  Fixture fixtureB = contact.getFixtureB();
+  if (fixtureA == m_platform || fixtureB == m_platform) {
+   contact.setTangentSpeed(5.0f);
+  }
+ }
 
-		// Platform
-		{
-			BodyDef bd = new BodyDef();
-			bd.position.set(-5.0f, 5.0f);
-			Body body = getWorld().createBody(bd);
-
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(10.0f, 0.5f);
-
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			fd.friction = 0.8f;
-			m_platform = body.createFixture(fd);
-		}
-
-		// Boxes
-		for (int i = 0; i < 5; ++i) {
-			BodyDef bd = new BodyDef();
-			bd.type = BodyType.DYNAMIC;
-			bd.position.set(-10.0f + 2.0f * i, 7.0f);
-			Body body = m_world.createBody(bd);
-
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(0.5f, 0.5f);
-			body.createFixture(shape, 20.0f);
-		}
-	}
-
-	@Override
-	public void preSolve(Contact contact, Manifold oldManifold) {
-		super.preSolve(contact, oldManifold);
-
-		Fixture fixtureA = contact.getFixtureA();
-		Fixture fixtureB = contact.getFixtureB();
-
-		if (fixtureA == m_platform || fixtureB == m_platform) {
-			contact.setTangentSpeed(5.0f);
-		}
-	}
-
-	@Override
-	public String getTestName() {
-		return "Conveyor Belt";
-	}
+ @Override
+ public String getTestName() {
+  return "Conveyor Belt";
+ }
 }

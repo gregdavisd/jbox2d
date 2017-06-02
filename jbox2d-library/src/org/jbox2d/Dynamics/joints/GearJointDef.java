@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 5:20:39 AM Jan 22, 2011
  */
@@ -29,33 +31,30 @@ package org.jbox2d.dynamics.joints;
 import java.io.Serializable;
 
 /**
- * Gear joint definition. This definition requires two existing revolute or prismatic joints (any combination will work). The
- * provided joints must attach a dynamic body to a static body.
+ * Gear joint definition. This definition requires two existing revolute or prismatic joints (any
+ * combination will work). The provided joints must attach a dynamic body to a static body.
  *
  * @author Daniel Murphy
  */
 public class GearJointDef extends JointDef implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ /**
+  * The first revolute/prismatic joint attached to the gear joint.
+  */
+ public Joint joint1;
+ /**
+  * The second revolute/prismatic joint attached to the gear joint.
+  */
+ public Joint joint2;
+ /**
+  * Gear ratio.
+  *
+  * @see GearJoint
+  */
+ public float ratio;
 
-	/**
-	 * The first revolute/prismatic joint attached to the gear joint.
-	 */
-	public Joint joint1;
-
-	/**
-	 * The second revolute/prismatic joint attached to the gear joint.
-	 */
-	public Joint joint2;
-
-	/**
-	 * Gear ratio.
-	 *
-	 * @see GearJoint
-	 */
-	public float ratio;
-
-	public GearJointDef() {
-		super(JointType.GEAR);
-	}
+ public GearJointDef() {
+  super(JointType.GEAR);
+ }
 }

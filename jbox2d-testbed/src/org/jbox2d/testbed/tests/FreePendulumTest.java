@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.shapes.CircleShape;
@@ -35,74 +37,65 @@ import org.jbox2d.testbed.framework.TestbedTest;
 
 public class FreePendulumTest extends TestbedTest {
 
-	private final boolean switchBodiesInJoint;
+ private final boolean switchBodiesInJoint;
 
-	public FreePendulumTest(boolean switchBodiesInJoint) {
-		this.switchBodiesInJoint = switchBodiesInJoint;
-	}
+ public FreePendulumTest(boolean switchBodiesInJoint) {
+  this.switchBodiesInJoint = switchBodiesInJoint;
+ }
 
-	@Override
-	public boolean isSaveLoadEnabled() {
-		return true;
-	}
+ @Override
+ public boolean isSaveLoadEnabled() {
+  return true;
+ }
 
-	@Override
-	public void initTest(boolean deserialized) {
-		if (deserialized) {
-			return;
-		}
-		Body pendulum;
-		Body base;
-		Body ground;
+ @Override
+ public void initTest(boolean deserialized) {
+  if (deserialized) {
+   return;
+  }
+  Body pendulum;
+  Body base;
+  Body ground;
+  {
+   CircleShape circleShape = new CircleShape();
+   circleShape.m_radius = 1;
+   Shape shape = circleShape;
+   BodyDef bodyDef = new BodyDef();
+   bodyDef.type = BodyType.DYNAMIC;
+   bodyDef.position.set(-5, 0);
+   bodyDef.allowSleep = false;
+   pendulum = getWorld().createBody(bodyDef);
+   pendulum.createFixture(shape, 1);
+  }
+  {
+   PolygonShape shape = new PolygonShape();
+   shape.setAsBox(1, 1);
+   BodyDef bodyDef = new BodyDef();
+   bodyDef.type = BodyType.DYNAMIC;
+   bodyDef.position.set(0, 2);
+   bodyDef.allowSleep = false;
+   base = getWorld().createBody(bodyDef);
+   base.createFixture(shape, 1);
+  }
+  {
+   PolygonShape shape = new PolygonShape();
+   shape.setAsBox(3, 1);
+   BodyDef bodyDef = new BodyDef();
+   bodyDef.type = BodyType.STATIC;
+   ground = getWorld().createBody(bodyDef);
+   ground.createFixture(shape, 0);
+  }
+  RevoluteJointDef jointDef = new RevoluteJointDef();
+  if (switchBodiesInJoint) {
+   jointDef.initialize(pendulum, base, new Vec2(0, 0));
+  } else {
+   jointDef.initialize(base, pendulum, new Vec2(0, 0));
+  }
+  getWorld().createJoint(jointDef);
+ }
 
-		{
-			CircleShape circleShape = new CircleShape();
-			circleShape.m_radius = 1;
-			Shape shape = circleShape;
-
-			BodyDef bodyDef = new BodyDef();
-			bodyDef.type = BodyType.DYNAMIC;
-			bodyDef.position.set(-5, 0);
-			bodyDef.allowSleep = false;
-			pendulum = getWorld().createBody(bodyDef);
-			pendulum.createFixture(shape, 1);
-		}
-
-		{
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(1, 1);
-
-			BodyDef bodyDef = new BodyDef();
-			bodyDef.type = BodyType.DYNAMIC;
-			bodyDef.position.set(0, 2);
-			bodyDef.allowSleep = false;
-			base = getWorld().createBody(bodyDef);
-			base.createFixture(shape, 1);
-		}
-
-		{
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(3, 1);
-
-			BodyDef bodyDef = new BodyDef();
-			bodyDef.type = BodyType.STATIC;
-			ground = getWorld().createBody(bodyDef);
-			ground.createFixture(shape, 0);
-		}
-
-		RevoluteJointDef jointDef = new RevoluteJointDef();
-
-		if (switchBodiesInJoint) {
-			jointDef.initialize(pendulum, base, new Vec2(0, 0));
-		} else {
-			jointDef.initialize(base, pendulum, new Vec2(0, 0));
-		}
-
-		getWorld().createJoint(jointDef);
-	}
-
-	@Override
-	public String getTestName() {
-		return "Free Pendulum " + (switchBodiesInJoint ? "1" : "0");
-	}
+ @Override
+ public String getTestName() {
+  return "Free Pendulum " + (switchBodiesInJoint ? "1" : "0");
+ }
 }

@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.common;
 
 import java.io.Serializable;
@@ -32,154 +34,153 @@ import java.io.Serializable;
  */
 public final class Rot implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+ private static final long serialVersionUID = 1L;
+ public float s, c; // sin and cos
 
-	public float s, c; // sin and cos
+ public Rot() {
+  setIdentity();
+ }
 
-	public Rot() {
-		setIdentity();
-	}
+ public Rot(float angle) {
+  set(angle);
+ }
 
-	public Rot(float angle) {
-		set(angle);
-	}
+ public float getSin() {
+  return s;
+ }
 
-	public float getSin() {
-		return s;
-	}
+ @Override
+ public String toString() {
+  return "Rot(s:" + s + ", c:" + c + ")";
+ }
 
-	@Override
-	public String toString() {
-		return "Rot(s:" + s + ", c:" + c + ")";
-	}
+ public float getCos() {
+  return c;
+ }
 
-	public float getCos() {
-		return c;
-	}
+ public final Rot set(float angle) {
+  s = (float) Math.sin(angle);
+  c = (float) Math.cos(angle);
+  return this;
+ }
 
-	public final Rot set(float angle) {
-		s = (float) Math.sin(angle);
-		c = (float) Math.cos(angle);
-		return this;
-	}
+ public final Rot set(Rot other) {
+  s = other.s;
+  c = other.c;
+  return this;
+ }
 
-	public final Rot set(Rot other) {
-		s = other.s;
-		c = other.c;
-		return this;
-	}
+ public final Rot setIdentity() {
+  s = 0;
+  c = 1;
+  return this;
+ }
 
-	public final Rot setIdentity() {
-		s = 0;
-		c = 1;
-		return this;
-	}
+ public final float getAngle() {
+  return (float) Math.atan2(s, c);
+ }
 
-	public final float getAngle() {
-		return (float) Math.atan2(s, c);
-	}
+ public final void getXAxis(Vec2 xAxis) {
+  xAxis.set(c, s);
+ }
 
-	public final void getXAxis(Vec2 xAxis) {
-		xAxis.set(c, s);
-	}
+ public final Vec2 getXAxis() {
+  return new Vec2(c, s);
+ }
 
-	public final Vec2 getXAxis() {
-		return new Vec2(c, s);
-	}
+ public final void getYAxis(Vec2 yAxis) {
+  yAxis.set(-s, c);
+ }
 
-	public final void getYAxis(Vec2 yAxis) {
-		yAxis.set(-s, c);
-	}
+ public final Vec2 getYAxis() {
+  return new Vec2(-s, c);
+ }
 
-	public final Vec2 getYAxis() {
-		return new Vec2(-s, c);
-	}
+ @Override
+ public final Rot clone() {
+  Rot copy = new Rot();
+  copy.s = s;
+  copy.c = c;
+  return copy;
+ }
 
-	@Override
-	public final Rot clone() {
-		Rot copy = new Rot();
-		copy.s = s;
-		copy.c = c;
-		return copy;
-	}
+ /**
+  * Multiply this rotation
+  *
+  * @param r the rotation to multiply by
+  * @return this for chaining
+  */
+ public final Rot mul(Rot r) {
+  float new_c = c * r.c - s * r.s;
+  float new_s = s * r.c + c * r.s;
+  c = new_c;
+  s = new_s;
+  return this;
+ }
 
-	/**
-	 * Multiply this rotation
-	 *
-	 * @param r the rotation to multiply by
-	 * @return this for chaining
-	 */
-	public final Rot mul(Rot r) {
-		float new_c = c * r.c - s * r.s;
-		float new_s = s * r.c + c * r.s;
-		c = new_c;
-		s = new_s;
-		return this;
-	}
+ /**
+  * Scale this rotation
+  *
+  * @param s scale factor
+  * @return this for chaining
+  */
+ public final Rot scale(float s) {
+  c *= s;
+  s *= s;
+  return this;
+ }
 
-	/**
-	 * Scale this rotation
-	 *
-	 * @param s scale factor
-	 * @return this for chaining
-	 */
-	public final Rot scale(float s) {
-		c *= s;
-		s *= s;
-		return this;
-	}
+ public static final void mul(Rot q, Rot r, Rot out) {
+  float tempc = q.c * r.c - q.s * r.s;
+  out.s = q.s * r.c + q.c * r.s;
+  out.c = tempc;
+ }
 
-	public static final void mul(Rot q, Rot r, Rot out) {
-		float tempc = q.c * r.c - q.s * r.s;
-		out.s = q.s * r.c + q.c * r.s;
-		out.c = tempc;
-	}
+ public static final void mulUnsafe(Rot q, Rot r, Rot out) {
+  assert (r != out);
+  assert (q != out);
+  // [qc -qs] * [rc -rs] = [qc*rc-qs*rs -qc*rs-qs*rc]
+  // [qs qc] [rs rc] [qs*rc+qc*rs -qs*rs+qc*rc]
+  // s = qs * rc + qc * rs
+  // c = qc * rc - qs * rs
+  out.s = q.s * r.c + q.c * r.s;
+  out.c = q.c * r.c - q.s * r.s;
+ }
 
-	public static final void mulUnsafe(Rot q, Rot r, Rot out) {
-		assert (r != out);
-		assert (q != out);
-		// [qc -qs] * [rc -rs] = [qc*rc-qs*rs -qc*rs-qs*rc]
-		// [qs qc] [rs rc] [qs*rc+qc*rs -qs*rs+qc*rc]
-		// s = qs * rc + qc * rs
-		// c = qc * rc - qs * rs
-		out.s = q.s * r.c + q.c * r.s;
-		out.c = q.c * r.c - q.s * r.s;
-	}
+ public static final void mulTrans(Rot q, Rot r, Rot out) {
+  final float tempc = q.c * r.c + q.s * r.s;
+  out.s = q.c * r.s - q.s * r.c;
+  out.c = tempc;
+ }
 
-	public static final void mulTrans(Rot q, Rot r, Rot out) {
-		final float tempc = q.c * r.c + q.s * r.s;
-		out.s = q.c * r.s - q.s * r.c;
-		out.c = tempc;
-	}
+ public static final void mulTransUnsafe(Rot q, Rot r, Rot out) {
+  // [ qc qs] * [rc -rs] = [qc*rc+qs*rs -qc*rs+qs*rc]
+  // [-qs qc] [rs rc] [-qs*rc+qc*rs qs*rs+qc*rc]
+  // s = qc * rs - qs * rc
+  // c = qc * rc + qs * rs
+  out.s = q.c * r.s - q.s * r.c;
+  out.c = q.c * r.c + q.s * r.s;
+ }
 
-	public static final void mulTransUnsafe(Rot q, Rot r, Rot out) {
-		// [ qc qs] * [rc -rs] = [qc*rc+qs*rs -qc*rs+qs*rc]
-		// [-qs qc] [rs rc] [-qs*rc+qc*rs qs*rs+qc*rc]
-		// s = qc * rs - qs * rc
-		// c = qc * rc + qs * rs
-		out.s = q.c * r.s - q.s * r.c;
-		out.c = q.c * r.c + q.s * r.s;
-	}
+ public static final void mulToOut(Rot q, Vec2 v, Vec2 out) {
+  float tempy = q.s * v.x + q.c * v.y;
+  out.x = q.c * v.x - q.s * v.y;
+  out.y = tempy;
+ }
 
-	public static final void mulToOut(Rot q, Vec2 v, Vec2 out) {
-		float tempy = q.s * v.x + q.c * v.y;
-		out.x = q.c * v.x - q.s * v.y;
-		out.y = tempy;
-	}
+ public static final void mulToOutUnsafe(Rot q, Vec2 v, Vec2 out) {
+  out.x = q.c * v.x - q.s * v.y;
+  out.y = q.s * v.x + q.c * v.y;
+ }
 
-	public static final void mulToOutUnsafe(Rot q, Vec2 v, Vec2 out) {
-		out.x = q.c * v.x - q.s * v.y;
-		out.y = q.s * v.x + q.c * v.y;
-	}
+ public static final void mulTrans(Rot q, Vec2 v, Vec2 out) {
+  final float tempy = -q.s * v.x + q.c * v.y;
+  out.x = q.c * v.x + q.s * v.y;
+  out.y = tempy;
+ }
 
-	public static final void mulTrans(Rot q, Vec2 v, Vec2 out) {
-		final float tempy = -q.s * v.x + q.c * v.y;
-		out.x = q.c * v.x + q.s * v.y;
-		out.y = tempy;
-	}
-
-	public static final void mulTransUnsafe(Rot q, Vec2 v, Vec2 out) {
-		out.x = q.c * v.x + q.s * v.y;
-		out.y = -q.s * v.x + q.c * v.y;
-	}
+ public static final void mulTransUnsafe(Rot q, Vec2 v, Vec2 out) {
+  out.x = q.c * v.x + q.s * v.y;
+  out.y = -q.s * v.x + q.c * v.y;
+ }
 }

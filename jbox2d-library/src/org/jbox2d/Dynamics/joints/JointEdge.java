@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,31 +21,29 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.joints;
 
 import java.io.Serializable;
 import org.jbox2d.dynamics.Body;
 
 /**
- * A joint edge is used to connect bodies and joints together in a joint graph where each body is a node and each joint is an
- * edge. A joint edge belongs to a doubly linked list maintained in each attached body. Each joint has two joint nodes, one for
- * each attached body.
+ * A joint edge is used to connect bodies and joints together in a joint graph where each body is a
+ * node and each joint is an edge. A joint edge belongs to a doubly linked list maintained in each
+ * attached body. Each joint has two joint nodes, one for each attached body.
  *
  * @author Daniel
  */
 public class JointEdge implements Serializable {
 
-	static final long serialVersionUID = 1L;
-
-	/**
-	 * Provides quick access to the other body attached
-	 */
-	public Body other;
-
-	/**
-	 * the joint
-	 */
-	public Joint joint;
-
+ static final long serialVersionUID = 1L;
+ /**
+  * Provides quick access to the other body attached
+  */
+ public Body other;
+ /**
+  * the joint
+  */
+ public Joint joint;
 }

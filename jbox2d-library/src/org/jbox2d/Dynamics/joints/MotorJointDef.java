@@ -11,49 +11,43 @@ import org.jbox2d.dynamics.Body;
  */
 public class MotorJointDef extends JointDef implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ /**
+  * Position of bodyB minus the position of bodyA, in bodyA's frame, in meters.
+  */
+ public final Vec2 linearOffset = new Vec2();
+ /**
+  * The bodyB angle minus bodyA angle in radians.
+  */
+ public float angularOffset;
+ /**
+  * The maximum motor force in N.
+  */
+ public float maxForce;
+ /**
+  * The maximum motor torque in N-m.
+  */
+ public float maxTorque;
+ /**
+  * Position correction factor in the range [0,1].
+  */
+ public float correctionFactor;
 
-	/**
-	 * Position of bodyB minus the position of bodyA, in bodyA's frame, in meters.
-	 */
-	public final Vec2 linearOffset = new Vec2();
+ public MotorJointDef() {
+  super(JointType.MOTOR);
+  angularOffset = 0;
+  maxForce = 1;
+  maxTorque = 1;
+  correctionFactor = 0.3f;
+ }
 
-	/**
-	 * The bodyB angle minus bodyA angle in radians.
-	 */
-	public float angularOffset;
-
-	/**
-	 * The maximum motor force in N.
-	 */
-	public float maxForce;
-
-	/**
-	 * The maximum motor torque in N-m.
-	 */
-	public float maxTorque;
-
-	/**
-	 * Position correction factor in the range [0,1].
-	 */
-	public float correctionFactor;
-
-	public MotorJointDef() {
-		super(JointType.MOTOR);
-		angularOffset = 0;
-		maxForce = 1;
-		maxTorque = 1;
-		correctionFactor = 0.3f;
-	}
-
-	public void initialize(Body bA, Body bB) {
-		bodyA = bA;
-		bodyB = bB;
-		Vec2 xB = bodyB.getPosition();
-		bodyA.getLocalPointToOut(xB, linearOffset);
-
-		float angleA = bodyA.getAngle();
-		float angleB = bodyB.getAngle();
-		angularOffset = angleB - angleA;
-	}
+ public void initialize(Body bA, Body bB) {
+  bodyA = bA;
+  bodyB = bB;
+  Vec2 xB = bodyB.getPosition();
+  bodyA.getLocalPointToOut(xB, linearOffset);
+  float angleA = bodyA.getAngle();
+  float angleB = bodyB.getAngle();
+  angularOffset = angleB - angleA;
+ }
 }

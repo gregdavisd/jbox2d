@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.common;
 
 import java.io.Serializable;
@@ -31,97 +33,95 @@ import javax.vecmath.Matrix2f;
  */
 public final class Mat22 extends Matrix2f<Mat22> implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	/**
-	 * Construct zero matrix. Note: this is NOT an identity matrix! djm fixed double allocation problem
-	 */
-	public Mat22() {
+ /**
+  * Construct zero matrix. Note: this is NOT an identity matrix! djm fixed double allocation problem
+  */
+ public Mat22() {
+ }
 
-	}
+ /**
+  * Create a matrix with given vectors as columns.
+  *
+  * @param c1 Column 1 of matrix
+  * @param c2 Column 2 of matrix
+  */
+ public Mat22(final Vec2 c1, final Vec2 c2) {
+  super(c1.x, c2.x, c1.y, c1.y);
+ }
 
-	/**
-	 * Create a matrix with given vectors as columns.
-	 *
-	 * @param c1 Column 1 of matrix
-	 * @param c2 Column 2 of matrix
-	 */
-	public Mat22(final Vec2 c1, final Vec2 c2) {
-		super(c1.x, c2.x, c1.y, c1.y);
-	}
+ /**
+  * Create a matrix from four floats.
+  *
+  * @param exx
+  * @param col2x
+  * @param exy
+  * @param col2y
+  */
+ public Mat22(final float exx, final float col2x, final float exy, final float col2y) {
+  super(exx, col2x, exy, col2y);
+ }
 
-	/**
-	 * Create a matrix from four floats.
-	 *
-	 * @param exx
-	 * @param col2x
-	 * @param exy
-	 * @param col2y
-	 */
-	public Mat22(final float exx, final float col2x, final float exy, final float col2y) {
-		super(exx, col2x, exy, col2y);
-	}
+ public final void invertToOut(final Mat22 out) {
+  final float a = m00, b = m01, c = m10, d = m11;
+  float det = a * d - b * c;
+  // b2Assert(det != 0.0f);
+  det = 1.0f / det;
+  out.m00 = det * d;
+  out.m01 = -det * b;
+  out.m10 = -det * c;
+  out.m11 = det * a;
+ }
 
-	public final void invertToOut(final Mat22 out) {
-		final float a = m00, b = m01, c = m10, d = m11;
-		float det = a * d - b * c;
-		// b2Assert(det != 0.0f);
-		det = 1.0f / det;
-		out.m00 = det * d;
-		out.m01 = -det * b;
-		out.m10 = -det * c;
-		out.m11 = det * a;
-	}
+ public final void mulToOut(final Vec2 v, final Vec2 out) {
+  final float tempy = m10 * v.x + m11 * v.y;
+  out.x = m00 * v.x + m01 * v.y;
+  out.y = tempy;
+ }
 
-	public final void mulToOut(final Vec2 v, final Vec2 out) {
-		final float tempy = m10 * v.x + m11 * v.y;
-		out.x = m00 * v.x + m01 * v.y;
-		out.y = tempy;
-	}
+ public final Mat22 mulLocal(final Mat22 R) {
+  mulToOut(R, this);
+  return this;
+ }
 
-	public final Mat22 mulLocal(final Mat22 R) {
-		mulToOut(R, this);
-		return this;
-	}
+ public final void mulToOut(final Mat22 R, final Mat22 out) {
+  final float tempy1 = this.m10 * R.m00 + this.m11 * R.m10;
+  final float tempx1 = this.m00 * R.m00 + this.m01 * R.m10;
+  out.m00 = tempx1;
+  out.m10 = tempy1;
+  final float tempy2 = this.m10 * R.m01 + this.m11 * R.m11;
+  final float tempx2 = this.m00 * R.m01 + this.m01 * R.m11;
+  out.m01 = tempx2;
+  out.m11 = tempy2;
+ }
 
-	public final void mulToOut(final Mat22 R, final Mat22 out) {
-		final float tempy1 = this.m10 * R.m00 + this.m11 * R.m10;
-		final float tempx1 = this.m00 * R.m00 + this.m01 * R.m10;
-		out.m00 = tempx1;
-		out.m10 = tempy1;
-		final float tempy2 = this.m10 * R.m01 + this.m11 * R.m11;
-		final float tempx2 = this.m00 * R.m01 + this.m01 * R.m11;
-		out.m01 = tempx2;
-		out.m11 = tempy2;
-	}
+ public final void solveToOut(final Vec2 b, final Vec2 out) {
+  final float a11 = m00, a12 = m01, a21 = m10, a22 = m11;
+  float det = a11 * a22 - a12 * a21;
+  if (det != 0.0f) {
+   det = 1.0f / det;
+  }
+  final float tempy = det * (a11 * b.y - a21 * b.x);
+  out.x = det * (a22 * b.x - a12 * b.y);
+  out.y = tempy;
+ }
 
-	public final void solveToOut(final Vec2 b, final Vec2 out) {
-		final float a11 = m00, a12 = m01, a21 = m10, a22 = m11;
-		float det = a11 * a22 - a12 * a21;
-		if (det != 0.0f) {
-			det = 1.0f / det;
-		}
-		final float tempy = det * (a11 * b.y - a21 * b.x);
-		out.x = det * (a22 * b.x - a12 * b.y);
-		out.y = tempy;
-	}
+ public final static void mulToOutUnsafe(final Mat22 R, final Vec2 v, final Vec2 out) {
+  assert (v != out);
+  out.x = R.m00 * v.x + R.m01 * v.y;
+  out.y = R.m10 * v.x + R.m11 * v.y;
+ }
 
-	public final static void mulToOutUnsafe(final Mat22 R, final Vec2 v, final Vec2 out) {
-		assert (v != out);
-		out.x = R.m00 * v.x + R.m01 * v.y;
-		out.y = R.m10 * v.x + R.m11 * v.y;
-	}
+ public final static Mat22 createScaleTransform(float scale) {
+  Mat22 mat = new Mat22();
+  mat.m00 = scale;
+  mat.m11 = scale;
+  return mat;
+ }
 
-	public final static Mat22 createScaleTransform(float scale) {
-		Mat22 mat = new Mat22();
-		mat.m00 = scale;
-		mat.m11 = scale;
-		return mat;
-	}
-
-	public final static void createScaleTransform(float scale, Mat22 out) {
-		out.m00 = scale;
-		out.m11 = scale;
-	}
-
+ public final static void createScaleTransform(float scale, Mat22 out) {
+  out.m00 = scale;
+  out.m11 = scale;
+ }
 }

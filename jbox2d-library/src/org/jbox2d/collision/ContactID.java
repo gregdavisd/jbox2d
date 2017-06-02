@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  *
@@ -52,62 +54,61 @@ import java.io.Serializable;
  */
 public class ContactID implements Comparable<ContactID>, Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	public static class Type {
+ public static class Type {
 
-		public static final byte VERTEX = 0;
-		public static final byte FACE = 1;
-	}
+  public static final byte VERTEX = 0;
+  public static final byte FACE = 1;
+ }
+ public byte indexA;
+ public byte indexB;
+ public byte typeA;
+ public byte typeB;
 
-	public byte indexA;
-	public byte indexB;
-	public byte typeA;
-	public byte typeB;
+ public int getKey() {
+  return ((int) indexA) << 24 | ((int) indexB) << 16 | ((int) typeA) << 8 | ((int) typeB);
+ }
 
-	public int getKey() {
-		return ((int) indexA) << 24 | ((int) indexB) << 16 | ((int) typeA) << 8 | ((int) typeB);
-	}
+ public boolean isEqual(final ContactID cid) {
+  return getKey() == cid.getKey();
+ }
 
-	public boolean isEqual(final ContactID cid) {
-		return getKey() == cid.getKey();
-	}
+ public ContactID() {
+ }
 
-	public ContactID() {
-	}
+ public ContactID(final ContactID c) {
+  set(c);
+ }
 
-	public ContactID(final ContactID c) {
-		set(c);
-	}
+ public void set(final ContactID c) {
+  indexA = c.indexA;
+  indexB = c.indexB;
+  typeA = c.typeA;
+  typeB = c.typeB;
+ }
 
-	public void set(final ContactID c) {
-		indexA = c.indexA;
-		indexB = c.indexB;
-		typeA = c.typeA;
-		typeB = c.typeB;
-	}
+ public void flip() {
+  byte tempA = indexA;
+  indexA = indexB;
+  indexB = tempA;
+  tempA = typeA;
+  typeA = typeB;
+  typeB = tempA;
+ }
 
-	public void flip() {
-		byte tempA = indexA;
-		indexA = indexB;
-		indexB = tempA;
-		tempA = typeA;
-		typeA = typeB;
-		typeB = tempA;
-	}
+ /**
+  * zeros out the data
+  */
+ public void zero() {
+  indexA = 0;
+  indexB = 0;
+  typeA = 0;
+  typeB = 0;
+ }
 
-	/**
-	 * zeros out the data
-	 */
-	public void zero() {
-		indexA = 0;
-		indexB = 0;
-		typeA = 0;
-		typeB = 0;
-	}
-
-	@Override
-	public int compareTo(ContactID o) {
-		return getKey() - o.getKey();
-	}
+ @Override
+ public int compareTo(ContactID o) {
+  return getKey() - o.getKey();
+ }
 }

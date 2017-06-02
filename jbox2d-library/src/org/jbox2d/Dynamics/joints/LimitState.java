@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,17 +21,17 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.joints;
 
 import java.io.Serializable;
 
 public class LimitState implements Serializable {
 
-	static final long serialVersionUID = 1L;
-
-	public static final byte INACTIVE = 0;
-	public static final byte AT_LOWER = 1;
-	public static final byte AT_UPPER = 2;
-	public static final byte EQUAL = 3;
+ static final long serialVersionUID = 1L;
+ public static final byte INACTIVE = 0;
+ public static final byte AT_LOWER = 1;
+ public static final byte AT_UPPER = 2;
+ public static final byte EQUAL = 3;
 }

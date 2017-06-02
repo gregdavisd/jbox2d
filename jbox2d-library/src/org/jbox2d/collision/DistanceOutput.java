@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.collision;
 
 import java.io.Serializable;
@@ -33,21 +35,18 @@ import org.jbox2d.common.Vec2;
  */
 public class DistanceOutput implements Serializable {
 
-	static final long serialVersionUID = 1L;
-	/**
-	 * Closest point on shapeA
-	 */
-	public final Vec2 pointA = new Vec2();
-
-	/**
-	 * Closest point on shapeB
-	 */
-	public final Vec2 pointB = new Vec2();
-
-	public float distance;
-
-	/**
-	 * number of gjk iterations used
-	 */
-	public int iterations;
+ static final long serialVersionUID = 1L;
+ /**
+  * Closest point on shapeA
+  */
+ public final Vec2 pointA = new Vec2();
+ /**
+  * Closest point on shapeB
+  */
+ public final Vec2 pointB = new Vec2();
+ public float distance;
+ /**
+  * number of gjk iterations used
+  */
+ public int iterations;
 }

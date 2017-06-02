@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.contacts;
 
 import java.io.Serializable;
@@ -30,37 +32,36 @@ import org.jbox2d.common.Vec2;
 
 public class ContactVelocityConstraint implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ public VelocityConstraintPoint[] points = new VelocityConstraintPoint[Settings.maxManifoldPoints];
+ public final Vec2 normal = new Vec2();
+ public final Mat22 normalMass = new Mat22();
+ public final Mat22 K = new Mat22();
+ public int indexA;
+ public int indexB;
+ public float invMassA, invMassB;
+ public float invIA, invIB;
+ public float friction;
+ public float restitution;
+ public float tangentSpeed;
+ public int pointCount;
+ public int contactIndex;
 
-	public VelocityConstraintPoint[] points = new VelocityConstraintPoint[Settings.maxManifoldPoints];
-	public final Vec2 normal = new Vec2();
-	public final Mat22 normalMass = new Mat22();
-	public final Mat22 K = new Mat22();
-	public int indexA;
-	public int indexB;
-	public float invMassA, invMassB;
-	public float invIA, invIB;
-	public float friction;
-	public float restitution;
-	public float tangentSpeed;
-	public int pointCount;
-	public int contactIndex;
+ public ContactVelocityConstraint() {
+  for (int i = 0; i < points.length; i++) {
+   points[i] = new VelocityConstraintPoint();
+  }
+ }
 
-	public ContactVelocityConstraint() {
-		for (int i = 0; i < points.length; i++) {
-			points[i] = new VelocityConstraintPoint();
-		}
-	}
+ public static class VelocityConstraintPoint implements Serializable {
 
-	public static class VelocityConstraintPoint implements Serializable {
-
-		static final long serialVersionUID = 1L;
-		public final Vec2 rA = new Vec2();
-		public final Vec2 rB = new Vec2();
-		public float normalImpulse;
-		public float tangentImpulse;
-		public float normalMass;
-		public float tangentMass;
-		public float velocityBias;
-	}
+  static final long serialVersionUID = 1L;
+  public final Vec2 rA = new Vec2();
+  public final Vec2 rB = new Vec2();
+  public float normalImpulse;
+  public float tangentImpulse;
+  public float normalMass;
+  public float tangentMass;
+  public float velocityBias;
+ }
 }

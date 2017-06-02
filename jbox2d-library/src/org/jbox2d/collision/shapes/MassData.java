@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  *
@@ -54,50 +56,49 @@ import org.jbox2d.common.Vec2;
  */
 public class MassData implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ /**
+  * The mass of the shape, usually in kilograms.
+  */
+ public float mass;
+ /**
+  * The position of the shape's centroid relative to the shape's origin.
+  */
+ public final Vec2 center;
+ /**
+  * The rotational inertia of the shape about the local origin.
+  */
+ public float I;
 
-	/**
-	 * The mass of the shape, usually in kilograms.
-	 */
-	public float mass;
-	/**
-	 * The position of the shape's centroid relative to the shape's origin.
-	 */
-	public final Vec2 center;
-	/**
-	 * The rotational inertia of the shape about the local origin.
-	 */
-	public float I;
+ /**
+  * Blank mass data
+  */
+ public MassData() {
+  mass = I = 0f;
+  center = new Vec2();
+ }
 
-	/**
-	 * Blank mass data
-	 */
-	public MassData() {
-		mass = I = 0f;
-		center = new Vec2();
-	}
+ /**
+  * Copies from the given mass data
+  *
+  * @param md mass data to copy from
+  */
+ public MassData(MassData md) {
+  mass = md.mass;
+  I = md.I;
+  center = new Vec2(md.center);
+ }
 
-	/**
-	 * Copies from the given mass data
-	 *
-	 * @param md mass data to copy from
-	 */
-	public MassData(MassData md) {
-		mass = md.mass;
-		I = md.I;
-		center = new Vec2(md.center);
-	}
+ public void set(MassData md) {
+  mass = md.mass;
+  I = md.I;
+  center.set(md.center);
+ }
 
-	public void set(MassData md) {
-		mass = md.mass;
-		I = md.I;
-		center.set(md.center);
-	}
-
-	/**
-	 * Return a copy of this object.
-	 */
-	public MassData clone() {
-		return new MassData(this);
-	}
+ /**
+  * Return a copy of this object.
+  */
+ public MassData clone() {
+  return new MassData(this);
+ }
 }

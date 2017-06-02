@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  *
@@ -57,20 +59,18 @@ import javax.vecmath.Color3f;
  */
 public class PrimeColor3f extends Color3f implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ public static final PrimeColor3f WHITE = new PrimeColor3f(1, 1, 1);
+ public static final PrimeColor3f BLACK = new PrimeColor3f(0, 0, 0);
+ public static final PrimeColor3f BLUE = new PrimeColor3f(0, 0, 1);
+ public static final PrimeColor3f GREEN = new PrimeColor3f(0, 1, 0);
+ public static final PrimeColor3f RED = new PrimeColor3f(1, 0, 0);
 
-	public static final PrimeColor3f WHITE = new PrimeColor3f(1, 1, 1);
-	public static final PrimeColor3f BLACK = new PrimeColor3f(0, 0, 0);
-	public static final PrimeColor3f BLUE = new PrimeColor3f(0, 0, 1);
-	public static final PrimeColor3f GREEN = new PrimeColor3f(0, 1, 0);
-	public static final PrimeColor3f RED = new PrimeColor3f(1, 0, 0);
+ public PrimeColor3f() {
+  super();
+ }
 
-	public PrimeColor3f() {
-		super();
-	}
-
-	public PrimeColor3f(float r, float g, float b) {
-		super(r, g, b);
-	}
-
+ public PrimeColor3f(float r, float g, float b) {
+  super(r, g, b);
+ }
 }

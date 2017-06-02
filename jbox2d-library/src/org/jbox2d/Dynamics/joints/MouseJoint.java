@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.joints;
 
 import java.io.Serializable;
@@ -29,231 +31,198 @@ import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
- * A mouse joint is used to make a point on a body track a specified world point. This a soft constraint with a maximum force.
- * This allows the constraint to stretch and without applying huge forces. NOTE: this joint is not documented in the manual
- * because it was developed to be used in the testbed. If you want to learn how to use the mouse joint, look at the testbed.
+ * A mouse joint is used to make a point on a body track a specified world point. This a soft
+ * constraint with a maximum force. This allows the constraint to stretch and without applying huge
+ * forces. NOTE: this joint is not documented in the manual because it was developed to be used in
+ * the testbed. If you want to learn how to use the mouse joint, look at the testbed.
  *
  * @author Daniel
  */
 public class MouseJoint extends Joint implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ private final Vec2 m_localAnchorB = new Vec2();
+ private final Vec2 m_targetA = new Vec2();
+ private float m_frequencyHz;
+ private float m_dampingRatio;
+ private float m_beta;
+ // Solver shared
+ private final Vec2 m_impulse = new Vec2();
+ private float m_maxForce;
+ private float m_gamma;
+ // Solver temp
+ private int m_indexB;
+ private final Vec2 m_rB = new Vec2();
+ private final Vec2 m_localCenterB = new Vec2();
+ private float m_invMassB;
+ private float m_invIB;
+ private final Mat22 m_mass = new Mat22();
+ private final Vec2 m_C = new Vec2();
 
-	private final Vec2 m_localAnchorB = new Vec2();
-	private final Vec2 m_targetA = new Vec2();
-	private float m_frequencyHz;
-	private float m_dampingRatio;
-	private float m_beta;
+ protected MouseJoint(IWorldPool argWorld, MouseJointDef def) {
+  super(argWorld, def);
+  //assert (def.target.isValid());
+  assert (def.maxForce >= 0);
+  assert (def.frequencyHz >= 0);
+  assert (def.dampingRatio >= 0);
+  m_targetA.set(def.target);
+  Transform.mulTransToOutUnsafe(m_bodyB.getTransform(), m_targetA, m_localAnchorB);
+  m_maxForce = def.maxForce;
+  m_impulse.setZero();
+  m_frequencyHz = def.frequencyHz;
+  m_dampingRatio = def.dampingRatio;
+  m_beta = 0;
+  m_gamma = 0;
+ }
 
-	// Solver shared
-	private final Vec2 m_impulse = new Vec2();
-	private float m_maxForce;
-	private float m_gamma;
+ @Override
+ public void getAnchorA(Vec2 argOut) {
+  argOut.set(m_targetA);
+ }
 
-	// Solver temp
-	private int m_indexB;
-	private final Vec2 m_rB = new Vec2();
-	private final Vec2 m_localCenterB = new Vec2();
-	private float m_invMassB;
-	private float m_invIB;
-	private final Mat22 m_mass = new Mat22();
-	private final Vec2 m_C = new Vec2();
+ @Override
+ public void getAnchorB(Vec2 argOut) {
+  m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
+ }
 
-	protected MouseJoint(IWorldPool argWorld, MouseJointDef def) {
-		super(argWorld, def);
-		//assert (def.target.isValid());
-		assert (def.maxForce >= 0);
-		assert (def.frequencyHz >= 0);
-		assert (def.dampingRatio >= 0);
+ @Override
+ public void getReactionForce(float invDt, Vec2 argOut) {
+  argOut.set(m_impulse).scale(invDt);
+ }
 
-		m_targetA.set(def.target);
-		Transform.mulTransToOutUnsafe(m_bodyB.getTransform(), m_targetA, m_localAnchorB);
+ @Override
+ public float getReactionTorque(float invDt) {
+  return invDt * 0.0f;
+ }
 
-		m_maxForce = def.maxForce;
-		m_impulse.setZero();
+ public void setTarget(Vec2 target) {
+  if (!m_bodyB.isAwake()) {
+   m_bodyB.setAwake(true);
+  }
+  m_targetA.set(target);
+ }
 
-		m_frequencyHz = def.frequencyHz;
-		m_dampingRatio = def.dampingRatio;
+ public Vec2 getTarget() {
+  return m_targetA;
+ }
 
-		m_beta = 0;
-		m_gamma = 0;
-	}
+ // / set/get the maximum force in Newtons.
+ public void setMaxForce(float force) {
+  m_maxForce = force;
+ }
 
-	@Override
-	public void getAnchorA(Vec2 argOut) {
-		argOut.set(m_targetA);
-	}
+ public float getMaxForce() {
+  return m_maxForce;
+ }
 
-	@Override
-	public void getAnchorB(Vec2 argOut) {
-		m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
-	}
+ // / set/get the frequency in Hertz.
+ public void setFrequency(float hz) {
+  m_frequencyHz = hz;
+ }
 
-	@Override
-	public void getReactionForce(float invDt, Vec2 argOut) {
-		argOut.set(m_impulse).scale(invDt);
-	}
+ public float getFrequency() {
+  return m_frequencyHz;
+ }
 
-	@Override
-	public float getReactionTorque(float invDt) {
-		return invDt * 0.0f;
-	}
+ // / set/get the damping ratio (dimensionless).
+ public void setDampingRatio(float ratio) {
+  m_dampingRatio = ratio;
+ }
 
-	public void setTarget(Vec2 target) {
-		if (!m_bodyB.isAwake()) {
-			m_bodyB.setAwake(true);
-		}
-		m_targetA.set(target);
-	}
+ public float getDampingRatio() {
+  return m_dampingRatio;
+ }
 
-	public Vec2 getTarget() {
-		return m_targetA;
-	}
-
-	// / set/get the maximum force in Newtons.
-	public void setMaxForce(float force) {
-		m_maxForce = force;
-	}
-
-	public float getMaxForce() {
-		return m_maxForce;
-	}
-
-	// / set/get the frequency in Hertz.
-	public void setFrequency(float hz) {
-		m_frequencyHz = hz;
-	}
-
-	public float getFrequency() {
-		return m_frequencyHz;
-	}
-
-	// / set/get the damping ratio (dimensionless).
-	public void setDampingRatio(float ratio) {
-		m_dampingRatio = ratio;
-	}
-
-	public float getDampingRatio() {
-		return m_dampingRatio;
-	}
-
-	@Override
-	public void initVelocityConstraints(final SolverData data) {
-		m_indexB = m_bodyB.m_islandIndex;
-		m_localCenterB.set(m_bodyB.m_sweep.localCenter);
-		m_invMassB = m_bodyB.m_invMass;
-		m_invIB = m_bodyB.m_invI;
-
-		Vec2 cB = data.positions[m_indexB].c;
-		float aB = data.positions[m_indexB].a;
-		Vec2 vB = data.velocities[m_indexB].v;
-		float wB = data.velocities[m_indexB].w;
-
-		final Rot qB = new Rot();
-
-		qB.set(aB);
-
-		float mass = m_bodyB.getMass();
-
-		// Frequency
-		float omega = 2.0f * (float) Math.PI * m_frequencyHz;
-
-		// Damping coefficient
-		float d = 2.0f * mass * m_dampingRatio * omega;
-
-		// Spring stiffness
-		float k = mass * (omega * omega);
-
-		// magic formulas
-		// gamma has units of inverse mass.
-		// beta has units of inverse time.
-		float h = data.step.dt;
-		assert (d + h * k > Settings.EPSILON);
-		m_gamma = h * (d + h * k);
-		if (m_gamma != 0.0f) {
-			m_gamma = 1.0f / m_gamma;
-		}
-		m_beta = h * k * m_gamma;
-
-		Vec2 temp = new Vec2();
-
-		// Compute the effective mass matrix.
-		Rot.mulToOutUnsafe(qB,  temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
-
-		// K = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
-		// = [1/m1+1/m2 0 ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
-		// [ 0 1/m1+1/m2] [-r1.x*r1.y r1.x*r1.x] [-r1.x*r1.y r1.x*r1.x]
-		final Mat22 K = new Mat22();
-		K.m00 = m_invMassB + m_invIB * m_rB.y * m_rB.y + m_gamma;
-		K.m10 = -m_invIB * m_rB.x * m_rB.y;
-		K.m01 = K.m10;
-		K.m11 = m_invMassB + m_invIB * m_rB.x * m_rB.x + m_gamma;
-
-		K.invertToOut(m_mass);
-
-		m_C.set(cB).add(m_rB).sub(m_targetA);
-		m_C.scale(m_beta);
-
-		// Cheat with some damping
-		wB *= 0.98f;
-
-		if (data.step.warmStarting) {
-			m_impulse.scale(data.step.dtRatio);
-			vB.x += m_invMassB * m_impulse.x;
-			vB.y += m_invMassB * m_impulse.y;
-			wB += m_invIB * m_rB.cross(m_impulse);
-		} else {
-			m_impulse.setZero();
-		}
-
+ @Override
+ public void initVelocityConstraints(final SolverData data) {
+  m_indexB = m_bodyB.m_islandIndex;
+  m_localCenterB.set(m_bodyB.m_sweep.localCenter);
+  m_invMassB = m_bodyB.m_invMass;
+  m_invIB = m_bodyB.m_invI;
+  Vec2 cB = data.positions[m_indexB].c;
+  float aB = data.positions[m_indexB].a;
+  Vec2 vB = data.velocities[m_indexB].v;
+  float wB = data.velocities[m_indexB].w;
+  final Rot qB = new Rot();
+  qB.set(aB);
+  float mass = m_bodyB.getMass();
+  // Frequency
+  float omega = 2.0f * (float) Math.PI * m_frequencyHz;
+  // Damping coefficient
+  float d = 2.0f * mass * m_dampingRatio * omega;
+  // Spring stiffness
+  float k = mass * (omega * omega);
+  // magic formulas
+  // gamma has units of inverse mass.
+  // beta has units of inverse time.
+  float h = data.step.dt;
+  assert (d + h * k > Settings.EPSILON);
+  m_gamma = h * (d + h * k);
+  if (m_gamma != 0.0f) {
+   m_gamma = 1.0f / m_gamma;
+  }
+  m_beta = h * k * m_gamma;
+  Vec2 temp = new Vec2();
+  // Compute the effective mass matrix.
+  Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
+  // K = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
+  // = [1/m1+1/m2 0 ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
+  // [ 0 1/m1+1/m2] [-r1.x*r1.y r1.x*r1.x] [-r1.x*r1.y r1.x*r1.x]
+  final Mat22 K = new Mat22();
+  K.m00 = m_invMassB + m_invIB * m_rB.y * m_rB.y + m_gamma;
+  K.m10 = -m_invIB * m_rB.x * m_rB.y;
+  K.m01 = K.m10;
+  K.m11 = m_invMassB + m_invIB * m_rB.x * m_rB.x + m_gamma;
+  K.invertToOut(m_mass);
+  m_C.set(cB).add(m_rB).sub(m_targetA);
+  m_C.scale(m_beta);
+  // Cheat with some damping
+  wB *= 0.98f;
+  if (data.step.warmStarting) {
+   m_impulse.scale(data.step.dtRatio);
+   vB.x += m_invMassB * m_impulse.x;
+   vB.y += m_invMassB * m_impulse.y;
+   wB += m_invIB * m_rB.cross(m_impulse);
+  } else {
+   m_impulse.setZero();
+  }
 //    data.velocities[m_indexB].v.set(vB);
-		data.velocities[m_indexB].w = wB;
+  data.velocities[m_indexB].w = wB;
+ }
 
-	}
+ @Override
+ public boolean solvePositionConstraints(final SolverData data) {
+  return true;
+ }
 
-	@Override
-	public boolean solvePositionConstraints(final SolverData data) {
-		return true;
-	}
-
-	@Override
-	public void solveVelocityConstraints(final SolverData data) {
-
-		Vec2 vB = data.velocities[m_indexB].v;
-		float wB = data.velocities[m_indexB].w;
-
-		// Cdot = v + cross(w, r)
-		final Vec2 Cdot = new Vec2();
-		Cdot.set(m_rB).setRightPerpendicular(wB);
-		Cdot.add(vB);
-
-		final Vec2 impulse = new Vec2();
-		final Vec2 temp = new Vec2();
-
-		temp.set(m_impulse).scale(m_gamma).add(m_C).add(Cdot).negate();
-		Mat22.mulToOutUnsafe(m_mass, temp, impulse);
-
-		Vec2 oldImpulse = temp;
-		oldImpulse.set(m_impulse);
-		m_impulse.add(impulse);
-		float maxImpulse = data.step.dt * m_maxForce;
-		if (m_impulse.lengthSquared() > maxImpulse * maxImpulse) {
-			m_impulse.scale(maxImpulse / m_impulse.length());
-		}
-		impulse.set(m_impulse).sub(oldImpulse);
-
-		vB.x += m_invMassB * impulse.x;
-		vB.y += m_invMassB * impulse.y;
-		wB += m_invIB * m_rB.cross(impulse);
-
+ @Override
+ public void solveVelocityConstraints(final SolverData data) {
+  Vec2 vB = data.velocities[m_indexB].v;
+  float wB = data.velocities[m_indexB].w;
+  // Cdot = v + cross(w, r)
+  final Vec2 Cdot = new Vec2();
+  Cdot.set(m_rB).setRightPerpendicular(wB);
+  Cdot.add(vB);
+  final Vec2 impulse = new Vec2();
+  final Vec2 temp = new Vec2();
+  temp.set(m_impulse).scale(m_gamma).add(m_C).add(Cdot).negate();
+  Mat22.mulToOutUnsafe(m_mass, temp, impulse);
+  Vec2 oldImpulse = temp;
+  oldImpulse.set(m_impulse);
+  m_impulse.add(impulse);
+  float maxImpulse = data.step.dt * m_maxForce;
+  if (m_impulse.lengthSquared() > maxImpulse * maxImpulse) {
+   m_impulse.scale(maxImpulse / m_impulse.length());
+  }
+  impulse.set(m_impulse).sub(oldImpulse);
+  vB.x += m_invMassB * impulse.x;
+  vB.y += m_invMassB * impulse.y;
+  wB += m_invIB * m_rB.cross(impulse);
 //    data.velocities[m_indexB].v.set(vB);
-		data.velocities[m_indexB].w = wB;
-
-	}
-
+  data.velocities[m_indexB].w = wB;
+ }
 }

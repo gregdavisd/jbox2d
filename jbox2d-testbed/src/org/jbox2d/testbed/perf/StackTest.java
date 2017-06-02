@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 6:24:51 AM Jan 20, 2011
  */
@@ -46,133 +48,131 @@ import org.jbox2d.profile.BasicPerformanceTest;
  */
 public class StackTest extends BasicPerformanceTest {
 
-	public static final int INNER_ITERS = 50000;
-	public static final int OUTER_ITERS = 200;
+ public static final int INNER_ITERS = 50000;
+ public static final int OUTER_ITERS = 200;
+ public static String[] tests = new String[]{"Pop2Sep", "Pop2Cont", "Pop3Sep", "Pop3Cont",
+  "Pop4Sep", "Pop4Cont", "Pop9Sep", "Pop9Cont"};
+ public static float aStore = 0;
 
-	public static String[] tests = new String[]{"Pop2Sep", "Pop2Cont", "Pop3Sep", "Pop3Cont",
-		"Pop4Sep", "Pop4Cont", "Pop9Sep", "Pop9Cont"};
-	public static float aStore = 0;
+ public StackTest() {
+  super(8, OUTER_ITERS, INNER_ITERS);
+ }
 
-	public StackTest() {
-		super(8, OUTER_ITERS, INNER_ITERS);
-	}
+ public float op(Vec2 argVec) {
+  argVec.set(MathUtils.randomFloat(-100, 100), MathUtils.randomFloat(-100, 100));
+  argVec.scale(3.2f);
+  float s = argVec.length();
+  argVec.normalize();
+  return s;
+ }
 
-	public float op(Vec2 argVec) {
-		argVec.set(MathUtils.randomFloat(-100, 100), MathUtils.randomFloat(-100, 100));
-		argVec.scale(3.2f);
-		float s = argVec.length();
-		argVec.normalize();
-		return s;
-	}
+ public final Vec2[] popVec2(int argNum) {
+  Vec2[] arr = new Vec2[argNum];
+  for (int i = 0; i < arr.length; ++i) {
+   arr[i] = new Vec2();
+  }
+  return arr;
+ }
+ private final IWorldPool wp = new DefaultWorldPool(100, 10);
 
-	public final Vec2[] popVec2(int argNum) {
-		Vec2[] arr = new Vec2[argNum];
-		for (int i = 0; i < arr.length; ++i) {
-			arr[i] = new Vec2();
-		}
-		return arr;
-	}
+ @Override
+ public void step(int argNum) {
+  float a = 0;
+  for (int i = 0; i < INNER_ITERS; i++) {
+   switch (argNum) {
+    case 0: {
+     final Vec2 v1 = new Vec2();
+     final Vec2 v2 = new Vec2();
+     a += op(v1);
+     a += op(v2);
+     break;
+    }
+    case 1: {
+     final Vec2[] pc = popVec2(2);
+     a += op(pc[0]);
+     a += op(pc[1]);
+     break;
+    }
+    case 2: {
+     final Vec2 v1 = new Vec2();
+     final Vec2 v2 = new Vec2();
+     final Vec2 v3 = new Vec2();
+     a += op(v1);
+     a += op(v2);
+     a += op(v3);
+     break;
+    }
+    case 3: {
+     final Vec2[] pc = popVec2(3);
+     a += op(pc[0]);
+     a += op(pc[1]);
+     a += op(pc[2]);
+     break;
+    }
+    case 4: {
+     final Vec2 v1 = new Vec2();
+     final Vec2 v2 = new Vec2();
+     final Vec2 v3 = new Vec2();
+     final Vec2 v4 = new Vec2();
+     a += op(v1);
+     a += op(v2);
+     a += op(v3);
+     a += op(v4);
+     break;
+    }
+    case 5: {
+     final Vec2[] pc = popVec2(4);
+     a += op(pc[0]);
+     a += op(pc[1]);
+     a += op(pc[2]);
+     a += op(pc[3]);
+    }
+    break;
+    case 6: {
+     final Vec2 v1 = new Vec2();
+     final Vec2 v2 = new Vec2();
+     final Vec2 v3 = new Vec2();
+     final Vec2 v4 = new Vec2();
+     final Vec2 v5 = new Vec2();
+     final Vec2 v6 = new Vec2();
+     final Vec2 v7 = new Vec2();
+     final Vec2 v8 = new Vec2();
+     final Vec2 v9 = new Vec2();
+     a += op(v1);
+     a += op(v2);
+     a += op(v3);
+     a += op(v4);
+     a += op(v5);
+     a += op(v6);
+     a += op(v7);
+     a += op(v8);
+     a += op(v9);
+     break;
+    }
+    case 7: {
+     final Vec2[] pc = popVec2(9);
+     a += op(pc[0]);
+     a += op(pc[1]);
+     a += op(pc[2]);
+     a += op(pc[3]);
+     a += op(pc[4]);
+     a += op(pc[5]);
+     a += op(pc[6]);
+     a += op(pc[7]);
+     a += op(pc[8]);
+     break;
+    }
+   }
+  }
+  aStore += a;
+ }
 
-	private final IWorldPool wp = new DefaultWorldPool(100, 10);
+ @Override
+ public String getTestName(int argNum) {
+  return tests[argNum];
+ }
 
-	@Override
-	public void step(int argNum) {
-		float a = 0;
-		for (int i = 0; i < INNER_ITERS; i++) {
-			switch (argNum) {
-				case 0: {
-					final Vec2 v1 = new Vec2();
-					final Vec2 v2 = new Vec2();
-					a += op(v1);
-					a += op(v2);
-					break;
-				}
-				case 1: {
-					final Vec2[] pc = popVec2(2);
-					a += op(pc[0]);
-					a += op(pc[1]);
-					break;
-				}
-				case 2: {
-					final Vec2 v1 = new Vec2();
-					final Vec2 v2 = new Vec2();
-					final Vec2 v3 = new Vec2();
-					a += op(v1);
-					a += op(v2);
-					a += op(v3);
-					break;
-				}
-				case 3: {
-					final Vec2[] pc = popVec2(3);
-					a += op(pc[0]);
-					a += op(pc[1]);
-					a += op(pc[2]);
-					break;
-				}
-				case 4: {
-					final Vec2 v1 = new Vec2();
-					final Vec2 v2 = new Vec2();
-					final Vec2 v3 = new Vec2();
-					final Vec2 v4 = new Vec2();
-					a += op(v1);
-					a += op(v2);
-					a += op(v3);
-					a += op(v4);
-					break;
-				}
-				case 5: {
-					final Vec2[] pc = popVec2(4);
-					a += op(pc[0]);
-					a += op(pc[1]);
-					a += op(pc[2]);
-					a += op(pc[3]);
-				}
-				break;
-				case 6: {
-					final Vec2 v1 = new Vec2();
-					final Vec2 v2 = new Vec2();
-					final Vec2 v3 = new Vec2();
-					final Vec2 v4 = new Vec2();
-					final Vec2 v5 = new Vec2();
-					final Vec2 v6 = new Vec2();
-					final Vec2 v7 = new Vec2();
-					final Vec2 v8 = new Vec2();
-					final Vec2 v9 = new Vec2();
-					a += op(v1);
-					a += op(v2);
-					a += op(v3);
-					a += op(v4);
-					a += op(v5);
-					a += op(v6);
-					a += op(v7);
-					a += op(v8);
-					a += op(v9);
-					break;
-				}
-				case 7: {
-					final Vec2[] pc = popVec2(9);
-					a += op(pc[0]);
-					a += op(pc[1]);
-					a += op(pc[2]);
-					a += op(pc[3]);
-					a += op(pc[4]);
-					a += op(pc[5]);
-					a += op(pc[6]);
-					a += op(pc[7]);
-					a += op(pc[8]);
-					break;
-				}
-			}
-		}
-		aStore += a;
-	}
-
-	@Override
-	public String getTestName(int argNum) {
-		return tests[argNum];
-	}
-
-	public static void main(String[] c) {
-		(new StackTest()).go();
-	}
+ public static void main(String[] c) {
+  (new StackTest()).go();
+ }
 }

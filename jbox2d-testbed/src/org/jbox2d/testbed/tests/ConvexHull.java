@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.common.Vec2;
@@ -33,73 +35,63 @@ import org.jbox2d.testbed.framework.TestbedTest;
 
 public class ConvexHull extends TestbedTest {
 
-	private final int e_count = Settings.maxPolygonVertices;
+ private final int e_count = Settings.maxPolygonVertices;
+ private boolean m_auto = false;
+ private Vec2[] m_points = new Vec2[Settings.maxPolygonVertices];
+ private int m_count;
 
-	private boolean m_auto = false;
-	private Vec2[] m_points = new Vec2[Settings.maxPolygonVertices];
-	private int m_count;
+ @Override
+ public void initTest(boolean deserialized) {
+  if (deserialized) {
+   return;
+  }
+  generate();
+ }
 
-	@Override
-	public void initTest(boolean deserialized) {
-		if (deserialized) {
-			return;
-		}
-		generate();
-	}
+ void generate() {
+  Vec2 lowerBound = new Vec2(-8f, -8f);
+  Vec2 upperBound = new Vec2(8f, 8f);
+  for (int i = 0; i < e_count; i++) {
+   float x = MathUtils.randomFloat(-8, 8);
+   float y = MathUtils.randomFloat(-8, 8);
+   Vec2 v = new Vec2(x, y);
+   v.clamp(lowerBound, upperBound, v);
+   m_points[i] = v;
+  }
+  m_count = e_count;
+ }
 
-	void generate() {
-		Vec2 lowerBound = new Vec2(-8f, -8f);
-		Vec2 upperBound = new Vec2(8f, 8f);
+ @Override
+ public void keyPressed(char argKeyChar, int argKeyCode) {
+  if (argKeyChar == 'g') {
+   generate();
+  } else if (argKeyChar == 'a') {
+   m_auto = !m_auto;
+  }
+ }
+ PolygonShape shape = new PolygonShape();
+ PrimeColor3f color = new PrimeColor3f(.9f, .9f, .9f);
+ PrimeColor3f color2 = new PrimeColor3f(.9f, .5f, .5f);
 
-		for (int i = 0; i < e_count; i++) {
-			float x = MathUtils.randomFloat(-8, 8);
-			float y = MathUtils.randomFloat(-8, 8);
+ @Override
+ public synchronized void step(TestbedSettings settings) {
+  super.step(settings);
+  shape.set(m_points, m_count);
+  addTextLine("Press g to generate a new random convex hull");
+  getDebugDraw().drawPolygon(shape.m_vertices, shape.m_count, color);
+  for (int i = 0; i < m_count; ++i) {
+   getDebugDraw().drawPoint(m_points[i], 2.0f, color2);
+   getDebugDraw().drawString((Vec2) new Vec2(m_points[i]).add(new Vec2(0.05f, 0.05f)), i + "",
+    PrimeColor3f.WHITE);
+  }
+  assert (shape.validate());
+  if (m_auto) {
+   generate();
+  }
+ }
 
-			Vec2 v = new Vec2(x, y);
-			v.clamp(lowerBound, upperBound, v);
-			m_points[i] = v;
-		}
-		m_count = e_count;
-	}
-
-	@Override
-	public void keyPressed(char argKeyChar, int argKeyCode) {
-		if (argKeyChar == 'g') {
-			generate();
-		} else if (argKeyChar == 'a') {
-			m_auto = !m_auto;
-		}
-	}
-
-	PolygonShape shape = new PolygonShape();
-	PrimeColor3f color = new PrimeColor3f(.9f, .9f, .9f);
-	PrimeColor3f color2 = new PrimeColor3f(.9f, .5f, .5f);
-
-	@Override
-	public synchronized void step(TestbedSettings settings) {
-		super.step(settings);
-
-		shape.set(m_points, m_count);
-
-		addTextLine("Press g to generate a new random convex hull");
-
-		getDebugDraw().drawPolygon(shape.m_vertices, shape.m_count, color);
-
-		for (int i = 0; i < m_count; ++i) {
-			getDebugDraw().drawPoint(m_points[i], 2.0f, color2);
-			getDebugDraw().drawString((Vec2) new Vec2(m_points[i]).add(new Vec2(0.05f, 0.05f)), i + "", PrimeColor3f.WHITE);
-		}
-
-		assert (shape.validate());
-
-		if (m_auto) {
-			generate();
-		}
-	}
-
-	@Override
-	public String getTestName() {
-		return "Convex Hull";
-	}
-
+ @Override
+ public String getTestName() {
+  return "Convex Hull";
+ }
 }

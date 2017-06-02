@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.collision.broadphase;
 
 import java.io.Serializable;
@@ -28,33 +30,30 @@ import org.jbox2d.collision.AABB;
 
 public class DynamicTreeNode implements Serializable {
 
-	static final long serialVersionUID = 1L;
-	/**
-	 * Enlarged AABB
-	 */
-	public final AABB aabb = new AABB();
+ static final long serialVersionUID = 1L;
+ /**
+  * Enlarged AABB
+  */
+ public final AABB aabb = new AABB();
+ public Object userData;
 
-	public Object userData;
+ /* parent link makes all the  tree nodes reachable via recursion, which causes serialization to crash with a stack overflow assertion.
+  */
+ transient protected DynamicTreeNode parent;
+ protected DynamicTreeNode child1;
+ protected DynamicTreeNode child2;
+ protected final int id;
+ protected int height;
 
-	/* parent link makes all the  tree nodes reachable via recursion, which causes serialization to crash with a stack overflow assertion.
-	 */
-	transient protected DynamicTreeNode parent;
+ protected DynamicTreeNode(int id) {
+  this.id = id;
+ }
 
-	protected DynamicTreeNode child1;
-	protected DynamicTreeNode child2;
-	protected final int id;
-	protected int height;
+ public Object getUserData() {
+  return userData;
+ }
 
-	protected DynamicTreeNode(int id) {
-		this.id = id;
-	}
-
-	public Object getUserData() {
-		return userData;
-	}
-
-	public void setUserData(Object argData) {
-		userData = argData;
-	}
-
+ public void setUserData(Object argData) {
+  userData = argData;
+ }
 }

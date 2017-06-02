@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.joints;
 
 import java.io.Serializable;
@@ -33,34 +35,30 @@ import org.jbox2d.dynamics.Body;
  */
 public class JointDef implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	public JointDef(byte type) {
-		this.type = type;
-		collideConnected = false;
-	}
-	/**
-	 * The joint type is set automatically for concrete joint types.
-	 */
-	public byte type;
-
-	/**
-	 * Use this to attach application specific data to your joints.
-	 */
-	public Object userData;
-
-	/**
-	 * The first attached body.
-	 */
-	public Body bodyA;
-
-	/**
-	 * The second attached body.
-	 */
-	public Body bodyB;
-
-	/**
-	 * Set this flag to true if the attached bodies should collide.
-	 */
-	public boolean collideConnected;
+ public JointDef(byte type) {
+  this.type = type;
+  collideConnected = false;
+ }
+ /**
+  * The joint type is set automatically for concrete joint types.
+  */
+ public byte type;
+ /**
+  * Use this to attach application specific data to your joints.
+  */
+ public Object userData;
+ /**
+  * The first attached body.
+  */
+ public Body bodyA;
+ /**
+  * The second attached body.
+  */
+ public Body bodyB;
+ /**
+  * Set this flag to true if the attached bodies should collide.
+  */
+ public boolean collideConnected;
 }

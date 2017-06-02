@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.collision.shapes;
 
 import java.io.Serializable;
@@ -32,13 +34,10 @@ import java.io.Serializable;
  */
 public class ShapeType implements Serializable {
 
-	static final long serialVersionUID = 1L;
-
-	public static final byte NUM_TYPES = 4;
-
-	public static final byte CIRCLE = 0;
-	public static final byte EDGE = 1;
-	public static final byte POLYGON = 2;
-	public static final byte CHAIN = 3;
-
+ static final long serialVersionUID = 1L;
+ public static final byte NUM_TYPES = 4;
+ public static final byte CIRCLE = 0;
+ public static final byte EDGE = 1;
+ public static final byte POLYGON = 2;
+ public static final byte CHAIN = 3;
 }

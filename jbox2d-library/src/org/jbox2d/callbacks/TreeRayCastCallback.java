@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.callbacks;
 
 import java.io.Serializable;
@@ -35,13 +37,13 @@ import org.jbox2d.collision.RayCastInput;
  */
 public interface TreeRayCastCallback extends Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	/**
-	 *
-	 * @param input
-	 * @param nodeId
-	 * @return the fraction to the node
-	 */
-	public float raycastCallback(RayCastInput input, int nodeId);
+ /**
+  *
+  * @param input
+  * @param nodeId
+  * @return the fraction to the node
+  */
+ public float raycastCallback(RayCastInput input, int nodeId);
 }

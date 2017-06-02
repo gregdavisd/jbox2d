@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.pooling;
 
 import java.io.Serializable;
@@ -37,26 +39,25 @@ import org.jbox2d.dynamics.contacts.Contact;
  */
 public interface IWorldPool extends Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	public IDynamicStack<Contact> getPolyContactStack();
+ public IDynamicStack<Contact> getPolyContactStack();
 
-	public IDynamicStack<Contact> getCircleContactStack();
+ public IDynamicStack<Contact> getCircleContactStack();
 
-	public IDynamicStack<Contact> getPolyCircleContactStack();
+ public IDynamicStack<Contact> getPolyCircleContactStack();
 
-	public IDynamicStack<Contact> getEdgeCircleContactStack();
+ public IDynamicStack<Contact> getEdgeCircleContactStack();
 
-	public IDynamicStack<Contact> getEdgePolyContactStack();
+ public IDynamicStack<Contact> getEdgePolyContactStack();
 
-	public IDynamicStack<Contact> getChainCircleContactStack();
+ public IDynamicStack<Contact> getChainCircleContactStack();
 
-	public IDynamicStack<Contact> getChainPolyContactStack();
+ public IDynamicStack<Contact> getChainPolyContactStack();
 
-	public Collision getCollision();
+ public Collision getCollision();
 
-	public TimeOfImpact getTimeOfImpact();
+ public TimeOfImpact getTimeOfImpact();
 
-	public Distance getDistance();
-
+ public Distance getDistance();
 }

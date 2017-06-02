@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics;
 
 //updated to rev 100
@@ -31,25 +33,20 @@ import java.io.Serializable;
  */
 public class TimeStep implements Serializable {
 
-	static final long serialVersionUID = 1L;
-	/**
-	 * time step
-	 */
-	public float dt;
-
-	/**
-	 * inverse time step (0 if dt == 0).
-	 */
-	public float inv_dt;
-
-	/**
-	 * dt * inv_dt0
-	 */
-	public float dtRatio;
-
-	public int velocityIterations;
-
-	public int positionIterations;
-
-	public boolean warmStarting;
+ static final long serialVersionUID = 1L;
+ /**
+  * time step
+  */
+ public float dt;
+ /**
+  * inverse time step (0 if dt == 0).
+  */
+ public float inv_dt;
+ /**
+  * dt * inv_dt0
+  */
+ public float dtRatio;
+ public int velocityIterations;
+ public int positionIterations;
+ public boolean warmStarting;
 }

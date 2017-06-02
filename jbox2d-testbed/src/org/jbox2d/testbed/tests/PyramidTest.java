@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 5:36:06 PM Jul 17, 2010
  */
@@ -39,56 +41,49 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class PyramidTest extends TestbedTest {
 
-	@Override
-	public boolean isSaveLoadEnabled() {
-		return true;
-	}
+ @Override
+ public boolean isSaveLoadEnabled() {
+  return true;
+ }
 
-	@Override
-	public void initTest(boolean deserialized) {
-		if (deserialized) {
-			return;
-		}
-		int count = 20;
-		{
-			BodyDef bd = new BodyDef();
-			Body ground = getWorld().createBody(bd);
+ @Override
+ public void initTest(boolean deserialized) {
+  if (deserialized) {
+   return;
+  }
+  int count = 20;
+  {
+   BodyDef bd = new BodyDef();
+   Body ground = getWorld().createBody(bd);
+   EdgeShape shape = new EdgeShape();
+   shape.set(new Vec2(-40.0f, 0f), new Vec2(40.0f, 0f));
+   ground.createFixture(shape, 0.0f);
+  }
+  {
+   float a = .5f;
+   PolygonShape shape = new PolygonShape();
+   shape.setAsBox(a, a);
+   Vec2 x = new Vec2(-7.0f, 0.75f);
+   Vec2 y = new Vec2();
+   Vec2 deltaX = new Vec2(0.5625f, 1.25f);
+   Vec2 deltaY = new Vec2(1.125f, 0.0f);
+   for (int i = 0; i < count; ++i) {
+    y.set(x);
+    for (int j = i; j < count; ++j) {
+     BodyDef bd = new BodyDef();
+     bd.type = BodyType.DYNAMIC;
+     bd.position.set(y);
+     Body body = getWorld().createBody(bd);
+     body.createFixture(shape, 5.0f);
+     y.add(deltaY);
+    }
+    x.add(deltaX);
+   }
+  }
+ }
 
-			EdgeShape shape = new EdgeShape();
-			shape.set(new Vec2(-40.0f, 0f), new Vec2(40.0f, 0f));
-			ground.createFixture(shape, 0.0f);
-
-		}
-
-		{
-			float a = .5f;
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(a, a);
-
-			Vec2 x = new Vec2(-7.0f, 0.75f);
-			Vec2 y = new Vec2();
-			Vec2 deltaX = new Vec2(0.5625f, 1.25f);
-			Vec2 deltaY = new Vec2(1.125f, 0.0f);
-
-			for (int i = 0; i < count; ++i) {
-				y.set(x);
-
-				for (int j = i; j < count; ++j) {
-					BodyDef bd = new BodyDef();
-					bd.type = BodyType.DYNAMIC;
-					bd.position.set(y);
-					Body body = getWorld().createBody(bd);
-					body.createFixture(shape, 5.0f);
-					y.add(deltaY);
-				}
-
-				x.add(deltaX);
-			}
-		}
-	}
-
-	@Override
-	public String getTestName() {
-		return "Pyramid";
-	}
+ @Override
+ public String getTestName() {
+  return "Pyramid";
+ }
 }

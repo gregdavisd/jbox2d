@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,26 +21,26 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.joints;
 
 import java.io.Serializable;
 
 public class JointType implements Serializable {
 
-	static final long serialVersionUID = 1L;
-
-	public static final byte UNKNOWN = 0;
-	public static final byte REVOLUTE = 1;
-	public static final byte PRISMATIC = 2;
-	public static final byte DISTANCE = 3;
-	public static final byte PULLEY = 4;
-	public static final byte MOUSE = 5;
-	public static final byte GEAR = 6;
-	public static final byte WHEEL = 7;
-	public static final byte WELD = 8;
-	public static final byte FRICTION = 9;
-	public static final byte ROPE = 10;
-	public static final byte CONSTANT_VOLUME = 11;
-	public static final byte MOTOR = 12;
+ static final long serialVersionUID = 1L;
+ public static final byte UNKNOWN = 0;
+ public static final byte REVOLUTE = 1;
+ public static final byte PRISMATIC = 2;
+ public static final byte DISTANCE = 3;
+ public static final byte PULLEY = 4;
+ public static final byte MOUSE = 5;
+ public static final byte GEAR = 6;
+ public static final byte WHEEL = 7;
+ public static final byte WELD = 8;
+ public static final byte FRICTION = 9;
+ public static final byte ROPE = 10;
+ public static final byte CONSTANT_VOLUME = 11;
+ public static final byte MOTOR = 12;
 }

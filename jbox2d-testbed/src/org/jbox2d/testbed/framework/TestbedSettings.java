@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 1:58:18 PM Jul 17, 2010
  */
@@ -31,7 +33,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
 
 /**
@@ -41,90 +42,88 @@ import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
  */
 public class TestbedSettings {
 
-	public static final String Hz = "Hz";
-	public static final String PositionIterations = "Pos Iters";
-	public static final String VelocityIterations = "Vel Iters";
-	public static final String AllowSleep = "Sleep";
-	public static final String WarmStarting = "Warm Starting";
-	public static final String SubStepping = "SubStepping";
-	public static final String ContinuousCollision = "Continuous Collision";
-	public static final String DrawShapes = "Shapes";
-	public static final String DrawJoints = "Joints";
-	public static final String DrawAABBs = "AABBs";
-	public static final String DrawContactPoints = "Contact Points";
-	public static final String DrawContactNormals = "Contact Normals";
-	public static final String DrawContactImpulses = "Contact Impulses";
-	public static final String DrawFrictionImpulses = "Friction Impulses";
-	public static final String DrawCOMs = "Center of Mass";
-	public static final String DrawStats = "Stats";
-	public static final String DrawHelp = "Help";
-	public static final String DrawTree = "Dynamic Tree";
-	public static final String DrawWireframe = "Wireframe Mode";
+ public static final String Hz = "Hz";
+ public static final String PositionIterations = "Pos Iters";
+ public static final String VelocityIterations = "Vel Iters";
+ public static final String AllowSleep = "Sleep";
+ public static final String WarmStarting = "Warm Starting";
+ public static final String SubStepping = "SubStepping";
+ public static final String ContinuousCollision = "Continuous Collision";
+ public static final String DrawShapes = "Shapes";
+ public static final String DrawJoints = "Joints";
+ public static final String DrawAABBs = "AABBs";
+ public static final String DrawContactPoints = "Contact Points";
+ public static final String DrawContactNormals = "Contact Normals";
+ public static final String DrawContactImpulses = "Contact Impulses";
+ public static final String DrawFrictionImpulses = "Friction Impulses";
+ public static final String DrawCOMs = "Center of Mass";
+ public static final String DrawStats = "Stats";
+ public static final String DrawHelp = "Help";
+ public static final String DrawTree = "Dynamic Tree";
+ public static final String DrawWireframe = "Wireframe Mode";
+ public boolean pause = false;
+ public boolean singleStep = false;
+ private List<TestbedSetting> settings;
+ private final Map<String, TestbedSetting> settingsMap;
 
-	public boolean pause = false;
-	public boolean singleStep = false;
+ public TestbedSettings() {
+  settings = new ArrayList<>();
+  settingsMap = new HashMap<>();
+  populateDefaultSettings();
+ }
 
-	private List<TestbedSetting> settings;
-	private final Map<String, TestbedSetting> settingsMap;
+ private void populateDefaultSettings() {
+  addSetting(new TestbedSetting(Hz, SettingType.ENGINE, 60, 1, 400));
+  addSetting(new TestbedSetting(PositionIterations, SettingType.ENGINE, 3, 0, 100));
+  addSetting(new TestbedSetting(VelocityIterations, SettingType.ENGINE, 8, 1, 100));
+  addSetting(new TestbedSetting(AllowSleep, SettingType.ENGINE, true));
+  addSetting(new TestbedSetting(WarmStarting, SettingType.ENGINE, true));
+  addSetting(new TestbedSetting(ContinuousCollision, SettingType.ENGINE, true));
+  addSetting(new TestbedSetting(SubStepping, SettingType.ENGINE, false));
+  addSetting(new TestbedSetting(DrawShapes, SettingType.DRAWING, true));
+  addSetting(new TestbedSetting(DrawJoints, SettingType.DRAWING, true));
+  addSetting(new TestbedSetting(DrawAABBs, SettingType.DRAWING, false));
+  addSetting(new TestbedSetting(DrawContactPoints, SettingType.DRAWING, false));
+  addSetting(new TestbedSetting(DrawContactNormals, SettingType.DRAWING, false));
+  addSetting(new TestbedSetting(DrawContactImpulses, SettingType.DRAWING, false));
+  addSetting(new TestbedSetting(DrawFrictionImpulses, SettingType.DRAWING, false));
+  addSetting(new TestbedSetting(DrawCOMs, SettingType.DRAWING, false));
+  addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, true));
+  addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, false));
+  addSetting(new TestbedSetting(DrawTree, SettingType.DRAWING, false));
+  addSetting(new TestbedSetting(DrawWireframe, SettingType.DRAWING, true));
+ }
 
-	public TestbedSettings() {
-		settings = new ArrayList<>();
-		settingsMap = new HashMap<>();
-		populateDefaultSettings();
-	}
+ /**
+  * Adds a settings to the settings list
+  *
+  * @param argSetting
+  */
+ public void addSetting(TestbedSetting argSetting) {
+  if (settingsMap.containsKey(argSetting.name)) {
+   throw new IllegalArgumentException("Settings already contain a setting with name: " +
+    argSetting.name);
+  }
+  settings.add(argSetting);
+  settingsMap.put(argSetting.name, argSetting);
+ }
 
-	private void populateDefaultSettings() {
-		addSetting(new TestbedSetting(Hz, SettingType.ENGINE, 60, 1, 400));
-		addSetting(new TestbedSetting(PositionIterations, SettingType.ENGINE, 3, 0, 100));
-		addSetting(new TestbedSetting(VelocityIterations, SettingType.ENGINE, 8, 1, 100));
-		addSetting(new TestbedSetting(AllowSleep, SettingType.ENGINE, true));
-		addSetting(new TestbedSetting(WarmStarting, SettingType.ENGINE, true));
-		addSetting(new TestbedSetting(ContinuousCollision, SettingType.ENGINE, true));
-		addSetting(new TestbedSetting(SubStepping, SettingType.ENGINE, false));
-		addSetting(new TestbedSetting(DrawShapes, SettingType.DRAWING, true));
-		addSetting(new TestbedSetting(DrawJoints, SettingType.DRAWING, true));
-		addSetting(new TestbedSetting(DrawAABBs, SettingType.DRAWING, false));
-		addSetting(new TestbedSetting(DrawContactPoints, SettingType.DRAWING, false));
-		addSetting(new TestbedSetting(DrawContactNormals, SettingType.DRAWING, false));
-		addSetting(new TestbedSetting(DrawContactImpulses, SettingType.DRAWING, false));
-		addSetting(new TestbedSetting(DrawFrictionImpulses, SettingType.DRAWING, false));
-		addSetting(new TestbedSetting(DrawCOMs, SettingType.DRAWING, false));
-		addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, true));
-		addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, false));
-		addSetting(new TestbedSetting(DrawTree, SettingType.DRAWING, false));
-		addSetting(new TestbedSetting(DrawWireframe, SettingType.DRAWING, true));
-	}
+ /**
+  * Returns an unmodifiable list of settings
+  *
+  * @return
+  */
+ public List<TestbedSetting> getSettings() {
+  return Collections.unmodifiableList(settings);
+ }
 
-	/**
-	 * Adds a settings to the settings list
-	 *
-	 * @param argSetting
-	 */
-	public void addSetting(TestbedSetting argSetting) {
-		if (settingsMap.containsKey(argSetting.name)) {
-			throw new IllegalArgumentException("Settings already contain a setting with name: "
-				+ argSetting.name);
-		}
-		settings.add(argSetting);
-		settingsMap.put(argSetting.name, argSetting);
-	}
-
-	/**
-	 * Returns an unmodifiable list of settings
-	 *
-	 * @return
-	 */
-	public List<TestbedSetting> getSettings() {
-		return Collections.unmodifiableList(settings);
-	}
-
-	/**
-	 * Gets a setting by name.
-	 *
-	 * @param argName
-	 * @return
-	 */
-	public TestbedSetting getSetting(String argName) {
-		return settingsMap.get(argName);
-	}
+ /**
+  * Gets a setting by name.
+  *
+  * @param argName
+  * @return
+  */
+ public TestbedSetting getSetting(String argName) {
+  return settingsMap.get(argName);
+ }
 }

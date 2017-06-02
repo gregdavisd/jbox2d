@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.testbed.framework;
 
 /**
@@ -30,44 +32,44 @@ package org.jbox2d.testbed.framework;
  */
 public class TestbedSetting {
 
-	/**
-	 * Whether the setting effects the engine's behavior or modifies drawing.
-	 *
-	 */
-	public static enum SettingType {
-		DRAWING, ENGINE
-	}
+ /**
+  * Whether the setting effects the engine's behavior or modifies drawing.
+  *
+  */
+ public static enum SettingType {
+  DRAWING, ENGINE
+ }
 
-	/**
-	 * The type of value this setting pertains to
-	 */
-	public static enum ConstraintType {
-		BOOLEAN, RANGE
-	}
+ /**
+  * The type of value this setting pertains to
+  */
+ public static enum ConstraintType {
+  BOOLEAN, RANGE
+ }
+ public final String name;
+ public final SettingType settingsType;
+ public final ConstraintType constraintType;
+ public boolean enabled;
+ public int value;
+ public final int min;
+ public final int max;
 
-	public final String name;
-	public final SettingType settingsType;
-	public final ConstraintType constraintType;
-	public boolean enabled;
-	public int value;
-	public final int min;
-	public final int max;
+ public TestbedSetting(String argName, SettingType argType, boolean argValue) {
+  name = argName;
+  settingsType = argType;
+  enabled = argValue;
+  constraintType = ConstraintType.BOOLEAN;
+  min = max = value = 0;
+ }
 
-	public TestbedSetting(String argName, SettingType argType, boolean argValue) {
-		name = argName;
-		settingsType = argType;
-		enabled = argValue;
-		constraintType = ConstraintType.BOOLEAN;
-		min = max = value = 0;
-	}
-
-	public TestbedSetting(String argName, SettingType argType, int argValue, int argMinimum, int argMaximum) {
-		name = argName;
-		settingsType = argType;
-		value = argValue;
-		min = argMinimum;
-		max = argMaximum;
-		constraintType = ConstraintType.RANGE;
-		enabled = false;
-	}
+ public TestbedSetting(String argName, SettingType argType, int argValue, int argMinimum,
+  int argMaximum) {
+  name = argName;
+  settingsType = argType;
+  value = argValue;
+  min = argMinimum;
+  max = argMaximum;
+  constraintType = ConstraintType.RANGE;
+  enabled = false;
+ }
 }

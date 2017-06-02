@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.contacts;
 
 import java.io.Serializable;
@@ -29,24 +31,23 @@ import org.jbox2d.common.Vec2;
 
 public class ContactPositionConstraint implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ Vec2[] localPoints = new Vec2[Settings.maxManifoldPoints];
+ final Vec2 localNormal = new Vec2();
+ final Vec2 localPoint = new Vec2();
+ int indexA;
+ int indexB;
+ float invMassA, invMassB;
+ final Vec2 localCenterA = new Vec2();
+ final Vec2 localCenterB = new Vec2();
+ float invIA, invIB;
+ byte type;
+ float radiusA, radiusB;
+ int pointCount;
 
-	Vec2[] localPoints = new Vec2[Settings.maxManifoldPoints];
-	final Vec2 localNormal = new Vec2();
-	final Vec2 localPoint = new Vec2();
-	int indexA;
-	int indexB;
-	float invMassA, invMassB;
-	final Vec2 localCenterA = new Vec2();
-	final Vec2 localCenterB = new Vec2();
-	float invIA, invIB;
-	byte type;
-	float radiusA, radiusB;
-	int pointCount;
-
-	public ContactPositionConstraint() {
-		for (int i = 0; i < localPoints.length; i++) {
-			localPoints[i] = new Vec2();
-		}
-	}
+ public ContactPositionConstraint() {
+  for (int i = 0; i < localPoints.length; i++) {
+   localPoints[i] = new Vec2();
+  }
+ }
 }

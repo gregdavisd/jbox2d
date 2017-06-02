@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 4:23:30 AM Jul 15, 2010
  */
@@ -31,26 +33,27 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.joints.Joint;
 
 /**
- * Joints and fixtures are destroyed when their associated body is destroyed. Implement this listener so that you may nullify
- * references to these joints and shapes.
+ * Joints and fixtures are destroyed when their associated body is destroyed. Implement this
+ * listener so that you may nullify references to these joints and shapes.
  *
  * @author Daniel Murphy
  */
 public interface DestructionListener extends Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	/**
-	 * Called when any joint is about to be destroyed due to the destruction of one of its attached bodies.
-	 *
-	 * @param joint
-	 */
-	void sayGoodbye(Joint joint);
+ /**
+  * Called when any joint is about to be destroyed due to the destruction of one of its attached
+  * bodies.
+  *
+  * @param joint
+  */
+ void sayGoodbye(Joint joint);
 
-	/**
-	 * Called when any fixture is about to be destroyed due to the destruction of its parent body.
-	 *
-	 * @param fixture
-	 */
-	void sayGoodbye(Fixture fixture);
+ /**
+  * Called when any fixture is about to be destroyed due to the destruction of its parent body.
+  *
+  * @param fixture
+  */
+ void sayGoodbye(Fixture fixture);
 }

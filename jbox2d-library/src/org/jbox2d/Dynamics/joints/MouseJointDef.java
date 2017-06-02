@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.joints;
 
 import java.io.Serializable;
@@ -33,34 +35,30 @@ import org.jbox2d.common.Vec2;
  */
 public class MouseJointDef extends JointDef implements Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
+ /**
+  * The initial world target point. This is assumed to coincide with the body anchor initially.
+  */
+ public final Vec2 target = new Vec2();
+ /**
+  * The maximum constraint force that can be exerted to move the candidate body. Usually you will
+  * express as some multiple of the weight (multiplier * mass * gravity).
+  */
+ public float maxForce;
+ /**
+  * The response speed.
+  */
+ public float frequencyHz;
+ /**
+  * The damping ratio. 0 = no damping, 1 = critical damping.
+  */
+ public float dampingRatio;
 
-	/**
-	 * The initial world target point. This is assumed to coincide with the body anchor initially.
-	 */
-	public final Vec2 target = new Vec2();
-
-	/**
-	 * The maximum constraint force that can be exerted to move the candidate body. Usually you will express as some multiple of the
-	 * weight (multiplier * mass * gravity).
-	 */
-	public float maxForce;
-
-	/**
-	 * The response speed.
-	 */
-	public float frequencyHz;
-
-	/**
-	 * The damping ratio. 0 = no damping, 1 = critical damping.
-	 */
-	public float dampingRatio;
-
-	public MouseJointDef() {
-		super(JointType.MOUSE);
-		target.set(0, 0);
-		maxForce = 0;
-		frequencyHz = 5;
-		dampingRatio = .7f;
-	}
+ public MouseJointDef() {
+  super(JointType.MOUSE);
+  target.set(0, 0);
+  maxForce = 0;
+  frequencyHz = 5;
+  dampingRatio = .7f;
+ }
 }

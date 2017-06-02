@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.pooling;
 
 import java.io.Serializable;
@@ -34,20 +36,19 @@ import java.io.Serializable;
  */
 public interface IDynamicStack<E> extends Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	/**
-	 * Pops an item off the stack
-	 *
-	 * @return
-	 */
-	public E pop();
+ /**
+  * Pops an item off the stack
+  *
+  * @return
+  */
+ public E pop();
 
-	/**
-	 * Pushes an item back on the stack
-	 *
-	 * @param argObject
-	 */
-	public void push(E argObject);
-
+ /**
+  * Pushes an item back on the stack
+  *
+  * @param argObject
+  */
+ public void push(E argObject);
 }

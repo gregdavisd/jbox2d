@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 package org.jbox2d.dynamics.contacts;
 
 import java.io.Serializable;
@@ -30,9 +32,9 @@ import org.jbox2d.pooling.IWorldPool;
 // updated to rev 100
 public interface ContactCreator extends Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	public Contact contactCreateFcn(IWorldPool argPool, Fixture fixtureA, Fixture fixtureB);
+ public Contact contactCreateFcn(IWorldPool argPool, Fixture fixtureA, Fixture fixtureB);
 
-	public void contactDestroyFcn(IWorldPool argPool, Contact contact);
+ public void contactDestroyFcn(IWorldPool argPool, Contact contact);
 }

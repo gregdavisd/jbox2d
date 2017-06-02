@@ -1,4 +1,5 @@
-/** *****************************************************************************
+/**
+ * *****************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  *
@@ -20,7 +21,8 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- ***************************************************************************** */
+ *****************************************************************************
+ */
 /**
  * Created at 4:30:03 AM Jul 15, 2010
  */
@@ -30,19 +32,20 @@ import java.io.Serializable;
 import org.jbox2d.dynamics.Fixture;
 
 /**
- * Callback class for AABB queries. See {@link World#queryAABB(QueryCallback, org.jbox2d.collision.AABB)}.
+ * Callback class for AABB queries. See
+ * {@link World#queryAABB(QueryCallback, org.jbox2d.collision.AABB)}.
  *
  * @author Daniel Murphy
  */
 public interface QueryCallback extends Serializable {
 
-	static final long serialVersionUID = 1L;
+ static final long serialVersionUID = 1L;
 
-	/**
-	 * Called for each fixture found in the query AABB.
-	 *
-	 * @param fixture
-	 * @return false to terminate the query.
-	 */
-	public boolean reportFixture(Fixture fixture);
+ /**
+  * Called for each fixture found in the query AABB.
+  *
+  * @param fixture
+  * @return false to terminate the query.
+  */
+ public boolean reportFixture(Fixture fixture);
 }
